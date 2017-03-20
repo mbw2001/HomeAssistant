@@ -1,0 +1,11 @@
+deps/*
+tts/*
+*.conf
+*.log
+*.db
+*.db-journal
+*.sqlite
+secrets.yaml
+known_devices.yaml
+.*
+!/.gitignore

@@ -1,0 +1,14 @@
+  turn_off_stue:
+    sequence:
+      - service: media_player.media_stop
+        data:
+          entity_id: media_player.kodi_stue
+      - service: remote.turn_off
+        data:
+          entity_id: remote.harmonystue
+  toggle_mute_stue:
+    sequence:
+      service: media_player.volume_mute
+      data_template:
+        entity_id: media_player.denonamp
+        is_volume_muted: '{{ not states.media_player.denonamp.attributes.is_volume_muted }}'

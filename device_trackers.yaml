@@ -1,0 +1,5 @@
+  - platform: nmap_tracker
+    hosts: 10.0.1.1/24
+    home_interval: 5
+  - platform: owntracks
+    max_gps_accuracy: 200

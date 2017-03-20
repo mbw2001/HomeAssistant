@@ -1,0 +1,61 @@
+  - platform: denonavr
+    name: DenonAmp
+    host: 10.0.1.80
+  - platform: cast
+  - platform: kodi
+    name: Kodi Stue
+    host: 10.0.1.10
+    username: !secret kodi_username
+    password: !secret kodi_password
+  - platform: kodi
+    name: Kodi Seng
+    host: 10.0.1.11
+    username: !secret kodi_username
+    password: !secret kodi_password
+  - platform: universal
+    name: Media Stue
+    children:
+      - media_player.kodi_stue
+      - media_player.chromestue
+    commands:
+      turn_on:
+        service: remote.turn_on
+        data_template:
+          entity_id: remote.harmonystue
+          activity: Kodi
+      turn_off:
+        service: script.turn_off_stue
+      volume_up:
+        service: media_player.volume_up
+        data:
+          entity_id: media_player.denonamp
+      volume_down:
+        service: media_player.volume_down
+        data:
+          entity_id: media_player.denonamp
+      volume_mute:
+        service: media_player.volume_mute
+        data_template:
+          entity_id: media_player.denonamp
+          is_volume_muted: '{{ is_volume_muted }}'
+      select_source:
+        service: media_player.select_source
+        data_template:
+          entity_id: media_player.denonamp
+          source: '{{ source }}'
+      volume_set:
+        service: media_player.volume_set
+        data_template:
+          entity_id: media_player.denonamp
+          volume_level: '{{ volume_level }}'
+    attributes:
+      state: remote.harmonystue
+      is_volume_muted: media_player.denonamp|is_volume_muted
+      volume_level: media_player.denonamp|volume_level
+      source: media_player.denonamp|source
+      source_list: media_player.denonamp|source_list
+  - platform: universal
+    name: Media Seng
+    children:
+      - media_player.kodi_seng
+      - media_player.chromeseng

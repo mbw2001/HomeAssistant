@@ -1,0 +1,102 @@
+  default_view:
+    icon: mdi:home
+    entities:
+      - group.weather
+      - group.all_devices
+      - group.status
+      - scene.stue_bright
+      - scene.stue_dimmed
+      - light.stue
+      - light.sovevrelse
+      - light.gang
+      - light.hue_go
+  livingroom:
+    name: Stue
+    icon: mdi:sofa
+    view: yes
+    entities:
+      - media_player.media_stue
+      - light.tv_lamper
+      - light.spisebord
+      - climate.stue
+  weather:
+    name: Weather
+    entities:
+      - sun.sun
+      - sensor.yr_temperature
+      - sensor.yr_cloudiness
+      - sensor.yr_humidity
+      - sensor.yr_precipitation
+      - sensor.yr_wind_speed
+      - sensor.yr_wind_direction
+  bedroom:
+    name: Soveværelse
+    icon: mdi:hotel
+    view: yes
+    entities:
+      - media_player.media_seng
+      - light.sengegavl
+      - climate.sovevrelse
+  office:
+    name: kontor
+    icon: mdi:laptop
+    view: yes
+    entities:
+      - climate.kontor
+      - switch.office_pc
+  hallway:
+    name: Gang
+    icon: mdi:glassdoor
+    view: yes
+    entities:
+      - light.standerlampe_gang
+  kitchen:
+    name: Køkken
+    icon: mdi:food
+    view: no
+    entities:
+      - light.kkken
+  status:
+    name: Status
+    icon: mdi:view-dashboard
+    view: yes
+    entities:
+      - group.system
+      - group.speedtest
+      - group.sabnzbd
+      - group.transmission
+  system:
+    name: System
+    entities:
+      - sensor.cpu_use
+      - sensor.ram_use
+      - sensor.swap_use
+      - sensor.disk_use_
+      - sensor.disk_use_home
+  speedtest:
+    name: Speedtest
+    entities:
+      - sensor.speedtest_download
+      - sensor.speedtest_upload
+      - sensor.speedtest_ping
+  sabnzbd:
+    name: SabNzbd
+    entities:
+      - sensor.sabnzbd_status
+      - sensor.sabnzbd_speed
+      - sensor.sabnzbd_queue
+      - sensor.sabnzbd_left
+      - sensor.sabnzbd_disk
+      - sensor.sabnzbd_disk_free
+  transmission:
+    name: Transmission
+    entities:
+      - sensor.transmission_status
+      - sensor.transmission_down_speed
+      - sensor.transmission_up_speed
+  config:
+    name: Config
+    view: yes
+    icon: mdi:settings
+    entities:
+      - group.all_automations

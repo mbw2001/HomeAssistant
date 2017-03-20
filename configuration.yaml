@@ -1,0 +1,96 @@
+homeassistant:
+  name: Home
+  latitude: !secret home_lattitude
+  longitude: !secret home_longtitude
+  elevation: !secret home_elevation
+  unit_system: metric
+  time_zone: !secret home_timezone
+  customize: !include customize.yaml
+
+zone :
+  name: Home
+  latitude: !secret home_lattitude
+  longitude: !secret home_longtitude
+  radius: 40
+
+zone 1:
+  name: !secret zone1_name
+  latitude: !secret zone1_lattitude
+  longitude: !secret zone1_longtitude
+  radius: 50
+
+zone 2:
+  name: !secret zone2_name
+  latitude: !secret zone2_lattitude
+  longitude: !secret zone2_longtitude
+  radius: 100
+
+zone 3:
+  name: !secret zone3_name
+  latitude: !secret zone3_lattitude
+  longitude: !secret zone3_longtitude
+  radius: 100
+
+frontend:
+
+config:
+
+http:
+  api_password: !secret api_password
+  base_url: !secret base_url
+
+# Checks for available updates
+updater:
+
+# Discover some devices automatically
+discovery:
+
+# Allows you to issue voice commands from the frontend in enabled browsers
+#conversation:
+
+logger:
+  default: warning
+  logs:
+    DenonAVR: critical
+
+recorder:
+  purge_days: 7
+  db_url: !secret db_url
+
+# Enables support for tracking state changes over time.
+history:
+
+# View all events in a logbook
+logbook:
+
+# Track the sun
+sun:
+
+notify:
+  platform: html5
+  name: html5-notify
+  gcm_api_key: !secret gcm_api_key
+  gcm_sender_id: !secret gcm_sender_id
+mqtt:
+  broker: !secret mqtt_broker
+  port: !secret mqtt_port
+  username: !secret mqtt_username
+  password: !secret mqtt_password
+ifttt:
+  key: !secret ifttt_key
+light:
+  platform: hue
+tado_v1:
+    mytado_username: !secret mytado_username
+    mytado_password: !secret mytado_password
+
+input_slider: !include input_sliders.yaml
+device_tracker: !include device_trackers.yaml
+media_player: !include media_players.yaml
+sensor: !include sensors.yaml
+remote: !include remotes.yaml
+group: !include groups.yaml
+scene: !include scenes.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+switch: !include switches.yaml

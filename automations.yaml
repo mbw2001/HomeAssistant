@@ -1,0 +1,81 @@
+  # Send notification when there is an update available
+  - alias: "Update Notifications"
+    trigger:
+      - platform: state
+        entity_id: updater.updater
+    action:
+      service: notify.html5notify_galaxys7
+      data:
+        title: 'New Home Assistant Release'
+        message: 'Home Assistant {{ states.updater.updater.state }} is now available.'
+
+  # Turn on lights when media player is idle
+  - alias: "Media Stue Idle"
+    initial_state: 'off'
+    trigger:
+      platform: state
+      entity_id: media_player.media_stue
+      from: 'playing'
+    condition:
+      condition: state
+      entity_id: sun.sun
+      state: 'below_horizon'
+    action:
+      service: scene.turn_on
+      entity_id: scene.stue_bright
+
+  # Dim lights when media player starts playing
+  - alias: "Media Stue Playing"
+    initial_state: 'off'
+    trigger:
+      platform: state
+      entity_id: media_player.media_stue
+      to: 'playing'
+    condition:
+      condition: state
+      entity_id: sun.sun
+      state: 'below_horizon'
+    action:
+      service: scene.turn_on
+      entity_id: scene.stue_dimmed
+
+  # Switch to Harmony activity Chromecast when Chromecast switches from off to idle
+  - alias: "Kodi Stue Activated"
+    trigger:
+      platform: state
+      entity_id: media_player.kodi_stue
+      from: 'idle'
+      #to: 'playing'
+    action:
+      service: remote.turn_on
+      data_template:
+        entity_id: remote.harmonystue
+        activity: 'Kodi'
+
+  # Switch to Harmony activity Chromecast when Chromecast switches from off to idle
+  - alias: "Chromecast Stue Activated"
+    trigger:
+      platform: state
+      entity_id: media_player.chromestue
+      from: 'off'
+      #to: 'idle'
+    action:
+      service: remote.turn_on
+      data_template:
+        entity_id: remote.harmonystue
+        activity: 'Chromecast'
+
+  # Switch Harmony to off when chromecast turns off
+  - alias: "Chromecast Stue Deactivated"
+    trigger:
+      platform: state
+      entity_id: media_player.chromestue
+      to: 'off'
+    condition:
+      condition: state
+      entity_id: sensor.harmonystue
+      state: 'Chromecast'
+    action:
+      service: remote.turn_off
+      data_template:
+        entity_id: remote.harmonystue

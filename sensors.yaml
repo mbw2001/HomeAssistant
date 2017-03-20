@@ -1,0 +1,51 @@
+  - platform: yr
+    monitored_conditions:
+      - temperature
+      - symbol
+      - precipitation
+      - windSpeed
+      - pressure
+      - windDirection
+      - humidity
+      - fog
+      - cloudiness
+      - lowClouds
+      - mediumClouds
+      - highClouds
+      - dewpointTemperature
+  - platform: sabnzbd
+    host: 127.0.0.1
+    port: 8888
+    api_key: !secret sabnzbd_apikey
+    monitored_variables:
+      - current_status
+      - speed
+      - queue_size
+      - queue_remaining
+  - platform: transmission
+    host: 127.0.0.1
+    port: 9091
+    username: !secret transmission_username
+    password: !secret transmission_password
+    monitored_variables:
+      - current_status
+      - download_speed
+      - upload_speed
+  - platform: speedtest
+    monitored_conditions:
+      - ping
+      - download
+      - upload
+  - platform: systemmonitor
+    resources:
+      - type: processor_use
+      - type: memory_use_percent
+      - type: swap_use_percent
+      - type: disk_use_percent
+        arg: /
+      - type: disk_use_percent
+        arg: /home
+  - platform: template
+    sensors:
+      harmonystue:
+        value_template: '{{ states.remote.harmonystue.attributes.current_activity }}'
