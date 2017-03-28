@@ -80,9 +80,9 @@ ifttt:
   key: !secret ifttt_key
 light:
   platform: hue
-tado_v1:
-    mytado_username: !secret mytado_username
-    mytado_password: !secret mytado_password
+tado:
+    username: !secret tado_username
+    password: !secret tado_password
 
 input_slider: !include input_sliders.yaml
 device_tracker: !include device_trackers.yaml
