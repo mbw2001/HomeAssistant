@@ -48,7 +48,12 @@
   - platform: template
     sensors:
       harmonystue:
-        value_template: '{{ states.remote.harmonystue.attributes.current_activity }}'
+        value_template: >
+          {% if is_state('remote.harmonystue', 'off')  %}
+            off
+          {% else %}
+            {{ states.remote.harmonystue.attributes.current_activity }}
+          {% endif %}
       denon_volume:
         value_template: >
           {% if is_state('media_player.denonamp', 'on')  %}

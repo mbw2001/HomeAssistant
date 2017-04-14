@@ -49,7 +49,7 @@
           entity_id: media_player.denonamp
           volume_level: '{{ volume_level }}'
     attributes:
-      state: remote.harmonystue
+      state: sensor.harmonystue
       is_volume_muted: media_player.denonamp|is_volume_muted
       volume_level: media_player.denonamp|volume_level
       source: media_player.denonamp|source

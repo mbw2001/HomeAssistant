@@ -1,21 +1,28 @@
   - name: Stue Bright
     entities:
-        light.tv_lamper:
-            state: on
-            transition: 2
-            brightness: 150
-            xy_color: [ 0.4448, 0.4066 ]
-        light.Spisebord:
-            state: on
-            transition: 2
-            brightness: 215
-            xy_color: [ 0.4448, 0.4066 ]
+      light.tv_lamper:
+        state: on
+        transition: 2
+        brightness: 150
+        xy_color: [0.4448, 0.4066]
+      light.spisebord:
+        state: on
+        transition: 2
+        brightness: 215
+        xy_color: [0.4448, 0.4066]
+      light.hue_go:
+        state: on
+        transition: 2
+        brightness: 215
+        xy_color: [0.4448, 0.4066]
   - name: Stue Dimmed
     entities:
-        light.tv_lamper:
-            state: on
-            transition: 2
-            brightness: 10
-            xy_color: [ 0.5926, 0.3814 ]
-        light.Spisebord:
-            state: off
+      light.tv_lamper:
+        state: on
+        transition: 2
+        brightness: 10
+        xy_color: [0.5926, 0.3814]
+      light.spisebord:
+        state: off
+      light.hue_go:
+        state: off
