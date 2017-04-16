@@ -45,6 +45,8 @@
         arg: /
       - type: disk_use_percent
         arg: /home
+      - type: disk_use_percent
+        arg: /storage
   - platform: template
     sensors:
       harmonystue:

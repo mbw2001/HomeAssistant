@@ -43,6 +43,7 @@
     icon: mdi:laptop
     view: yes
     entities:
+      - media_player.kodi_office
       - climate.kontor
       - switch.office_pc
   hallway:
@@ -66,6 +67,7 @@
       - group.speedtest
       - group.sabnzbd
       - group.transmission
+      - group.all_automations
   system:
     name: System
     entities:
@@ -74,6 +76,7 @@
       - sensor.swap_use
       - sensor.disk_use_
       - sensor.disk_use_home
+      - sensor.disk_use_storage
   speedtest:
     name: Speedtest
     entities:
@@ -95,9 +98,3 @@
       - sensor.transmission_status
       - sensor.transmission_down_speed
       - sensor.transmission_up_speed
-  config:
-    name: Config
-    view: yes
-    icon: mdi:settings
-    entities:
-      - group.all_automations

@@ -1,0 +1,16 @@
+  - name: Home
+    latitude: !secret home_lattitude
+    longitude: !secret home_longtitude
+    radius: 40
+  - name: !secret zone1_name
+    latitude: !secret zone1_lattitude
+    longitude: !secret zone1_longtitude
+    radius: 50
+  - name: !secret zone2_name
+    latitude: !secret zone2_lattitude
+    longitude: !secret zone2_longtitude
+    radius: 100
+  - name: !secret zone3_name
+    latitude: !secret zone3_lattitude
+    longitude: !secret zone3_longtitude
+    radius: 100

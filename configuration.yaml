@@ -7,30 +7,6 @@ homeassistant:
   time_zone: !secret home_timezone
   customize: !include customize.yaml
 
-zone :
-  name: Home
-  latitude: !secret home_lattitude
-  longitude: !secret home_longtitude
-  radius: 40
-
-zone 1:
-  name: !secret zone1_name
-  latitude: !secret zone1_lattitude
-  longitude: !secret zone1_longtitude
-  radius: 50
-
-zone 2:
-  name: !secret zone2_name
-  latitude: !secret zone2_lattitude
-  longitude: !secret zone2_longtitude
-  radius: 100
-
-zone 3:
-  name: !secret zone3_name
-  latitude: !secret zone3_lattitude
-  longitude: !secret zone3_longtitude
-  radius: 100
-
 frontend:
 
 config:
@@ -43,7 +19,8 @@ http:
 updater:
 
 # Discover some devices automatically
-discovery:
+# discovery:
+#  ignore: plex_mediaserver
 
 # Allows you to issue voice commands from the frontend in enabled browsers
 #conversation:
@@ -81,9 +58,10 @@ ifttt:
 light:
   platform: hue
 tado:
-    username: !secret tado_username
-    password: !secret tado_password
+  username: !secret tado_username
+  password: !secret tado_password
 
+zone: !include zones.yaml
 input_slider: !include input_sliders.yaml
 device_tracker: !include device_trackers.yaml
 media_player: !include media_players.yaml

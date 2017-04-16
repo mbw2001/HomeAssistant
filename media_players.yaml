@@ -12,6 +12,11 @@
     host: 10.0.1.11
     username: !secret kodi_username
     password: !secret kodi_password
+  - platform: kodi
+    name: Kodi Office
+    host: 10.0.1.15
+    username: !secret kodi_username
+    password: !secret kodi_password
   - platform: universal
     name: Media Stue
     children:
