@@ -49,6 +49,15 @@
         arg: /storage
   - platform: template
     sensors:
+      media_stue:
+        value_template: >
+          {% if is_state('media_player.media_stue', 'off')  %}
+            off
+          {% elif states.media_player.media_stue.attributes.media_content_type %}
+            {{ states.media_player.media_stue.attributes.media_content_type }}
+          {% else %}
+            channel
+          {% endif %}
       harmonystue:
         value_template: >
           {% if is_state('remote.harmonystue', 'off')  %}
@@ -58,7 +67,7 @@
           {% endif %}
       denon_volume:
         value_template: >
-          {% if is_state('media_player.denonamp', 'on')  %}
+          {% if states.media_player.denonamp.attributes.volume_level %}
             {{ (states.media_player.denonamp.attributes.volume_level * 100 - 80) | round(2) }}
           {% else %}
             0.0

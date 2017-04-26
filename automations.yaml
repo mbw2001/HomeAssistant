@@ -10,7 +10,7 @@
         message: 'Home Assistant {{ states.updater.updater.state }} is now available'
 
   # Turn on lights when media player is idle
-  - alias: Media Stue Idle
+  - alias: "Stue: Bright Light when Idle"
     trigger:
       - platform: state
         entity_id: media_player.media_stue
@@ -19,7 +19,7 @@
       - platform: state
         entity_id: media_player.media_stue
         from: 'playing'
-        to: 'idle'
+        to: 'off'
     condition:
       condition: state
       entity_id: sun.sun
@@ -28,53 +28,66 @@
       service: script.stue_bright_mode
 
   # Dim lights when media player starts playing
-  - alias: Media Stue Playing
+  - alias: "Stue: Movie Lighting when Playing"
     trigger:
-      platform: state
-      entity_id: media_player.media_stue
-      to: 'playing'
+      - platform: state
+        entity_id: media_player.media_stue
+        from: 'off'
+        to: 'playing'
+      - platform: state
+        entity_id: media_player.media_stue
+        from: 'paused'
+        to: 'playing'
     condition:
-      condition: state
-      entity_id: sun.sun
-      state: 'below_horizon'
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: sun.sun
+          state: 'below_horizon'
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: sensor.media_stue
+              state: 'movie'
+            - condition: state
+              entity_id: sensor.media_stue
+              state: 'tvshow'
     action:
       service: script.stue_movie_mode
 
   # Switch to Harmony activity Kodi when Kodi Stue switches from off to idle
-  - alias: Kodi Stue Activated
+  - alias: "Stue: Switch to Kodi"
     trigger:
       platform: state
       entity_id: media_player.kodi_stue
       from: 'idle'
     action:
       service: remote.turn_on
-      data_template:
+      data:
         entity_id: remote.harmonystue
         activity: 'Kodi'
 
   # Switch to Harmony activity Chromecast when Chromecast switches from off to idle
-  - alias: "Chromecast Stue Activated"
+  - alias: "Stue: Switch to Chromecast"
     trigger:
       platform: state
       entity_id: media_player.chromestue
       from: 'off'
     action:
       service: remote.turn_on
-      data_template:
+      data:
         entity_id: remote.harmonystue
         activity: 'Chromecast'
 
   # Switch Harmony to off when chromecast turns off
-  - alias: Chromecast Stue Deactivated
+  - alias: "Stue: PowerOff when Idle"
     trigger:
       platform: state
-      entity_id: media_player.chromestue
+      entity_id: media_player.media_stue
       to: 'off'
-    condition:
-      condition: state
-      entity_id: sensor.harmonystue
-      state: 'Chromecast'
+      for:
+        minutes: 5
     action:
       service: remote.turn_off
-      data_template:
+      data:
         entity_id: remote.harmonystue
