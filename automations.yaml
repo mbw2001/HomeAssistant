@@ -25,8 +25,7 @@
       entity_id: sun.sun
       state: 'below_horizon'
     action:
-      service: scene.turn_on
-      entity_id: scene.stue_bright
+      service: script.stue_bright_mode
 
   # Dim lights when media player starts playing
   - alias: Media Stue Playing
@@ -39,8 +38,7 @@
       entity_id: sun.sun
       state: 'below_horizon'
     action:
-      service: scene.turn_on
-      entity_id: scene.stue_dimmed
+      service: script.stue_movie_mode
 
   # Switch to Harmony activity Kodi when Kodi Stue switches from off to idle
   - alias: Kodi Stue Activated

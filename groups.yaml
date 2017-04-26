@@ -5,8 +5,8 @@
       - group.weather
       - group.all_devices
       - group.status
-      - scene.stue_bright
-      - scene.stue_dimmed
+      - script.stue_bright_mode
+      - script.stue_movie_mode
       - light.stue
       - light.sovevrelse
       - light.gang
@@ -49,7 +49,7 @@
   hallway:
     name: Gang
     icon: mdi:glassdoor
-    view: yes
+    #view: yes
     entities:
       - light.standerlampe_gang
   kitchen:
@@ -84,7 +84,7 @@
       - sensor.speedtest_upload
       - sensor.speedtest_ping
   sabnzbd:
-    name: SabNzbd
+    name: SABnzbd
     entities:
       - sensor.sabnzbd_status
       - sensor.sabnzbd_speed

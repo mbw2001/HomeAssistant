@@ -6,6 +6,21 @@
       - service: remote.turn_off
         data:
           entity_id: remote.harmonystue
+  stue_bright_mode:
+    sequence:
+      - service: light.hue_activate_scene
+        data:
+          group_name: Stue
+          scene_name: Bright
+  stue_movie_mode:
+    sequence:
+      - service: light.hue_activate_scene
+        data:
+          group_name: Stue
+          scene_name: Movie
+      - service: light.turn_off
+        data:
+          entity_id: light.standerlampe_gang
   toggle_mute_stue:
     sequence:
       service: media_player.volume_mute
