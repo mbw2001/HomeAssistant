@@ -10,7 +10,6 @@
       - light.stue
       - light.sovevrelse
       - light.gang
-      - media_player.spotify
   livingroom:
     name: Stue
     icon: mdi:sofa
@@ -37,7 +36,9 @@
     view: yes
     entities:
       - media_player.media_seng
-      - light.sengegavl
+      - light.sovevrelse_tv
+      - light.sovevrelse_camilla
+      - light.sovevrelse_michael
       - climate.sovevrelse
   office:
     name: kontor

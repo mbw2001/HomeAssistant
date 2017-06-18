@@ -21,12 +21,13 @@ http:
 updater:
 
 # Discover some devices automatically
-# discovery:
-#  ignore: plex_mediaserver
+discovery:
+  ignore: plex_mediaserver
 
 # Allows you to issue voice commands from the frontend in enabled browsers
 #conversation:
 
+# Log Severities: notset, debug, info, warn, warning, error, fatal, critical
 logger:
   default: warning
   logs:
@@ -64,7 +65,6 @@ tado:
   password: !secret tado_password
 
 zone: !include zones.yaml
-input_slider: !include input_sliders.yaml
 device_tracker: !include device_trackers.yaml
 media_player: !include media_players.yaml
 sensor: !include sensors.yaml

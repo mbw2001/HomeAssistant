@@ -1,6 +1,0 @@
-  denon_volume:
-    name: Denon Volume
-    icon: mdi:volume-high
-    min: 0
-    max: 1
-    step: 0.005

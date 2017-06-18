@@ -2,9 +2,9 @@
     name: DenonAmp
     host: 10.0.1.80
   - platform: cast
-#  - platform: spotify
-#    client_id: !secret spotify_client_id
-#    client_secret: !secret spotify_client_secret
+  - platform: spotify
+    client_id: !secret spotify_client_id
+    client_secret: !secret spotify_client_secret
   - platform: kodi
     name: Kodi Stue
     host: 10.0.1.10
@@ -13,11 +13,6 @@
   - platform: kodi
     name: Kodi Seng
     host: 10.0.1.11
-    username: !secret kodi_username
-    password: !secret kodi_password
-  - platform: kodi
-    name: Kodi Office
-    host: 10.0.1.15
     username: !secret kodi_username
     password: !secret kodi_password
   - platform: universal
@@ -43,19 +38,6 @@
         data_template:
           entity_id: media_player.denonamp
           volume_level: '{{ volume_level }}'
-      #volume_mute:
-      #  service: media_player.volume_mute
-      #  data_template:
-      #    entity_id: media_player.denonamp
-      #    is_volume_muted: '{{ is_volume_muted }}'
-      #volume_up:
-      #  service: media_player.volume_up
-      #  data:
-      #    entity_id: media_player.denonamp
-      #volume_down:
-      #  service: media_player.volume_down
-      #  data:
-      #    entity_id: media_player.denonamp
     attributes:
       #state: sensor.harmonystue
       is_volume_muted: media_player.denonamp|is_volume_muted

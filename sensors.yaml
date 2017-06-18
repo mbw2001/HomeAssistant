@@ -65,11 +65,11 @@
           {% else %}
             {{ states.remote.harmonystue.attributes.current_activity }}
           {% endif %}
-      denon_volume:
-        value_template: >
-          {% if states.media_player.denonamp.attributes.volume_level %}
-            {{ (states.media_player.denonamp.attributes.volume_level * 100 - 80) | round(2) }}
-          {% else %}
-            0.0
-          {% endif %}
-        unit_of_measurement: 'dB'
+#       denon_volume:
+#         value_template: >
+#           {% if states.media_player.denonamp.attributes.volume_level %}
+#             {{ (states.media_player.denonamp.attributes.volume_level * 100 - 80) | round(2) }}
+#           {% else %}
+#             0.0
+#           {% endif %}
+#         unit_of_measurement: 'dB'
