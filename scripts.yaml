@@ -2,7 +2,7 @@
     sequence:
       - service: media_player.media_stop
         data:
-          entity_id: media_player.kodi_stue
+          entity_id: media_player.media_stue
       - service: remote.turn_off
         data:
           entity_id: remote.harmonystue
