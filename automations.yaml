@@ -64,9 +64,12 @@
   - id: switch_to_chromecast
     alias: "Stue: Switch to Chromecast"
     trigger:
-      platform: state
-      entity_id: media_player.chromestue
-      from: 'off'
+      - platform: state
+        entity_id: media_player.chromestue
+        from: 'off'
+      - platform: state
+        entity_id: media_player.chromestue
+        from: 'idle'
     condition:
       condition: template
       value_template: '{{ states.remote.harmonystue.state != "Chromecast" }}'
