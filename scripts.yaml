@@ -6,6 +6,16 @@
       - service: remote.turn_off
         data:
           entity_id: remote.harmonystue
+  turn_on_stue:
+    sequence:
+      - service: remote.turn_on
+        data_template:
+          entity_id: remote.harmonystue
+          activity: Kodi
+      - service: media_player.kodi_call_method
+        data:
+          entity_id: media_player.kodi_stue
+          method: 'Input.Back'
   stue_bright_mode:
     sequence:
       - service: light.hue_activate_scene

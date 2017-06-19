@@ -22,10 +22,7 @@
       - media_player.chromestue
     commands:
       turn_on:
-        service: remote.turn_on
-        data_template:
-          entity_id: remote.harmonystue
-          activity: Kodi
+        service: script.turn_on_stue
       turn_off:
         service: script.turn_off_stue
       select_source:
