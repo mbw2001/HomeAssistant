@@ -3,13 +3,24 @@
     view: yes
     entities:
       - group.weather
-      - group.all_devices
-      - group.status
+      - group.devices
       - script.stue_bright_mode
       - script.stue_movie_mode
       - light.stue
       - light.sovevrelse
       - light.gang
+  office_pc:
+    name: Office PC
+    icon: mdi:laptop-windows
+    entities:
+      - device_tracker.office_ethernet
+      - device_tracker.office_wifi
+  devices:
+    name: Devices
+    entities:
+      - device_tracker.mbw_galaxys7
+      - device_tracker.milla_galaxya3
+      - group.office_pc
   livingroom:
     name: Stue
     icon: mdi:sofa
