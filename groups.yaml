@@ -5,9 +5,9 @@
       - group.devices
       - script.stue_bright_mode
       - script.stue_movie_mode
-      - light.stue
-      - light.sovevrelse
-      - light.gang
+      - light.living_room
+      - light.bedroom
+      - light.hallway
   office_pc:
     name: Office PC
     icon: mdi:laptop-windows
@@ -21,15 +21,15 @@
       - device_tracker.milla_galaxya3
       - group.office_pc
   livingroom:
-    name: Stue
+    name: Living Room
     icon: mdi:sofa
     view: yes
     entities:
       - media_player.media_stue
       - light.tv_lamper
-      - light.spisebord
+      - light.dining_table
       - light.hue_go
-      - climate.stue
+      - climate.living_room
   weather:
     name: Weather
     entities:
@@ -41,31 +41,30 @@
       - sensor.yr_wind_speed
       - sensor.yr_wind_direction
   bedroom:
-    name: Soveværelse
+    name: Bedroom
     icon: mdi:hotel
     view: yes
     entities:
       - media_player.media_seng
-      - light.sovevrelse_tv
-      - light.sovevrelse_camilla
-      - light.sovevrelse_michael
-      - climate.sovevrelse
+      - light.bedroom_screen_light
+      - light.bedroom_camilla
+      - light.bedroom_michael
+      - climate.bedroom
   office:
-    name: kontor
+    name: Office
     icon: mdi:laptop
     view: yes
     entities:
-      - media_player.kodi_office
-      - climate.kontor
+      - climate.office
       - switch.office_pc
   hallway:
-    name: Gang
+    name: Hallway
     icon: mdi:glassdoor
     #view: yes
     entities:
-      - light.standerlampe_gang
+      - light.hallway
   kitchen:
-    name: Køkken
+    name: Kitchen
     icon: mdi:food
     view: no
     entities:
