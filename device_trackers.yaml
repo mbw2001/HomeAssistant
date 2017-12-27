@@ -4,3 +4,7 @@
     track_new_devices: false
     scan_options: " --privileged -sP "
   - platform: owntracks_http
+  - platform: unifi_direct
+    host: !secret unifi_ip
+    username: !secret unifi_username
+    password: !secret unifi_password
