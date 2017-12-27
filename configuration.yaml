@@ -70,7 +70,6 @@ media_player: !include media_players.yaml
 sensor: !include sensors.yaml
 remote: !include remotes.yaml
 group: !include groups.yaml
-scene: !include scenes.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
 switch: !include switches.yaml
