@@ -60,8 +60,6 @@ mqtt:
   password: !secret mqtt_password
 ifttt:
   key: !secret ifttt_key
-light:
-  platform: hue
 tado:
   username: !secret tado_username
   password: !secret tado_password
@@ -77,3 +75,4 @@ automation: !include automations.yaml
 script: !include scripts.yaml
 switch: !include switches.yaml
 google_assistant: !include google_assistant.yaml
+hue: !include hue.yaml
