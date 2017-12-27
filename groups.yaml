@@ -2,7 +2,6 @@
     icon: mdi:home
     view: yes
     entities:
-      - group.weather
       - group.devices
       - script.stue_bright_mode
       - script.stue_movie_mode
