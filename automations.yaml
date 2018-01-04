@@ -11,8 +11,12 @@
         from: 'playing'
         to: 'off'
     condition:
-      condition: sun
-      after: sunset
+      condition: and
+      conditions:
+        - condition: sun
+          after: sunset
+        - condition: template
+          value_template: '{{ states.remote.harmonystue.state != "Musik" }}'
     action:
       service: script.stue_bright_mode
 
@@ -44,7 +48,7 @@
     action:
       service: script.stue_movie_mode
 
-  # Switch to Harmony activity Kodi when Kodi Stue switches from off to idle
+  # Switch to Harmony activity Kodi when Kodi Stue switches from idle
   - id: switch_to_kodi
     alias: "Stue: Switch to Kodi"
     trigger:
@@ -60,7 +64,7 @@
         entity_id: remote.harmonystue
         activity: 'Kodi'
 
-  # Switch to Harmony activity Chromecast when Chromecast switches from off to idle
+  # Switch to Harmony activity Chromecast when Chromecast switches from off or idle
   - id: switch_to_chromecast
     alias: "Stue: Switch to Chromecast"
     trigger:
@@ -78,6 +82,31 @@
       data:
         entity_id: remote.harmonystue
         activity: 'Chromecast'
+
+  # Switch to Harmony activity Chromecast when Chromecast switches from off or idle
+  - id: switch_to_music
+    alias: "Stue: Switch to Music"
+    trigger:
+      - platform: state
+        entity_id: media_player.living_room_speaker
+        from: 'off'
+      - platform: state
+        entity_id: media_player.living_room_speaker
+        from: 'idle'
+      - platform: state
+        entity_id: media_player.all_speakers
+        from: 'off'
+      - platform: state
+        entity_id: media_player.all_speakers
+        from: 'idle'
+    condition:
+      condition: template
+      value_template: '{{ states.remote.harmonystue.state != "Musik" }}'
+    action:
+      service: remote.turn_on
+      data:
+        entity_id: remote.harmonystue
+        activity: 'Musik'
 
   # Switch Harmony to off when chromecast turns off
   - id: poweroff_when_idle

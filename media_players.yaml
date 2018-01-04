@@ -20,6 +20,8 @@
     children:
       - media_player.kodi_stue
       - media_player.chromestue
+      - media_player.living_room_speaker
+      - media_player.all_speakers
     commands:
       turn_on:
         service: script.turn_on_stue
@@ -45,3 +47,8 @@
     children:
       - media_player.kodi_seng
       - media_player.chromeseng
+  - platform: universal
+    name: Media Kitchen
+    children:
+      - media_player.kitchen_speaker
+      - media_player.all_speakers

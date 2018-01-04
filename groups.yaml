@@ -66,9 +66,9 @@
   kitchen:
     name: Kitchen
     icon: mdi:food
-    view: no
+    view: yes
     entities:
-      - light.kkken
+      - media_player.media_kitchen
   status:
     name: Status
     icon: mdi:view-dashboard
