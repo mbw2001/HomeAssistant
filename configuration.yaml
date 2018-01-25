@@ -72,6 +72,6 @@ remote: !include remotes.yaml
 group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
-switch: !include switches.yaml
+#switch: !include switches.yaml
 google_assistant: !include google_assistant.yaml
 hue: !include hue.yaml
