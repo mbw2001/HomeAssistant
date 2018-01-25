@@ -6,8 +6,10 @@
       - script.stue_bright_mode
       - script.stue_movie_mode
       - light.living_room
+      - light.kitchen
       - light.bedroom
       - light.hallway
+      - light.office
   office_pc:
     name: Office PC
     icon: mdi:laptop-windows
@@ -55,8 +57,9 @@
     icon: mdi:laptop
     view: yes
     entities:
+      - media_player.office_speakers
       - climate.office
-      - switch.office_pc
+      - light.office
   hallway:
     name: Hallway
     icon: mdi:glassdoor
@@ -69,6 +72,9 @@
     view: yes
     entities:
       - media_player.media_kitchen
+      - light.kitchen_window_1
+      - light.kitchen_window_2
+      - light.kitchen_strip
   status:
     name: Status
     icon: mdi:view-dashboard
