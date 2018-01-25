@@ -10,18 +10,18 @@
       - light.bedroom
       - light.hallway
       - light.office
-  office_pc:
+  mbw_office:
     name: Office PC
     icon: mdi:laptop-windows
     entities:
-      - device_tracker.office_ethernet
-      - device_tracker.office_wifi
+      - device_tracker.mbw_office_lan
+      - device_tracker.mbw_office_wlan
   devices:
     name: Devices
     entities:
       - device_tracker.mbw_galaxy_s7
       - device_tracker.milla_galaxy_a3
-      - group.office_pc
+      - group.mbw_office
   livingroom:
     name: Living Room
     icon: mdi:sofa
