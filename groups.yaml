@@ -19,8 +19,8 @@
   devices:
     name: Devices
     entities:
-      - device_tracker.mbw_galaxys7
-      - device_tracker.milla_galaxya3
+      - device_tracker.mbw_galaxy_s7
+      - device_tracker.milla_galaxy_a3
       - group.office_pc
   livingroom:
     name: Living Room
