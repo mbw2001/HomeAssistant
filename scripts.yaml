@@ -1,39 +1,44 @@
-  turn_off_stue:
-    sequence:
-      - service: media_player.media_stop
-        data:
-          entity_id: media_player.media_stue
-      - service: remote.turn_off
-        data:
-          entity_id: remote.harmonystue
-  turn_on_stue:
-    sequence:
-      - service: remote.turn_on
-        data_template:
-          entity_id: remote.harmonystue
-          activity: Kodi
-      - service: media_player.kodi_call_method
-        data:
-          entity_id: media_player.kodi_stue
-          method: 'Input.Back'
-  stue_bright_mode:
-    sequence:
-      - service: hue.hue_activate_scene
-        data:
-          group_name: 'Living Room'
-          scene_name: Bright
-  stue_movie_mode:
-    sequence:
-      - service: hue.hue_activate_scene
-        data:
-          group_name: 'Living Room'
-          scene_name: Movie
-      - service: light.turn_off
-        data:
-          entity_id: light.standerlampe_gang
-  toggle_mute_stue:
-    sequence:
-      service: media_player.volume_mute
-      data_template:
-        entity_id: media_player.denonamp
-        is_volume_muted: '{{ not states.media_player.denonamp.attributes.is_volume_muted }}'
+turn_off_stue:
+  sequence:
+  - service: media_player.media_stop
+    data:
+      entity_id: media_player.media_stue
+  - service: remote.turn_off
+    data:
+      entity_id: remote.harmonystue
+
+turn_on_stue:
+  sequence:
+  - service: remote.turn_on
+    data_template:
+      entity_id: remote.harmonystue
+      activity: Kodi
+  - service: media_player.kodi_call_method
+    data:
+      entity_id: media_player.kodi_stue
+      method: Input.Back
+
+stue_bright_mode:
+  sequence:
+  - service: hue.hue_activate_scene
+    data:
+      group_name: Living Room
+      scene_name: Bright
+
+stue_movie_mode:
+  sequence:
+  - service: hue.hue_activate_scene
+    data:
+      group_name: Living Room
+      scene_name: Movie
+  - service: light.turn_off
+    data:
+      entity_id: light.hallway
+
+toggle_mute_stue:
+  sequence:
+    service: media_player.volume_mute
+    data_template:
+      entity_id: media_player.denonamp
+      is_volume_muted: '{{ not states.media_player.denonamp.attributes.is_volume_muted
+        }}'
