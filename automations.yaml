@@ -16,7 +16,7 @@
         - condition: sun
           after: sunset
         - condition: template
-          value_template: '{{ states.remote.harmonystue.state != "Musik" }}'
+          value_template: '{{ states.remote.harmonystue.state != "Music" }}'
     action:
       service: script.stue_bright_mode
 
@@ -101,12 +101,12 @@
         from: 'idle'
     condition:
       condition: template
-      value_template: '{{ states.remote.harmonystue.state != "Musik" }}'
+      value_template: '{{ states.remote.harmonystue.state != "Music" }}'
     action:
       service: remote.turn_on
       data:
         entity_id: remote.harmonystue
-        activity: 'Musik'
+        activity: 'Music'
 
   # Switch Harmony to off when chromecast turns off
   - id: poweroff_when_idle
