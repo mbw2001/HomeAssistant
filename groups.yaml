@@ -2,9 +2,8 @@
     icon: mdi:home
     view: yes
     entities:
-      - group.devices
-      - script.stue_bright_mode
-      - script.stue_movie_mode
+      - device_tracker.mbw_galaxy_s7
+      - device_tracker.milla_galaxy_a3
       - light.living_room
       - light.kitchen
       - light.bedroom
@@ -16,12 +15,6 @@
     entities:
       - device_tracker.mbw_office_lan
       - device_tracker.mbw_office_wlan
-  devices:
-    name: Devices
-    entities:
-      - device_tracker.mbw_galaxy_s7
-      - device_tracker.milla_galaxy_a3
-      - group.mbw_office
   livingroom:
     name: Living Room
     icon: mdi:sofa

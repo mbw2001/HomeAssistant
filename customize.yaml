@@ -1,9 +1,3 @@
-    group.all_automations:
-      friendly_name: All Automations
-      hidden: false
-    script.stue_bright_mode:
-      friendly_name: Stue Bright
-      icon: mdi:lightbulb
-    script.stue_movie_mode:
-      friendly_name: Stue Movie
-      icon: mdi:lightbulb
+group.all_automations:
+  friendly_name: Automation
+  hidden: false
