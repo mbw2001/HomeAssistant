@@ -1,7 +1,7 @@
   - platform: nmap_tracker
     hosts: 10.0.1.1/24
     home_interval: 15
-    interval_seconds: 30
+    interval_seconds: 180
     track_new_devices: false
     scan_options: " --privileged -sP "
   - platform: owntracks_http
