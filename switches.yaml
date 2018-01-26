@@ -1,4 +1,0 @@
-  - platform: wake_on_lan
-    name: Office PC
-    mac_address: 2C:4D:54:3E:C5:D5
-    host: 10.0.1.20
