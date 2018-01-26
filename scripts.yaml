@@ -40,5 +40,4 @@ toggle_mute_stue:
     service: media_player.volume_mute
     data_template:
       entity_id: media_player.denonamp
-      is_volume_muted: '{{ not states.media_player.denonamp.attributes.is_volume_muted
-        }}'
+      is_volume_muted: '{{ not states.media_player.denonamp.attributes.is_volume_muted }}'
