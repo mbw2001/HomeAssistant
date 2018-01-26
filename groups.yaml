@@ -4,6 +4,8 @@
     entities:
       - device_tracker.mbw_galaxy_s7
       - device_tracker.milla_galaxy_a3
+      - script.living_room_bright_light
+      - script.living_room_movie_light
       - light.living_room
       - light.kitchen
       - light.bedroom
