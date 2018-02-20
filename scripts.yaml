@@ -2,20 +2,20 @@ living_room_off:
   sequence:
   - service: media_player.media_stop
     data:
-      entity_id: media_player.media_stue
+      entity_id: media_player.living_room_media
   - service: remote.turn_off
     data:
-      entity_id: remote.harmonystue
+      entity_id: remote.living_room_harmony
 
 living_room_on:
   sequence:
   - service: remote.turn_on
     data_template:
-      entity_id: remote.harmonystue
+      entity_id: remote.living_room_harmony
       activity: Kodi
   - service: media_player.kodi_call_method
     data:
-      entity_id: media_player.kodi_stue
+      entity_id: media_player.living_room_kodi
       method: Input.Back
 
 living_room_bright_light:

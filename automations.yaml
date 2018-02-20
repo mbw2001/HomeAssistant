@@ -3,11 +3,11 @@
     alias: "Living Room: Bright Light when Idle"
     trigger:
       - platform: state
-        entity_id: media_player.media_stue
+        entity_id: media_player.living_room_media
         from: 'playing'
         to: 'paused'
       - platform: state
-        entity_id: media_player.media_stue
+        entity_id: media_player.living_room_media
         from: 'playing'
         to: 'off'
     condition:
@@ -16,7 +16,7 @@
         - condition: sun
           after: sunset
         - condition: template
-          value_template: '{{ states.remote.harmonystue.state != "Music" }}'
+          value_template: '{{ states.remote.living_room_harmony.state != "Music" }}'
     action:
       service: script.living_room_bright_light
 
@@ -25,11 +25,11 @@
     alias: "Living Room: Movie Lighting when Playing"
     trigger:
       - platform: state
-        entity_id: media_player.media_stue
+        entity_id: media_player.living_room_media
         from: 'off'
         to: 'playing'
       - platform: state
-        entity_id: media_player.media_stue
+        entity_id: media_player.living_room_media
         from: 'paused'
         to: 'playing'
     condition:
@@ -40,10 +40,10 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: sensor.media_stue
+              entity_id: sensor.living_room_media
               state: 'movie'
             - condition: state
-              entity_id: sensor.media_stue
+              entity_id: sensor.living_room_media
               state: 'tvshow'
     action:
       service: script.living_room_movie_light
@@ -53,15 +53,15 @@
     alias: "Living Room: Switch to Kodi"
     trigger:
       platform: state
-      entity_id: media_player.kodi_stue
+      entity_id: media_player.living_room_kodi
       from: 'idle'
     condition:
       condition: template
-      value_template: '{{ states.remote.harmonystue.state != "Kodi" }}'
+      value_template: '{{ states.remote.living_room_harmony.state != "Kodi" }}'
     action:
       service: remote.turn_on
       data:
-        entity_id: remote.harmonystue
+        entity_id: remote.living_room_harmony
         activity: 'Kodi'
 
   # Switch to Harmony activity Chromecast when Chromecast switches from off or idle
@@ -69,18 +69,18 @@
     alias: "Living Room: Switch to Chromecast"
     trigger:
       - platform: state
-        entity_id: media_player.chromestue
+        entity_id: media_player.living_room_cast
         from: 'off'
       - platform: state
-        entity_id: media_player.chromestue
+        entity_id: media_player.living_room_cast
         from: 'idle'
     condition:
       condition: template
-      value_template: '{{ states.remote.harmonystue.state != "Chromecast" }}'
+      value_template: '{{ states.remote.living_room_harmony.state != "Chromecast" }}'
     action:
       service: remote.turn_on
       data:
-        entity_id: remote.harmonystue
+        entity_id: remote.living_room_harmony
         activity: 'Chromecast'
 
   # Switch to Harmony activity Chromecast when Chromecast switches from off or idle
@@ -101,11 +101,11 @@
         from: 'idle'
     condition:
       condition: template
-      value_template: '{{ states.remote.harmonystue.state != "Music" }}'
+      value_template: '{{ states.remote.living_room_harmony.state != "Music" }}'
     action:
       service: remote.turn_on
       data:
-        entity_id: remote.harmonystue
+        entity_id: remote.living_room_harmony
         activity: 'Music'
 
   # Switch Harmony to off when chromecast turns off
@@ -113,14 +113,14 @@
     alias: "Living Room: PowerOff when Idle"
     trigger:
       platform: state
-      entity_id: media_player.media_stue
+      entity_id: media_player.living_room_media
       to: 'off'
       for:
         minutes: 5
     condition:
       condition: template
-      value_template: '{{ states.remote.harmonystue.state != "Off" }}'
+      value_template: '{{ states.remote.living_room_harmony.state != "Off" }}'
     action:
       service: remote.turn_off
       data:
-        entity_id: remote.harmonystue
+        entity_id: remote.living_room_harmony

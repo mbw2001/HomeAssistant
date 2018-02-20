@@ -1,54 +1,59 @@
   - platform: denonavr
-    name: DenonAmp
+    name: Living Room Amp
     host: 10.0.1.80
   - platform: cast
 #  - platform: spotify
 #    client_id: !secret spotify_client_id
 #    client_secret: !secret spotify_client_secret
   - platform: kodi
-    name: Kodi Stue
+    name: Living Room Kodi
     host: 10.0.1.10
     username: !secret kodi_username
     password: !secret kodi_password
   - platform: kodi
-    name: Kodi Seng
+    name: Bedroom Kodi
     host: 10.0.1.11
     username: !secret kodi_username
     password: !secret kodi_password
   - platform: universal
-    name: Media Stue
+    name: Living Room Media
     children:
-      - media_player.kodi_stue
-      - media_player.chromestue
+      - media_player.living_room_kodi
+      - media_player.living_room_cast
       - media_player.living_room_speaker
       - media_player.all_speakers
     commands:
       turn_on:
-        service: script.turn_on_stue
+        service: script.living_room_on
       turn_off:
-        service: script.turn_off_stue
+        service: script.living_room_off
       select_source:
         service: media_player.select_source
         data_template:
-          entity_id: media_player.denonamp
+          entity_id: media_player.living_room_amp
           source: '{{ source }}'
+      volume_mute:
+        service: media_player.volume_mute
+        data_template:
+          entity_id: media_player.living_room_amp
+          is_volume_muted: '{{ not states.media_player.living_room_amp.attributes.is_volume_muted }}'
       volume_set:
         service: media_player.volume_set
         data_template:
-          entity_id: media_player.denonamp
+          entity_id: media_player.living_room_amp
           volume_level: '{{ volume_level }}'
     attributes:
-      is_volume_muted: media_player.denonamp|is_volume_muted
-      volume_level: media_player.denonamp|volume_level
-      source: media_player.denonamp|source
-      source_list: media_player.denonamp|source_list
+      is_volume_muted: media_player.living_room_amp|is_volume_muted
+      volume_level: media_player.living_room_amp|volume_level
+      source: media_player.living_room_amp|source
+      source_list: media_player.living_room_amp|source_list
   - platform: universal
-    name: Media Seng
+    name: Bedroom Media
     children:
-      - media_player.kodi_seng
-      - media_player.chromeseng
+      - media_player.bedroom_kodi
+      - media_player.bedroom_cast
   - platform: universal
-    name: Media Kitchen
+    name: Kitchen Media
     children:
       - media_player.kitchen_speaker
       - media_player.all_speakers

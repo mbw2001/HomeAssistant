@@ -22,27 +22,17 @@
     icon: mdi:sofa
     view: yes
     entities:
-      - media_player.media_stue
-      - light.tv_lamper
+      - media_player.living_room_media
+      - light.screen_lights
       - light.dining_table
       - light.hue_go
       - climate.living_room
-  weather:
-    name: Weather
-    entities:
-      - sun.sun
-      - sensor.yr_temperature
-      - sensor.yr_cloudiness
-      - sensor.yr_humidity
-      - sensor.yr_precipitation
-      - sensor.yr_wind_speed
-      - sensor.yr_wind_direction
   bedroom:
     name: Bedroom
     icon: mdi:hotel
     view: yes
     entities:
-      - media_player.media_seng
+      - media_player.bedroom_media
       - light.bedroom_screen_light
       - light.bedroom_camilla
       - light.bedroom_michael
@@ -52,7 +42,7 @@
     icon: mdi:laptop
     view: yes
     entities:
-      - media_player.office_speakers
+      - media_player.office_speaker
       - climate.office
       - light.office
   hallway:
@@ -66,9 +56,8 @@
     icon: mdi:food
     view: yes
     entities:
-      - media_player.media_kitchen
-      - light.kitchen_window_1
-      - light.kitchen_window_2
+      - media_player.kitchen_media
+      - light.kitchen_window
       - light.kitchen_strip
   status:
     name: Status
