@@ -1,12 +1,16 @@
+  - platform: time_date
+    display_options:
+      - 'time'
+      - 'date'
   - platform: yr
     monitored_conditions:
-      - temperature
       - symbol
+      - temperature
+      - humidity
+      - pressure
       - precipitation
       - windSpeed
-      - pressure
       - windDirection
-      - humidity
       - fog
       - cloudiness
       - lowClouds
@@ -55,6 +59,8 @@
             off
           {% elif states.media_player.living_room_media.attributes.media_content_type %}
             {{ states.media_player.living_room_media.attributes.media_content_type }}
+          {% elif is_state_attr("media_player.living_room_media","active_child","media_player.living_room_cast") %}
+            movie
           {% else %}
-            channel
+            unknown
           {% endif %}

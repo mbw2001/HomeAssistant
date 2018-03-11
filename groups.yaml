@@ -4,13 +4,26 @@
     entities:
       - device_tracker.mbw_galaxy_s7
       - device_tracker.milla_galaxy_a3
-      - script.living_room_bright_light
-      - script.living_room_movie_light
+      - group.living_room_light_scene
       - light.living_room
       - light.kitchen
       - light.bedroom
       - light.hallway
       - light.office
+      - group.alarm_clock
+  living_room_light_scene:
+    name: Living Room
+    entities:
+      - input_text.living_room_tiles
+  alarm_clock:
+    name: Alarm Clock
+    control: hidden
+    entities:
+      - automation.alarm_clock
+      - input_boolean.alarm_clock_active
+      - input_datetime.alarm_clock_time
+      - input_boolean.alarm_clock_repeat
+      - input_boolean.alarm_clock_tv
   mbw_office:
     name: Office PC
     icon: mdi:laptop-windows
@@ -53,7 +66,7 @@
       - light.hallway
   kitchen:
     name: Kitchen
-    icon: mdi:food
+    icon: mdi:stove
     view: yes
     entities:
       - media_player.kitchen_media

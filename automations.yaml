@@ -2,21 +2,12 @@
   - id: living_room_bright_light
     alias: "Living Room: Bright Light when Idle"
     trigger:
-      - platform: state
-        entity_id: media_player.living_room_media
-        from: 'playing'
-        to: 'paused'
-      - platform: state
-        entity_id: media_player.living_room_media
-        from: 'playing'
-        to: 'off'
+      platform: state
+      entity_id: media_player.living_room_media
+      from: 'playing'
     condition:
-      condition: and
-      conditions:
-        - condition: sun
-          after: sunset
-        - condition: template
-          value_template: '{{ states.remote.living_room_harmony.state != "Music" }}'
+      condition: sun
+      after: sunset
     action:
       service: script.living_room_bright_light
 
@@ -24,14 +15,9 @@
   - id: living_room_movie_light
     alias: "Living Room: Movie Lighting when Playing"
     trigger:
-      - platform: state
-        entity_id: media_player.living_room_media
-        from: 'off'
-        to: 'playing'
-      - platform: state
-        entity_id: media_player.living_room_media
-        from: 'paused'
-        to: 'playing'
+      platform: state
+      entity_id: media_player.living_room_media
+      to: 'playing'
     condition:
       condition: and
       conditions:
@@ -54,10 +40,10 @@
     trigger:
       platform: state
       entity_id: media_player.living_room_kodi
-      from: 'idle'
+      to: 'playing'
     condition:
       condition: template
-      value_template: '{{ states.remote.living_room_harmony.state != "Kodi" }}'
+      value_template: '{{ not is_state("remote.living_room_harmony","Kodi") }}'
     action:
       service: remote.turn_on
       data:
@@ -68,15 +54,12 @@
   - id: switch_to_chromecast
     alias: "Living Room: Switch to Chromecast"
     trigger:
-      - platform: state
-        entity_id: media_player.living_room_cast
-        from: 'off'
-      - platform: state
-        entity_id: media_player.living_room_cast
-        from: 'idle'
+      platform: state
+      entity_id: media_player.living_room_cast
+      to: 'playing'
     condition:
       condition: template
-      value_template: '{{ states.remote.living_room_harmony.state != "Chromecast" }}'
+      value_template: '{{ not is_state("remote.living_room_harmony","Chromecast") }}'
     action:
       service: remote.turn_on
       data:
@@ -87,21 +70,14 @@
   - id: switch_to_music
     alias: "Living Room: Switch to Music"
     trigger:
-      - platform: state
-        entity_id: media_player.living_room_speaker
-        from: 'off'
-      - platform: state
-        entity_id: media_player.living_room_speaker
-        from: 'idle'
-      - platform: state
-        entity_id: media_player.all_speakers
-        from: 'off'
-      - platform: state
-        entity_id: media_player.all_speakers
-        from: 'idle'
+      platform: state
+      entity_id:
+        - media_player.living_room_speaker
+        - media_player.all_speakers
+      to: 'playing'
     condition:
       condition: template
-      value_template: '{{ states.remote.living_room_harmony.state != "Music" }}'
+      value_template: '{{ not is_state("remote.living_room_harmony","Music") }}'
     action:
       service: remote.turn_on
       data:
@@ -119,8 +95,76 @@
         minutes: 5
     condition:
       condition: template
-      value_template: '{{ states.remote.living_room_harmony.state != "Off" }}'
+      value_template: '{{ not is_state("remote.living_room_harmony","Off") }}'
     action:
       service: remote.turn_off
       data:
         entity_id: remote.living_room_harmony
+
+  # Notify when lights are on but noone is home
+  - id: lights_on_empty_home
+    alias: "Lights on with noone home"
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.mbw_galaxy_s
+          - device_tracker.milla_galaxy_a3
+        to: 'not_home'
+        for:
+          minutes: 5
+      - platform: state
+        entity_id: group.all_lights
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: device_tracker.mbw_galaxy_s7
+          state: 'not_home'
+        - condition: state
+          entity_id: device_tracker.milla_galaxy_a3
+          state: 'not_home'
+        - condition: state
+          entity_id: group.all_lights
+          state: 'on'
+    action:
+      service: notify.html5notify
+      data:
+        title: "Lights are on"
+        message: "There are lights on, but noone is home."
+        target: 'mbw_galaxy_s7'
+        data:
+          tag: 'turn_off_lights'
+          actions:
+            - title: "Turn off lights"
+              action: 'turn_off_lights'
+  # Turn of lights when notification is pressed
+  - id: lights_on_empty_home_clicked
+    alias: "Lights on notification clicked"
+    trigger:
+      platform: event
+      event_type: html5_notification.clicked
+      event_data:
+        tag: 'turn_off_lights'
+    action:
+      service: light.turn_off
+
+  # Alarm clock automation
+  - id: alarm_clock
+    alias: Alarm Clock
+    trigger:
+      platform: template
+      value_template: "{{ states('sensor.time') == (states.input_datetime.alarm_clock_time.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
+    condition:
+      condition: state
+      entity_id: input_boolean.alarm_clock_active
+      state: 'on'
+    action:
+      - service: light.turn_on
+        entity_id: light.bedroom
+      - service: script.bedroom_news
+      - condition: state
+        entity_id: input_boolean.alarm_clock_repeat
+        state: 'off'
+      - service: input_boolean.turn_off
+        entity_id: input_boolean.alarm_clock_active

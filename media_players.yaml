@@ -5,6 +5,7 @@
 #  - platform: spotify
 #    client_id: !secret spotify_client_id
 #    client_secret: !secret spotify_client_secret
+  - platform: plex
   - platform: kodi
     name: Living Room Kodi
     host: 10.0.1.10
@@ -15,6 +16,25 @@
     host: 10.0.1.11
     username: !secret kodi_username
     password: !secret kodi_password
+    turn_on_action:
+      service: media_player.kodi_call_method
+      data:
+        entity_id: media_player.bedroom_kodi
+        method: Addons.ExecuteAddon
+        addonid: script.json-cec
+        params:
+          command: activate
+    turn_off_action:
+    - service: media_player.media_stop
+      data:
+        entity_id: media_player.bedroom_kodi
+    - service: media_player.kodi_call_method
+      data:
+        entity_id: media_player.bedroom_kodi
+        method: Addons.ExecuteAddon
+        addonid: script.json-cec
+        params:
+          command: standby
   - platform: universal
     name: Living Room Media
     children:
@@ -52,6 +72,15 @@
     children:
       - media_player.bedroom_kodi
       - media_player.bedroom_cast
+    commands:
+      turn_on:
+        service: media_player.turn_on
+        data:
+          entity_id: media_player.bedroom_kodi
+      turn_off:
+        service: media_player.turn_off
+        data:
+          entity_id: media_player.bedroom_kodi
   - platform: universal
     name: Kitchen Media
     children:

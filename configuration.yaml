@@ -9,12 +9,20 @@ homeassistant:
 
 frontend:
   themes: !include themes.yaml
+  extra_html_url:
+    - /local/custom_ui/state-card-tiles.html
+  extra_html_url_es5:
+    - /local/custom_ui/state-card-tiles_es5.html
 
 config:
 
 http:
   api_password: !secret api_password
   base_url: !secret base_url
+  cors_allowed_origins:
+    - https://google.com
+    - https://home-assistant.io
+  use_x_forwarded_for: True
   ip_ban_enabled: True
   login_attempts_threshold: 3
 
@@ -22,11 +30,10 @@ http:
 updater:
 
 # Discover some devices automatically
-#discovery:
-#  ignore: plex_mediaserver
+discovery:
 
 # Allows you to issue voice commands from the frontend in enabled browsers
-#conversation:
+conversation:
 
 # Log Severities: notset, debug, info, warn, warning, error, fatal, critical
 logger:
@@ -48,21 +55,25 @@ logbook:
 # Track the sun
 sun:
 
+map:
+
 notify:
   platform: html5
   name: html5-notify
   gcm_api_key: !secret gcm_api_key
   gcm_sender_id: !secret gcm_sender_id
-mqtt:
-  broker: !secret mqtt_broker
-  port: !secret mqtt_port
-  username: !secret mqtt_username
-  password: !secret mqtt_password
+#mqtt:
+#  broker: !secret mqtt_broker
+#  port: !secret mqtt_port
+#  username: !secret mqtt_username
+#  password: !secret mqtt_password
 ifttt:
   key: !secret ifttt_key
 tado:
   username: !secret tado_username
   password: !secret tado_password
+google_assistant: !include google_assistant.yaml
+hue: !include hue.yaml
 
 zone: !include zones.yaml
 device_tracker: !include device_trackers.yaml
@@ -74,5 +85,6 @@ automation: !include automations.yaml
 script: !include scripts.yaml
 #switch: !include switches.yaml
 #input_select: !include input_selects.yaml
-google_assistant: !include google_assistant.yaml
-hue: !include hue.yaml
+input_boolean: !include input_boolean.yaml
+input_text: !include input_text.yaml
+input_datetime: !include input_datetime.yaml

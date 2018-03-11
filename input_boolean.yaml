@@ -1,0 +1,11 @@
+alarm_clock_active:
+  name: Active
+  icon: mdi:alarm-check
+
+alarm_clock_repeat:
+  name: Repeat
+  icon: mdi:autorenew
+
+alarm_clock_tv:
+  name: Turn on TV
+  icon: mdi:television
