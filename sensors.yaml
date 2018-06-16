@@ -17,18 +17,15 @@
       - mediumClouds
       - highClouds
       - dewpointTemperature
-  - platform: sabnzbd
-    host: 127.0.0.1
-    port: 8888
-    api_key: !secret sabnzbd_apikey
+  - platform: nzbget
+    host: nzbget
+    username: !secret nzbget_username
+    password: !secret nzbget_password
     monitored_variables:
-      - current_status
-      - speed
-      - queue_size
-      - queue_remaining
+      - download_rate
+      - remaining_size
   - platform: transmission
-    host: 127.0.0.1
-    port: 9091
+    host: transmission
     username: !secret transmission_username
     password: !secret transmission_password
     monitored_variables:
@@ -40,17 +37,6 @@
       - ping
       - download
       - upload
-  - platform: systemmonitor
-    resources:
-      - type: processor_use
-      - type: memory_use_percent
-      - type: swap_use_percent
-      - type: disk_use_percent
-        arg: /
-      - type: disk_use_percent
-        arg: /home
-      - type: disk_use_percent
-        arg: /storage
   - platform: template
     sensors:
       living_room_media:
