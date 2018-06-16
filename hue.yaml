@@ -1,3 +1,2 @@
   bridges:
     - host: 10.0.1.37
-      filename: phue.conf
