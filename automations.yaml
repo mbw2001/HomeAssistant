@@ -9,7 +9,10 @@
       condition: sun
       after: sunset
     action:
-      service: script.living_room_bright_light
+      service: hue.hue_activate_scene
+      data:
+        group_name: Living Room
+        scene_name: Bright
 
   # Dim lights when media player starts playing
   - id: living_room_movie_light
@@ -25,14 +28,18 @@
           after: sunset
         - condition: or
           conditions:
-            - condition: state
-              entity_id: sensor.living_room_media
-              state: 'movie'
-            - condition: state
-              entity_id: sensor.living_room_media
-              state: 'tvshow'
+            - condition: template
+              value_template: '{{ is_state_attr('media_player.living_room_media','media_content_type','movie') }}'
+            - condition: template
+              value_template: '{{ is_state_attr('media_player.living_room_media','media_content_type','tvshow') }}'
     action:
-      service: script.living_room_movie_light
+      - service: hue.hue_activate_scene
+        data:
+          group_name: Living Room
+          scene_name: Movie
+      - service: light.turn_off
+        data:
+          entity_id: light.hallway
 
   # Switch to Harmony activity Kodi when Kodi changes from idle
   - id: switch_to_kodi
