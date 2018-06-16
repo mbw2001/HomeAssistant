@@ -109,8 +109,8 @@
     trigger:
       - platform: state
         entity_id:
-          - device_tracker.mbw_galaxy_s
-          - device_tracker.milla_galaxy_a3
+          - device_tracker.mbw_oneplus_6
+          - device_tracker.milla_oneplus_5t
         to: 'not_home'
         for:
           minutes: 5
@@ -121,10 +121,10 @@
       condition: and
       conditions:
         - condition: state
-          entity_id: device_tracker.mbw_galaxy_s7
+          entity_id: device_tracker.mbw_oneplus_6
           state: 'not_home'
         - condition: state
-          entity_id: device_tracker.milla_galaxy_a3
+          entity_id: device_tracker.milla_oneplus_5t
           state: 'not_home'
         - condition: state
           entity_id: group.all_lights
@@ -134,7 +134,7 @@
       data:
         title: "Lights are on"
         message: "There are lights on, but noone is home."
-        target: 'mbw_galaxy_s7'
+        target: 'mbw_oneplus_6'
         data:
           tag: 'turn_off_lights'
           actions:
@@ -176,13 +176,3 @@
         state: 'off'
       - service: input_boolean.turn_off
         entity_id: input_boolean.alarm_clock_active
-
-  - id: no_dress
-    alias: "No Dress!"
-    trigger:
-      platform: template
-      value_template: "{% if 'Say Yes to the Dress' in states.media_player.living_room_media.attributes.media_title %}true{% endif %}"
-    action:
-      service: media_player.media_stop
-      data:
-        entity_id: media_player.living_room_media
