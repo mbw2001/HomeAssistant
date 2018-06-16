@@ -6,7 +6,7 @@
       - device_tracker.milla_oneplus_5t
       - sensor.yr_temperature
       - sensor.yr_precipitation
-      - group.living_room_tiles
+      - light.living_room
       - light.kitchen
       - light.bedroom
       - light.hallway
@@ -25,7 +25,7 @@
     entities:
       - device_tracker.mbw_office_lan
       - device_tracker.mbw_office_wlan
-  livingroom:
+  living_room:
     name: Living Room
     icon: mdi:sofa
     view: yes
