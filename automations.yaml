@@ -22,16 +22,8 @@
       entity_id: media_player.living_room_media
       to: 'playing'
     condition:
-      condition: and
-      conditions:
-        - condition: sun
-          after: sunset
-        - condition: or
-          conditions:
-            - condition: template
-              value_template: '{{ is_state_attr('media_player.living_room_media','media_content_type','movie') }}'
-            - condition: template
-              value_template: '{{ is_state_attr('media_player.living_room_media','media_content_type','tvshow') }}'
+      condition: sun
+      after: sunset
     action:
       - service: hue.hue_activate_scene
         data:
