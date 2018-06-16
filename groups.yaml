@@ -56,7 +56,7 @@
   hallway:
     name: Hallway
     icon: mdi:glassdoor
-    #view: yes
+    view: no
     entities:
       - light.hallway
   kitchen:
