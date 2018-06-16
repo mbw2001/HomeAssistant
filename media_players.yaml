@@ -2,9 +2,13 @@
     name: Living Room Amp
     host: 10.0.1.80
   - platform: cast
-#  - platform: spotify
-#    client_id: !secret spotify_client_id
-#    client_secret: !secret spotify_client_secret
+    host: 10.0.1.30
+  - platform: cast
+    host: 10.0.1.31
+  - platform: cast
+    host: 10.0.1.32
+  - platform: cast
+    host: 10.0.1.33
   - platform: plex
   - platform: kodi
     name: Living Room Kodi
