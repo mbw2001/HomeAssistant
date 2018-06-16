@@ -9,10 +9,6 @@ homeassistant:
 
 frontend:
   themes: !include themes.yaml
-  extra_html_url:
-    - /local/custom_ui/state-card-tiles.html
-  extra_html_url_es5:
-    - /local/custom_ui/state-card-tiles_es5.html
 
 config:
 
@@ -69,11 +65,6 @@ notify:
   name: html5-notify
   gcm_api_key: !secret gcm_api_key
   gcm_sender_id: !secret gcm_sender_id
-#mqtt:
-#  broker: !secret mqtt_broker
-#  port: !secret mqtt_port
-#  username: !secret mqtt_username
-#  password: !secret mqtt_password
 ifttt:
   key: !secret ifttt_key
 tado:
@@ -90,8 +81,5 @@ remote: !include remotes.yaml
 group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
-#switch: !include switches.yaml
-#input_select: !include input_selects.yaml
 input_boolean: !include input_boolean.yaml
-input_text: !include input_text.yaml
 input_datetime: !include input_datetime.yaml

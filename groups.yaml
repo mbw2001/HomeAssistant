@@ -7,16 +7,11 @@
       - sensor.yr_temperature
       - sensor.yr_precipitation
       - group.living_room_tiles
-      - light.living_room
       - light.kitchen
       - light.bedroom
       - light.hallway
       - light.office
       - group.alarm_clock
-  living_room_tiles:
-    name: Living Room
-    entities:
-      - input_text.living_room_tiles
   alarm_clock:
     name: Alarm Clock
     control: hidden
