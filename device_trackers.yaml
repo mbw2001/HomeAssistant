@@ -3,8 +3,10 @@
     exclude:
       - 10.0.1.10
     track_new_devices: false
+    interval_seconds: 120
   - platform: unifi_direct
     host: !secret unifi_ip
     username: !secret unifi_username
     password: !secret unifi_password
     track_new_devices: false
+    verify_ssl: false
