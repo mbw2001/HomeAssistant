@@ -41,13 +41,15 @@
       platform: state
       entity_id: media_player.living_room_kodi
       to: 'playing'
+      for:
+        seconds: 1
     condition:
       condition: template
-      value_template: '{{ not is_state("remote.living_room_harmony","Kodi") }}'
+      value_template: '{{ not is_state_attr("remote.living_room","current_activity","Kodi") }}'
     action:
       service: remote.turn_on
       data:
-        entity_id: remote.living_room_harmony
+        entity_id: remote.living_room
         activity: 'Kodi'
 
   # Switch to Harmony activity Chromecast when Chromecast switches from off or idle
@@ -59,11 +61,11 @@
       to: 'playing'
     condition:
       condition: template
-      value_template: '{{ not is_state("remote.living_room_harmony","Chromecast") }}'
+      value_template: '{{ not is_state_attr("remote.living_room","current_activity","Chromecast") }}'
     action:
       service: remote.turn_on
       data:
-        entity_id: remote.living_room_harmony
+        entity_id: remote.living_room
         activity: 'Chromecast'
 
   # Switch to Harmony activity Chromecast when Chromecast switches from off or idle
@@ -77,11 +79,11 @@
       to: 'playing'
     condition:
       condition: template
-      value_template: '{{ not is_state("remote.living_room_harmony","Music") }}'
+      value_template: '{{ not is_state_attr("remote.living_room","current_activity","Music") }}'
     action:
       service: remote.turn_on
       data:
-        entity_id: remote.living_room_harmony
+        entity_id: remote.living_room
         activity: 'Music'
 
   # Switch Harmony to off when chromecast turns off
@@ -95,11 +97,11 @@
         minutes: 5
     condition:
       condition: template
-      value_template: '{{ not is_state("remote.living_room_harmony","Off") }}'
+      value_template: '{{ not is_state("remote.living_room","off") }}'
     action:
       service: remote.turn_off
       data:
-        entity_id: remote.living_room_harmony
+        entity_id: remote.living_room
 
   # Notify when lights are on but noone is home
   - id: lights_on_empty_home
