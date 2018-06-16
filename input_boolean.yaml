@@ -1,5 +1,5 @@
 alarm_clock_active:
-  name: Active
+  name: Alarm Active
   icon: mdi:alarm-check
 
 alarm_clock_repeat:
