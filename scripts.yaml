@@ -1,25 +1,3 @@
-living_room_on:
-  alias: Turn on living room
-  sequence:
-    - service: remote.turn_on
-      data_template:
-        entity_id: remote.living_room_harmony
-        activity: Kodi
-    - service: media_player.kodi_call_method
-      data:
-        entity_id: media_player.living_room_kodi
-        method: Input.Back
-
-living_room_off:
-  alias: Turn off living room
-  sequence:
-    - service: media_player.media_stop
-      data:
-        entity_id: media_player.living_room_media
-    - service: remote.turn_off
-      data:
-        entity_id: remote.living_room_harmony
-
 living_room_bright_light:
   alias: Living Room Bright Light
   sequence:
@@ -38,17 +16,3 @@ living_room_movie_light:
     - service: light.turn_off
       data:
         entity_id: light.hallway
-
-bedroom_news:
-  alias: Bedroom turn on news
-  sequence:
-    - condition: state
-      entity_id: input_boolean.alarm_clock_tv
-      state: 'on'
-    - service: media_player.turn_on
-      entity_id: media_player.bedroom_kodi
-    - service: media_player.play_media
-      entity_id: media_player.bedroom_kodi
-      data:
-        media_content_type: "CHANNEL"
-        media_content_id: 2

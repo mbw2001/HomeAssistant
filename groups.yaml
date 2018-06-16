@@ -4,14 +4,16 @@
     entities:
       - device_tracker.mbw_galaxy_s7
       - device_tracker.milla_galaxy_a3
-      - group.living_room_light_scene
+      - sensor.yr_temperature
+      - sensor.yr_precipitation
+      - group.living_room_tiles
       - light.living_room
       - light.kitchen
       - light.bedroom
       - light.hallway
       - light.office
       - group.alarm_clock
-  living_room_light_scene:
+  living_room_tiles:
     name: Living Room
     entities:
       - input_text.living_room_tiles
@@ -19,11 +21,9 @@
     name: Alarm Clock
     control: hidden
     entities:
-      - automation.alarm_clock
       - input_boolean.alarm_clock_active
       - input_datetime.alarm_clock_time
       - input_boolean.alarm_clock_repeat
-      - input_boolean.alarm_clock_tv
   mbw_office:
     name: Office PC
     icon: mdi:laptop-windows
@@ -77,38 +77,16 @@
     icon: mdi:view-dashboard
     view: yes
     entities:
-      - group.system
-      - group.speedtest
-      - group.sabnzbd
-      - group.transmission
+      - group.internet
       - group.all_automations
-  system:
-    name: System
-    entities:
-      - sensor.cpu_use
-      - sensor.ram_use
-      - sensor.swap_use
-      - sensor.disk_use_
-      - sensor.disk_use_home
-      - sensor.disk_use_storage
-  speedtest:
-    name: Speedtest
+  internet:
+    name: Internet
     entities:
       - sensor.speedtest_download
       - sensor.speedtest_upload
       - sensor.speedtest_ping
-  sabnzbd:
-    name: SABnzbd
-    entities:
-      - sensor.sabnzbd_status
-      - sensor.sabnzbd_speed
-      - sensor.sabnzbd_queue
-      - sensor.sabnzbd_left
-      - sensor.sabnzbd_disk
-      - sensor.sabnzbd_disk_free
-  transmission:
-    name: Transmission
-    entities:
+      - sensor.nzbget_speed
+      - sensor.nzbget_queue_size
       - sensor.transmission_status
       - sensor.transmission_down_speed
       - sensor.transmission_up_speed
