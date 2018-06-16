@@ -18,7 +18,7 @@
     entities:
       - input_boolean.alarm_clock_active
       - input_datetime.alarm_clock_time
-      - input_boolean.alarm_clock_repeat
+      - input_boolean.alarm_clock_weekend
   mbw_office:
     name: Office PC
     icon: mdi:laptop-windows

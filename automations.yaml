@@ -152,14 +152,28 @@
 
   # Alarm clock automation
   - id: alarm_clock
-    alias: Alarm Clock
+    alias: "Alarm Clock"
     trigger:
       platform: template
-      value_template: "{{ states('sensor.time') == (states.input_datetime.alarm_clock_time.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
+      value_template: "{{ states('sensor.time') == states('sensor.alarm_clock_time') }}"
     condition:
-      condition: state
-      entity_id: input_boolean.alarm_clock_active
-      state: 'on'
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.alarm_clock_active
+          state: 'on'
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: input_boolean.alarm_clock_weekend
+              state: 'on'
+            - condition: time
+              weekday:
+                - mon
+                - tue
+                - wed
+                - thu
+                - fri
     action:
       - service: light.turn_on
         entity_id: light.bedroom
@@ -170,8 +184,3 @@
         data:
           media_content_type: "CHANNEL"
           media_content_id: 2
-      - condition: state
-        entity_id: input_boolean.alarm_clock_repeat
-        state: 'off'
-      - service: input_boolean.turn_off
-        entity_id: input_boolean.alarm_clock_active

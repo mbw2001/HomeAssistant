@@ -2,9 +2,9 @@ alarm_clock_active:
   name: Alarm Active
   icon: mdi:alarm-check
 
-alarm_clock_repeat:
-  name: Repeat
-  icon: mdi:autorenew
+alarm_clock_weekend:
+  name: Weekend
+  icon: mdi:alarm-check
 
 alarm_clock_tv:
   name: Turn on TV

@@ -39,14 +39,6 @@
       - upload
   - platform: template
     sensors:
-      living_room_media:
+      alarm_clock_time:
         value_template: >
-          {% if is_state('media_player.living_room_media', 'off')  %}
-            off
-          {% elif states.media_player.living_room_media.attributes.media_content_type %}
-            {{ states.media_player.living_room_media.attributes.media_content_type }}
-          {% elif is_state_attr("media_player.living_room_media","active_child","media_player.living_room_cast") %}
-            movie
-          {% else %}
-            unknown
-          {% endif %}
+          {{ states.input_datetime.alarm_clock_time.attributes.timestamp | int | timestamp_custom('%H:%M',false) }}
