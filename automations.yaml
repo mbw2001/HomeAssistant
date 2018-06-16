@@ -228,8 +228,6 @@
     action:
       - service: light.turn_on
         entity_id: light.bedroom
-      - service: media_player.turn_on
-        entity_id: media_player.bedroom_media
       - service: media_player.play_media
         entity_id: media_player.bedroom_kodi
         data:
