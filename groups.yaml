@@ -2,8 +2,8 @@
     icon: mdi:home
     view: yes
     entities:
-      - device_tracker.mbw_galaxy_s7
-      - device_tracker.milla_galaxy_a3
+      - device_tracker.mbw_oneplus_6
+      - device_tracker.milla_oneplus_5t
       - sensor.yr_temperature
       - sensor.yr_precipitation
       - group.living_room_tiles
