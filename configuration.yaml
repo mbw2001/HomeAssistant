@@ -76,6 +76,7 @@ hue: !include hue.yaml
 zone: !include zones.yaml
 device_tracker: !include device_trackers.yaml
 media_player: !include media_players.yaml
+cast: !include cast.yaml
 sensor: !include sensors.yaml
 remote: !include remotes.yaml
 group: !include groups.yaml
