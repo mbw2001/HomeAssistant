@@ -1,0 +1,25 @@
+name: Floras Alle
+views:
+  - tab_icon: mdi:home-assistant
+    theme: dark-mode
+    cards:
+      - type: entities
+        title: Alarm
+        entities:
+          - input_boolean.alarm_clock_active
+          - input_datetime.alarm_clock_time
+          - input_boolean.alarm_clock_weekend
+      - type: glance
+        title: Lights
+        entities:
+          - light.living_room
+          - light.kitchen
+          - light.bedroom
+          - light.hallway
+          - light.office
+      - type: entity-filter
+        filter:
+          - domain: device_tracker
+            state: 'home'
+        card_config:
+          title: Whos home
