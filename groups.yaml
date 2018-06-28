@@ -1,5 +1,5 @@
   default_view:
-    icon: mdi:home
+    icon: mdi:home-assistant
     view: yes
     entities:
       - device_tracker.mbw_oneplus_6
