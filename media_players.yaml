@@ -1,7 +1,6 @@
   - platform: denonavr
     name: Living Room Amp
     host: 10.0.1.80
-  - platform: plex
   - platform: kodi
     name: Living Room Kodi
     host: 10.0.1.10
