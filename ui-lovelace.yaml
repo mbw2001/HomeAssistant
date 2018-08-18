@@ -1,25 +1,129 @@
 name: Floras Alle
 views:
-  - tab_icon: mdi:home-assistant
-    theme: dark-mode
+  - title: Home
+    icon: mdi:home-assistant
     cards:
+      - type: entity-filter
+        entities:
+          - device_tracker.mbw_oneplus_6
+          - device_tracker.milla_oneplus_5t
+        state_filter:
+          - home
+        card:
+          title: Who's home
+          type: glance
+          show_state: false
+          show_name: false
       - type: entities
         title: Alarm
+        show_header_toggle: false
         entities:
           - input_boolean.alarm_clock_active
           - input_datetime.alarm_clock_time
           - input_boolean.alarm_clock_weekend
       - type: glance
         title: Lights
+        show_state: false
         entities:
-          - light.living_room
-          - light.kitchen
-          - light.bedroom
-          - light.hallway
-          - light.office
-      - type: entity-filter
-        filter:
-          - domain: device_tracker
-            state: 'home'
-        card_config:
-          title: Whos home
+          - entity: light.living_room
+            tap_action: toggle
+          - entity: light.kitchen
+            tap_action: toggle
+          - entity: light.bedroom
+            tap_action: toggle
+          - entity: light.hallway
+            tap_action: toggle
+          - entity: light.office
+            tap_action: toggle
+  - title: Living Room
+    icon: mdi:sofa
+    cards:
+      - type: media-control
+        entity: media_player.living_room_media
+      - type: glance
+        title: Lights
+        show_state: false
+        column_width: 33%
+        entities:
+          - entity: light.screen_lights
+            tap_action: toggle
+          - entity: light.dining_table
+            tap_action: toggle
+          - entity: light.hue_go
+            tap_action: toggle
+      - type: entities
+        entities:
+          - climate.living_room
+  - title: Bedroom
+    icon: mdi:hotel
+    cards:
+      - type: media-control
+        entity: media_player.bedroom_media
+      - type: glance
+        title: Lights
+        show_state: false
+        column_width: 33%
+        entities:
+          - entity: light.bedroom_screen_light
+            tap_action: toggle
+          - entity: light.bedroom_camilla
+            tap_action: toggle
+          - entity: light.bedroom_michael
+            tap_action: toggle
+      - type: entities
+        entities:
+          - climate.bedroom
+  - title: Office
+    icon: mdi:laptop
+    cards:
+      - type: glance
+        title: Lights
+        show_state: false
+        entities:
+          - entity: light.office
+            tap_action: toggle
+      - type: entities
+        entities:
+          - climate.bedroom
+  - title: Kitchen
+    icon: mdi:stove
+    cards:
+      - type: media-control
+        entity: media_player.kitchen_speaker
+      - type: glance
+        title: Lights
+        show_state: false
+        entities:
+          - entity: light.kitchen_window
+            tap_action: toggle
+          - entity: light.kitchen_strip
+            tap_action: toggle
+  - title: Status
+    icon: mdi:view-dashboard
+    cards:
+      - type: entities
+        entities:
+          - group.all_automations
+      - type: history-graph
+        hours_to_show: 48
+        entities:
+          - entity: sensor.speedtest_ping
+            name: Ping
+      - type: history-graph
+        hours_to_show: 48
+        entities:
+          - sensor.nzbget_queue_size
+      - type: history-graph
+        hours_to_show: 48
+        entities:
+          - sensor.speedtest_download
+          - sensor.speedtest_upload
+      - type: history-graph
+        hours_to_show: 48
+        entities:
+          - entity: sensor.nzbget_speed
+            name: NZBGet
+          - entity: sensor.transmission_down_speed
+            name: Transmission Down
+          - entity: sensor.transmission_up_speed
+            name: Transmission Up
