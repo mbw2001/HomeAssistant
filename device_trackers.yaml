@@ -10,3 +10,4 @@
     password: !secret unifi_password
     track_new_devices: false
     verify_ssl: false
+  - platform: owntracks

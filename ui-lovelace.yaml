@@ -5,7 +5,7 @@ views:
     cards:
       - type: entity-filter
         entities:
-          - device_tracker.mbw_oneplus_6
+          - device_tracker.mbw_oneplus6
           - device_tracker.milla_oneplus_5t
         state_filter:
           - home
