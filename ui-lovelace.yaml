@@ -6,7 +6,7 @@ views:
       - type: entity-filter
         entities:
           - device_tracker.mbw_oneplus6
-          - device_tracker.milla_oneplus_5t
+          - device_tracker.milla_oneplus5t
         state_filter:
           - home
         card:
@@ -76,6 +76,8 @@ views:
   - title: Office
     icon: mdi:laptop
     cards:
+      - type: media-control
+        entity: media_player.office_speaker
       - type: glance
         title: Lights
         show_state: false
@@ -84,7 +86,7 @@ views:
             tap_action: toggle
       - type: entities
         entities:
-          - climate.bedroom
+          - climate.office
   - title: Kitchen
     icon: mdi:stove
     cards:
