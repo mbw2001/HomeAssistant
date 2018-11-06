@@ -1,9 +1,11 @@
 name: Floras Alle
 views:
-  - title: Home
+  - id: 0  # Automatically created id
+    title: Home
     icon: mdi:home-assistant
     cards:
-      - type: entity-filter
+      - id: 71d1ee4142c44675bbb207a2edb31e6f  # Automatically created id
+        type: entity-filter
         entities:
           - device_tracker.mbw_oneplus6
           - device_tracker.milla_oneplus5t
@@ -14,14 +16,16 @@ views:
           type: glance
           show_state: false
           show_name: false
-      - type: entities
+      - id: fd94773f37234a75a2d3941e59b53ecd  # Automatically created id
+        type: entities
         title: Alarm
         show_header_toggle: false
         entities:
           - input_boolean.alarm_clock_active
           - input_datetime.alarm_clock_time
           - input_boolean.alarm_clock_weekend
-      - type: glance
+      - id: 6b987930e8654335b490076e79a51ff1  # Automatically created id
+        type: glance
         title: Lights
         show_state: false
         entities:
@@ -35,12 +39,15 @@ views:
             tap_action: toggle
           - entity: light.office
             tap_action: toggle
-  - title: Living Room
+  - id: 1  # Automatically created id
+    title: Living Room
     icon: mdi:sofa
     cards:
-      - type: media-control
+      - id: 0e6fe5d32c6243d7b66fb86c10827eac  # Automatically created id
+        type: media-control
         entity: media_player.living_room_media
-      - type: glance
+      - id: d8ad4edf4fec4ff2a3e9bfdc46f9c789  # Automatically created id
+        type: glance
         title: Lights
         show_state: false
         column_width: 33%
@@ -51,15 +58,19 @@ views:
             tap_action: toggle
           - entity: light.hue_go
             tap_action: toggle
-      - type: entities
+      - id: 93d7521911ec46bcaec4e456b261a151  # Automatically created id
+        type: entities
         entities:
           - climate.living_room
-  - title: Bedroom
+  - id: 2  # Automatically created id
+    title: Bedroom
     icon: mdi:hotel
     cards:
-      - type: media-control
+      - id: 985304e616a4423ea3afb6528ab807ed  # Automatically created id
+        type: media-control
         entity: media_player.bedroom_media
-      - type: glance
+      - id: 2fdaf60f91d346e092987d13109bcaf4  # Automatically created id
+        type: glance
         title: Lights
         show_state: false
         column_width: 33%
@@ -70,29 +81,37 @@ views:
             tap_action: toggle
           - entity: light.bedroom_michael
             tap_action: toggle
-      - type: entities
+      - id: 32190a53443f49e8922b85c7580de802  # Automatically created id
+        type: entities
         entities:
           - climate.bedroom
-  - title: Office
+  - id: 3  # Automatically created id
+    title: Office
     icon: mdi:laptop
     cards:
-      - type: media-control
+      - id: a35e485226864c8c852fce87d525d7bc  # Automatically created id
+        type: media-control
         entity: media_player.office_speaker
-      - type: glance
+      - id: 741bdeb78bf8481591ba2039bc789da4  # Automatically created id
+        type: glance
         title: Lights
         show_state: false
         entities:
           - entity: light.office
             tap_action: toggle
-      - type: entities
+      - id: b102301905c9463fbb497b12b1d938b1  # Automatically created id
+        type: entities
         entities:
           - climate.office
-  - title: Kitchen
+  - id: 4  # Automatically created id
+    title: Kitchen
     icon: mdi:stove
     cards:
-      - type: media-control
+      - id: 25cb3e25d614422faad5ed82ce24b18e  # Automatically created id
+        type: media-control
         entity: media_player.kitchen_speaker
-      - type: glance
+      - id: 544da3eb4e4e4d29a2b2cb43538bd86b  # Automatically created id
+        type: glance
         title: Lights
         show_state: false
         entities:
@@ -100,27 +119,33 @@ views:
             tap_action: toggle
           - entity: light.kitchen_strip
             tap_action: toggle
-  - title: Status
+  - id: 5  # Automatically created id
+    title: Status
     icon: mdi:view-dashboard
     cards:
-      - type: entities
+      - id: 8886a9d05bea4529b205a03147b59d93  # Automatically created id
+        type: entities
         entities:
           - group.all_automations
-      - type: history-graph
+      - id: 331c9ca7b24643b886334bfd3548a766  # Automatically created id
+        type: history-graph
         hours_to_show: 48
         entities:
           - entity: sensor.speedtest_ping
             name: Ping
-      - type: history-graph
+      - id: c66221298b5b4282b319c2f2698be9c6  # Automatically created id
+        type: history-graph
         hours_to_show: 48
         entities:
           - sensor.nzbget_queue_size
-      - type: history-graph
+      - id: 7d3233230ebf48a485fb7d74aff7b4e4  # Automatically created id
+        type: history-graph
         hours_to_show: 48
         entities:
           - sensor.speedtest_download
           - sensor.speedtest_upload
-      - type: history-graph
+      - id: e3d154e281fc4f2c9ed6a14583bd0aa4  # Automatically created id
+        type: history-graph
         hours_to_show: 48
         entities:
           - entity: sensor.nzbget_speed

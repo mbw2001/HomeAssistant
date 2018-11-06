@@ -4,7 +4,9 @@
     trigger:
       platform: state
       entity_id: media_player.living_room_media
-      from: 'playing'
+      to: 'off'
+      for:
+        seconds: 1
     condition:
       condition: sun
       after: sunset
@@ -21,9 +23,14 @@
       platform: state
       entity_id: media_player.living_room_media
       to: 'playing'
+      for:
+        seconds: 1
     condition:
-      condition: sun
-      after: sunset
+      - condition: sun
+        after: sunset
+      - condition: state
+        entity_id: 'light.living_room'
+        state: 'on'
     action:
       - service: hue.hue_activate_scene
         data:
@@ -33,48 +40,30 @@
         data:
           entity_id: light.hallway
 
-  # Switch to Harmony activity Kodi when Kodi changes from idle
-  - id: living_room_switch_to_kodi
-    alias: "Living Room: Switch to Kodi"
+  # Set correct Harmony activity when media is playing in the living room
+  - id: living_room_switch_to_tv
+    alias: "Living Room: Switch to TV"
     trigger:
       platform: state
-      entity_id: media_player.living_room_kodi
+      entity_id: media_player.living_room_media
       to: 'playing'
       for:
         seconds: 1
     condition:
       condition: template
-      value_template: '{{ not is_state_attr("remote.living_room","current_activity","Kodi") }}'
+      value_template: '{{ not is_state_attr("remote.living_room","current_activity","Watch TV") }}'
     action:
       service: remote.turn_on
       data:
         entity_id: remote.living_room
-        activity: 'Kodi'
+        activity: 'Watch TV'
 
-  # Switch to Harmony activity Chromecast when Chromecast switches from off or idle
-  - id: living_room_switch_to_chromecast
-    alias: "Living Room: Switch to Chromecast"
-    trigger:
-      platform: state
-      entity_id: media_player.living_room_cast
-      to: 'playing'
-    condition:
-      condition: template
-      value_template: '{{ not is_state_attr("remote.living_room","current_activity","Chromecast") }}'
-    action:
-      service: remote.turn_on
-      data:
-        entity_id: remote.living_room
-        activity: 'Chromecast'
-
-  # Switch to Harmony activity Chromecast when Chromecast switches from off or idle
+  # Set correct Harmony activity when music is playing in the living room
   - id: living_room_switch_to_music
     alias: "Living Room: Switch to Music"
     trigger:
       platform: state
-      entity_id:
-        - media_player.living_room_speaker
-        - media_player.all_speakers
+      entity_id: media_player.living_room_soundbar
       to: 'playing'
     condition:
       condition: template
@@ -85,73 +74,23 @@
         entity_id: remote.living_room
         activity: 'Music'
 
-  # Switch Harmony to off when chromecast turns off
-  - id: living_room_poweroff_when_idle
-    alias: "Living Room: PowerOff when Idle"
-    trigger:
-      platform: state
-      entity_id: media_player.living_room_media
-      to: 'off'
-      for:
-        minutes: 5
-    condition:
-      condition: template
-      value_template: '{{ not is_state("remote.living_room","off") }}'
-    action:
-      service: remote.turn_off
-      data:
-        entity_id: remote.living_room
-
   # Switch to Harmony activity Kodi when Kodi changes from idle
-  - id: bedroom_switch_to_kodi
-    alias: "Bedroom: Switch to Kodi"
+  - id: bedroom_switch_to_tv
+    alias: "Bedroom: Switch to TV"
     trigger:
       platform: state
-      entity_id: media_player.bedroom_kodi
+      entity_id: media_player.bedroom_media
       to: 'playing'
       for:
         seconds: 1
     condition:
       condition: template
-      value_template: '{{ not is_state_attr("remote.bedroom","current_activity","Kodi") }}'
+      value_template: '{{ not is_state_attr("remote.bedroom","current_activity","Watch TV") }}'
     action:
       service: remote.turn_on
       data:
         entity_id: remote.bedroom
-        activity: 'Kodi'
-
-  # Switch to Harmony activity Chromecast when Chromecast switches from off or idle
-  - id: bedroom_switch_to_chromecast
-    alias: "Bedroom: Switch to Chromecast"
-    trigger:
-      platform: state
-      entity_id: media_player.bedroom_cast
-      to: 'playing'
-    condition:
-      condition: template
-      value_template: '{{ not is_state_attr("remote.bedroom","current_activity","Chromecast") }}'
-    action:
-      service: remote.turn_on
-      data:
-        entity_id: remote.bedroom
-        activity: 'Chromecast'
-
-  # Switch Harmony to off when chromecast turns off
-  - id: bedroom_poweroff_when_idle
-    alias: "Bedroom: PowerOff when Idle"
-    trigger:
-      platform: state
-      entity_id: media_player.bedroom_media
-      to: 'off'
-      for:
-        minutes: 5
-    condition:
-      condition: template
-      value_template: '{{ not is_state("remote.bedroom","off") }}'
-    action:
-      service: remote.turn_off
-      data:
-        entity_id: remote.bedroom
+        activity: 'Watch TV'
 
   # Notify when lights are on but noone is home
   - id: lights_on_empty_home
@@ -159,8 +98,8 @@
     trigger:
       - platform: state
         entity_id:
-          - device_tracker.mbw_oneplus_6
-          - device_tracker.milla_oneplus_5t
+          - device_tracker.mbw_oneplus6
+          - device_tracker.milla_oneplus5t
         to: 'not_home'
         for:
           minutes: 5
@@ -171,10 +110,10 @@
       condition: and
       conditions:
         - condition: state
-          entity_id: device_tracker.mbw_oneplus_6
+          entity_id: device_tracker.mbw_oneplus6
           state: 'not_home'
         - condition: state
-          entity_id: device_tracker.milla_oneplus_5t
+          entity_id: device_tracker.milla_oneplus5t
           state: 'not_home'
         - condition: state
           entity_id: group.all_lights
@@ -184,7 +123,7 @@
       data:
         title: "Lights are on"
         message: "There are lights on, but noone is home."
-        target: 'mbw_oneplus_6'
+        target: 'mbw_oneplus6'
         data:
           tag: 'turn_off_lights'
           actions:
@@ -226,8 +165,10 @@
                 - thu
                 - fri
     action:
+      - service: shell_command.bedroom_tv_start_kodi
       - service: light.turn_on
         entity_id: light.bedroom
+      - delay: '00:00:10'
       - service: media_player.play_media
         entity_id: media_player.bedroom_kodi
         data:

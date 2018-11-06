@@ -1,14 +1,14 @@
-  - platform: denonavr
-    name: Living Room Amp
-    host: 10.0.1.80
+#  - platform: denonavr
+#    name: Living Room Amp
+#    host: 10.0.1.80
   - platform: kodi
     name: Living Room Kodi
-    host: 10.0.1.10
+    host: 10.0.1.15
     username: !secret kodi_username
     password: !secret kodi_password
   - platform: kodi
     name: Bedroom Kodi
-    host: 10.0.1.11
+    host: 10.0.1.16
     username: !secret kodi_username
     password: !secret kodi_password
   - platform: universal
@@ -16,48 +16,56 @@
     children:
       - media_player.living_room_kodi
       - media_player.living_room_cast
-      - media_player.living_room_speaker
     commands:
       turn_on:
         service: remote.turn_on
         data_template:
           entity_id: remote.living_room
-          activity: Kodi
+          activity: "Watch TV"
       turn_off:
         service: remote.turn_off
         data:
           entity_id: remote.living_room
-      select_source:
-        service: media_player.select_source
-        data_template:
-          entity_id: media_player.living_room_amp
-          source: '{{ source }}'
-      volume_mute:
-        service: media_player.volume_mute
-        data_template:
-          entity_id: media_player.living_room_amp
-          is_volume_muted: '{{ not states.media_player.living_room_amp.attributes.is_volume_muted }}'
-      volume_set:
-        service: media_player.volume_set
-        data_template:
-          entity_id: media_player.living_room_amp
-          volume_level: '{{ volume_level }}'
-    attributes:
-      is_volume_muted: media_player.living_room_amp|is_volume_muted
-      volume_level: media_player.living_room_amp|volume_level
-      source: media_player.living_room_amp|source
-      source_list: media_player.living_room_amp|source_list
+      #select_source:
+      #  service: media_player.select_source
+      #  data_template:
+      #    entity_id: media_player.living_room_amp
+      #    source: '{{ source }}'
+      #volume_mute:
+      #  service: media_player.volume_mute
+      #  data_template:
+      #    entity_id: media_player.living_room_amp
+      #    is_volume_muted: '{{ not states.media_player.living_room_amp.attributes.is_volume_muted }}'
+      #volume_set:
+      #  service: media_player.volume_set
+      #  data_template:
+      #    entity_id: media_player.living_room_amp
+      #    volume_level: '{{ volume_level }}'
+    #attributes:
+    #  is_volume_muted: media_player.living_room_amp|is_volume_muted
+    #  volume_level: media_player.living_room_amp|volume_level
+    #  source: media_player.living_room_amp|source
+    #  source_list: media_player.living_room_amp|source_list
+  - platform: philips_js
+    name: Bedroom TV
+    host: 10.0.1.16
+    api_version: 5
+    turn_on_action:
+      service: wake_on_lan.send_magic_packet
+      data:
+        mac: 70:AF:24:14:32:74
   - platform: universal
     name: Bedroom Media
     children:
       - media_player.bedroom_kodi
       - media_player.bedroom_cast
+      - media_player.bedroom_tv
     commands:
       turn_on:
         service: remote.turn_on
         data_template:
           entity_id: remote.bedroom
-          activity: Kodi
+          activity: "Watch TV"
       turn_off:
         service: remote.turn_off
         data:

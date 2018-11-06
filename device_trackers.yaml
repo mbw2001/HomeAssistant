@@ -11,6 +11,6 @@
     track_new_devices: false
     verify_ssl: false
   - platform: owntracks
-  - platform: google_maps
-    username: !secret google_user
-    password: !secret google_password
+  #- platform: google_maps
+  #  username: !secret google_user
+  #  password: !secret google_password
