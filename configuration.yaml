@@ -5,7 +5,6 @@ homeassistant:
   elevation: !secret home_elevation
   unit_system: metric
   time_zone: !secret home_timezone
-  customize: !include customize.yaml
   auth_providers:
    - type: homeassistant
 
@@ -62,6 +61,8 @@ sun:
 
 map:
 
+person:
+
 wake_on_lan:
 
 notify:
@@ -69,28 +70,33 @@ notify:
   name: html5-notify
   gcm_api_key: !secret gcm_api_key
   gcm_sender_id: !secret gcm_sender_id
+
 mqtt:
   broker: !secret mqtt_broker
   port: !secret mqtt_port
   username: !secret mqtt_username
   password: !secret mqtt_password
 
+netatmo:
+  api_key: !secret netatmo_api_key
+  secret_key: !secret netatmo_secret_key
+  username: !secret netatmo_username
+  password: !secret netatmo_password
+
 ifttt:
   key: !secret ifttt_key
-tado:
-  username: !secret tado_username
-  password: !secret tado_password
-hue: !include hue.yaml
+
+speedtestdotnet:
+
+#transmission:
+#  host: !secret transmission_host
+#  port: !secret transmission_port
+#  username: !secret transmission_username
+#  password: !secret transmission_password
 
 zone: !include zones.yaml
-device_tracker: !include device_trackers.yaml
-media_player: !include media_players.yaml
-cast: !include cast.yaml
-sensor: !include sensors.yaml
 remote: !include remotes.yaml
-automation: !include automations.yaml
-script: !include scripts.yaml
+device_tracker: !include device_trackers.yaml
+sensor: !include sensors.yaml
 input_boolean: !include input_boolean.yaml
 input_datetime: !include input_datetime.yaml
-shell_command:
-  bedroom_tv_start_kodi: python -c "import socket; s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.sendto(bytes('YatseStart-Xbmc', 'utf-8'), ('10.0.1.16', 5600))"

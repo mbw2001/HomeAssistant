@@ -2,6 +2,7 @@
     display_options:
       - 'time'
       - 'date'
+  - platform: netatmo
   - platform: yr
     monitored_conditions:
       - symbol
@@ -18,25 +19,14 @@
       - highClouds
       - dewpointTemperature
   - platform: nzbget
-    host: nzbget
+    host: !secret nzbget_host
+    port: !secret nzbget_port
+    ssl: true
     username: !secret nzbget_username
     password: !secret nzbget_password
     monitored_variables:
       - download_rate
       - remaining_size
-  - platform: transmission
-    host: transmission
-    username: !secret transmission_username
-    password: !secret transmission_password
-    monitored_variables:
-      - current_status
-      - download_speed
-      - upload_speed
-  - platform: speedtest
-    monitored_conditions:
-      - ping
-      - download
-      - upload
   - platform: template
     sensors:
       alarm_clock_time:
