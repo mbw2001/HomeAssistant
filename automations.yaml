@@ -1,0 +1,116 @@
+- id: '1566466893191'
+  alias: Vacuum
+  trigger:
+  - at: '11:00:00'
+    platform: time
+  - entity_id: person.michael_winkel
+    event: leave
+    platform: zone
+    zone: zone.home
+  - entity_id: person.camilla_christensen
+    event: leave
+    platform: zone
+    zone: zone.home
+  condition:
+  - condition: template
+    value_template: '{{ not is_state(''person.michael_winkel'', ''home'') }}'
+  - condition: template
+    value_template: '{{ not is_state(''person.camilla_christensen'', ''home'') }}'
+  - after: 09:00:00
+    before: '13:00:00'
+    condition: time
+  action:
+  - data:
+      entity_id: vacuum.tumle
+    service: vacuum.start_pause
+- id: '1567088370668'
+  alias: Michael left Work
+  trigger:
+  - entity_id: device_tracker.oneplus_a6003
+    event: leave
+    platform: zone
+    zone: zone.configit
+  condition:
+  - after: '15:00:00'
+    before: '19:00:00'
+    condition: time
+  action:
+  - data:
+      entity_id: sensor.michael_home
+    service: homeassistant.update_entity
+  - data:
+      data:
+        tag: michael_home
+      message: Forventet hjemme om {{ states('sensor.michael_home') }} min ({{ (now().strftime('%s')
+        | int + (states('sensor.michael_home') | int * 60)) | timestamp_custom('%H:%M',
+        false) }})
+      target:
+      title: Michael har forladt kontoret
+    service: notify.mobile_app_oneplus_a5010
+- id: '1567674235251'
+  alias: Camilla left Work
+  trigger:
+  - entity_id: device_tracker.oneplus_a5010
+    event: leave
+    platform: zone
+    zone: zone.uiu
+  - entity_id: device_tracker.320i
+    event: enter
+    platform: zone
+    zone: zone.uiu
+  condition:
+  - after: '11:00:00'
+    before: '23:59:00'
+    condition: time
+  action:
+  - data:
+      entity_id: sensor.camilla_home
+    service: homeassistant.update_entity
+  - data:
+      data:
+        tag: camilla_home
+      message: Forventet hjemme om {{ states('sensor.camilla_home') }} min ({{ (now().strftime('%s')
+        | int + (states('sensor.camilla_home') | int * 60)) | timestamp_custom('%H:%M',
+        false) }})
+      target:
+      title: Camilla har forladt kontoret
+    service: notify.mobile_app_oneplus_a6003
+- id: '1576573187577'
+  alias: Set Theme at Startup
+  description: ''
+  trigger:
+  - event: start
+    platform: homeassistant
+  condition: []
+  action:
+  - data:
+      name: transparent_theme
+    service: frontend.set_theme
+- id: '1576578293051'
+  alias: CO2
+  description: ''
+  trigger:
+  - above: '900'
+    entity_id: sensor.netatmo_savannehuset_living_room_co2
+    platform: numeric_state
+  - above: '900'
+    entity_id: sensor.netatmo_savannehuset_bedroom_co2
+    platform: numeric_state
+  - above: '900'
+    entity_id: sensor.netatmo_savannehuset_office_co2
+    platform: numeric_state
+  condition: []
+  action:
+  - data:
+      data:
+        apns_headers:
+          apns-collapse-id: homeassistant-co2
+      message: 'Living Room: {{states(''sensor.netatmo_savannehuset_living_room_co2'')}}
+
+        Bedroom: {{states(''sensor.netatmo_savannehuset_bedroom_co2'')}}
+
+        Office: {{states(''sensor.netatmo_savannehuset_office_co2'')}}
+
+        '
+      title: Open Windows
+    service: notify.mobile_app_oneplus_a6003

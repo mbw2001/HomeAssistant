@@ -10,3 +10,7 @@
     latitude: !secret zone2_lattitude
     longitude: !secret zone2_longtitude
     radius: !secret zone2_radius
+  - name: !secret zone3_name
+    latitude: !secret zone3_lattitude
+    longitude: !secret zone3_longtitude
+    radius: !secret zone3_radius

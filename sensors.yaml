@@ -1,34 +1,70 @@
-  - platform: time_date
-    display_options:
-      - 'time'
-      - 'date'
-  - platform: netatmo
-  - platform: yr
-    monitored_conditions:
-      - symbol
-      - temperature
-      - humidity
-      - pressure
-      - precipitation
-      - windSpeed
-      - windDirection
-      - fog
-      - cloudiness
-      - lowClouds
-      - mediumClouds
-      - highClouds
-      - dewpointTemperature
-  - platform: nzbget
-    host: !secret nzbget_host
-    port: !secret nzbget_port
-    ssl: true
-    username: !secret nzbget_username
-    password: !secret nzbget_password
-    monitored_variables:
-      - download_rate
-      - remaining_size
   - platform: template
     sensors:
-      alarm_clock_time:
-        value_template: >
-          {{ states.input_datetime.alarm_clock_time.attributes.timestamp | int | timestamp_custom('%H:%M',false) }}
+      oneplus6_battery:
+        friendly_name: 'Oneplus 6 Battery'
+        value_template: "{{ state_attr('device_tracker.oneplus_a6003', 'battery_level') }}"
+        unit_of_measurement: '%'
+        icon_template: "mdi:battery-{{ (states('sensor.oneplus6_battery') | int / 10) | round(0) * 10 }}"
+      oneplus5t_battery:
+        friendly_name: 'Oneplus 5t Battery'
+        value_template: "{{ state_attr('device_tracker.oneplus_a5010', 'battery_level') }}"
+        unit_of_measurement: '%'
+        icon_template: "mdi:battery-{{ (states('sensor.oneplus5t_battery') | int / 10) | round(0) * 10 }}"
+      oneplus6_homewifi:
+        friendly_name: 'Oneplus 6 Home Wifi'
+        value_template: "{{ state_attr('device_tracker.oneplus_6', 'essid') }}"
+        icon_template: "mdi:wifi{% if not is_state('device_tracker.oneplus_6', 'home')%}-off{%endif%}"
+      oneplus5t_homewifi:
+        friendly_name: 'Oneplus 5t Home Wifi'
+        value_template: "{{ state_attr('device_tracker.oneplus5tcamilla', 'essid') }}"
+        icon_template: "mdi:wifi{% if not is_state('device_tracker.oneplus5tcamilla', 'home')%}-off{%endif%}"
+      tumle_battery:
+        friendly_name: 'Tumle Battery'
+        value_template: "{{ state_attr('vacuum.tumle', 'battery_level') }}"
+        icon_template: "{{ state_attr('vacuum.tumle', 'battery_icon') }}"
+      tumle_status:
+        friendly_name: 'Tumle Status'
+        value_template: "{{ state_attr('vacuum.tumle', 'status') }}"
+        icon_template: 'mdi:home'
+      320i_status:
+        friendly_name: 'Tumle Status'
+        value_template: "{{ state_attr('vacuum.tumle', 'status') }}"
+        icon_template: 'mdi:home'
+
+  - platform: netatmo
+  - platform: google_travel_time
+    name: Michael Home
+    api_key: !secret google_apikey
+    origin: device_tracker.oneplus_a6003
+    destination: zone.home
+    scan_interval: 86400
+    options:
+      mode: transit
+  - platform: google_travel_time
+    name: Camilla Home
+    api_key: !secret google_apikey
+    origin: device_tracker.oneplus_a5010
+    destination: zone.home
+    scan_interval: 86400
+    options:
+      mode: driving
+  - platform: glances
+    host: glances
+    version: 3
+    resources:
+      - disk_use_percent
+      - disk_use
+      - disk_free
+      - memory_use_percent
+      - memory_use
+      - memory_free
+      - swap_use_percent
+      - swap_use
+      - swap_free
+      - processor_load
+      - process_running
+      - process_total
+      - process_thread
+      - process_sleeping
+      - cpu_use_percent
+      - cpu_temp

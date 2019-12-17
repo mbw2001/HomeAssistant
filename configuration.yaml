@@ -1,5 +1,6 @@
 homeassistant:
   name: Home
+  customize: !include customize.yaml
   latitude: !secret home_lattitude
   longitude: !secret home_longtitude
   elevation: !secret home_elevation
@@ -18,25 +19,17 @@ http:
   cors_allowed_origins:
     - https://google.com
     - https://home-assistant.io
-  trusted_proxies: 127.0.0.1
-  use_x_forwarded_for: True
-  ip_ban_enabled: True
+    - https://cast.home-assistant.io
+  trusted_proxies: 172.18.0.0/16
+  use_x_forwarded_for: true
+  ip_ban_enabled: true
   login_attempts_threshold: 3
 
-# Checks for available updates
 updater:
-
-# Discover some devices automatically
 discovery:
-
-# Allows you to issue voice commands from the frontend in enabled browsers
-conversation:
-
 # Log Severities: notset, debug, info, warn, warning, error, fatal, critical
 logger:
   default: warning
-  logs:
-    DenonAVR: critical
 
 recorder:
   db_url: !secret db_url
@@ -47,35 +40,32 @@ recorder:
       - sensor.date
       - sensor.time
 
-# Enables support for tracking state changes over time.
 history:
 
-# View all events in a logbook
 logbook:
   exclude:
     entities:
       - sensor.yr_symbol
 
-# Track the sun
+system_health:
+
 sun:
 
-map:
-
 person:
+
+mobile_app:
 
 wake_on_lan:
 
 notify:
-  platform: html5
-  name: html5-notify
-  gcm_api_key: !secret gcm_api_key
-  gcm_sender_id: !secret gcm_sender_id
-
-mqtt:
-  broker: !secret mqtt_broker
-  port: !secret mqtt_port
-  username: !secret mqtt_username
-  password: !secret mqtt_password
+  - platform: html5
+    name: html5-notify
+    vapid_pub_key: !secret vapid_pub_key
+    vapid_prv_key: !secret vapid_prv_key
+    vapid_email: !secret vapid_email
+  - platform: webostv
+    host: 10.0.1.70
+    name: living_room_tv
 
 netatmo:
   api_key: !secret netatmo_api_key
@@ -88,15 +78,35 @@ ifttt:
 
 speedtestdotnet:
 
-#transmission:
-#  host: !secret transmission_host
-#  port: !secret transmission_port
-#  username: !secret transmission_username
-#  password: !secret transmission_password
+nzbget:
+  host: !secret nzbget_host
+  port: !secret nzbget_port
+  ssl: false
+  username: !secret nzbget_username
+  password: !secret nzbget_password
+        
+transmission:
+  host: !secret transmission_host
+  port: !secret transmission_port
+  username: !secret transmission_username
+  password: !secret transmission_password
 
+vacuum:
+  - platform: roomba
+    host: !secret roomba_host
+    username: !secret roomba_username
+    password: !secret roomba_password
+    name: !secret roomba_name
+
+bmw_connected_drive:
+  name:
+    username: !secret bmw_username
+    password: !secret bmw_password
+    region: "rest_of_world"
+
+automation: !include automations.yaml
 zone: !include zones.yaml
 remote: !include remotes.yaml
-device_tracker: !include device_trackers.yaml
 sensor: !include sensors.yaml
-input_boolean: !include input_boolean.yaml
-input_datetime: !include input_datetime.yaml
+media_player: !include media_players.yaml
+cast: !include cast.yaml

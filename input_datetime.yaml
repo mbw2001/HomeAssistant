@@ -1,4 +1,0 @@
-alarm_clock_time:
-  name: Time
-  has_date: false
-  has_time: true
