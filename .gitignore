@@ -1,7 +1,5 @@
 deps/*
 tts/*
-www/*
-custom_components/*
 *.conf
 *.log
 *.db
