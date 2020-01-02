@@ -85,12 +85,6 @@ nzbget:
   ssl: false
   username: !secret nzbget_username
   password: !secret nzbget_password
-        
-transmission:
-  host: !secret transmission_host
-  port: !secret transmission_port
-  username: !secret transmission_username
-  password: !secret transmission_password
 
 vacuum:
   - platform: roomba
