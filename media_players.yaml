@@ -2,6 +2,7 @@
     name: Living Room Media
     children:
       - media_player.living_room_kodi
+      - media_player.living_room_cast
       - media_player.living_room_shield
       - media_player.living_room_tv
     commands:
@@ -27,6 +28,9 @@
       data:
         entity_id: media_player.living_room_kodi
         method: Application.Quit
+  - platform: androidtv
+    name: Living Room Shield
+    host: 10.0.1.84
   - platform: webostv
     host: 10.0.1.70
     name: 'Living Room TV'
@@ -39,4 +43,17 @@
         - 'Netflix'
         - 'Plex'
         - 'UHD Fireplace'
-
+  - platform: universal
+    name: Yoga Room Media
+    children:
+      - media_player.yoga_tv_cast
+      - media_player.yoga_tv
+    attributes:
+      source: media_player.yoga_tv|source
+      source_list: media_player.yoga_tv|source_list
+  - platform: philips_android_tv
+    name: Yoga TV
+    host: !secret phillips_tv_host
+    username: !secret phillips_tv_username
+    password: !secret phillips_tv_password
+    mac: !secret phillips_tv_mac
