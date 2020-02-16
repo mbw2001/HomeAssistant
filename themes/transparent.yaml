@@ -1,7 +1,6 @@
 transparent:
 # Main colors
 # https://www.color-hex.com/color/5294e2
-  #lovelace-background: center / cover no-repeat url("/local/dark-blur-abstract-4k-v3.jpg") fixed
   lovelace-background: center / cover no-repeat url("/local/bg3.jpg") fixed
   primary-color: '#5294E2'                                                        # Header
   accent-color: '#E45E65'                                                         # Accent color
@@ -75,4 +74,5 @@ transparent:
   google-green-500: '#39E949'
 
 # compact-custom-header https://github.com/maykar/compact-custom-header/wiki/Styling-Config
-  ch-background: 'rgba(150, 150, 150, 0.2)'
+  #ch-background: 'rgba(150, 150, 150, 0.2)'
+  ch-background: 'rgba(150, 150, 150, 0.0)'
