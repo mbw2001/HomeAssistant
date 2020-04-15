@@ -1,12 +1,12 @@
 transparent:
 # Main colors
 # https://www.color-hex.com/color/5294e2
-  lovelace-background: center / cover no-repeat url("/local/bg3.jpg") fixed
+  lovelace-background: center / cover no-repeat url("/local/darkblur.jpg") fixed
   primary-color: '#5294E2'                                                        # Header
   accent-color: '#E45E65'                                                         # Accent color
   dark-primary-color: 'var(--accent-color)'                                       # Hyperlinks                                         
   light-primary-color: 'var(--accent-color)'                                      # Horizontal line in about
-  ha-card-border-radius: '15px'   
+  ha-card-border-radius: '10px'   
   ha-card-background: 'rgba(150, 150, 150, 0.1)'
 
 # Text colors                                                                  
