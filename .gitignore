@@ -1,12 +1,12 @@
 deps/*
 tts/*
+custom_components/*
 *.conf
 *.log
 *.db
 *.db-journal
 *.sqlite
+.*
 secrets.yaml
 known_devices.yaml
-entity_registry.yaml
-.*
 !/.gitignore
