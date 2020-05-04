@@ -1,0 +1,46 @@
+turn_on_tv:
+  alias: Turn on TV
+  sequence:
+  - condition: template
+    value_template: '{{ not is_state_attr(''remote.living_room'', ''current_activity'',
+      ''Watch TV'') }}'
+  - data:
+      activity: Watch TV
+      entity_id: remote.living_room
+    service: remote.turn_on
+turn_on_news:
+  alias: Turn on News
+  sequence:
+  - service: remote.turn_on
+    data:
+      entity_id: remote.living_room
+      activity: Watch TV
+  - service: media_player.select_source
+    data:
+      entity_id: media_player.living_room_shield
+      source: Kodi
+  - service: media_player.play_media
+    data_template:
+      entity_id: media_player.living_room_kodi
+      media_content_type: CHANNEL
+      media_content_id: 24
+start_playlist:
+  alias: Start Spotify Playlist
+  sequence:
+  - service: input_select.select_option
+    data_template:
+      entity_id: input_select.playlists
+      option: '{{ playlist }}'
+  - service: spotcast.start
+    data_template:
+      entity_id: '{{ entity_id }}'
+      force_playback: true
+      random_song: true
+      repeat: true
+      shuffle: true
+      uri: '{% if playlist == ''90s Acoustics'' %} spotify:playlist:37i9dQZF1DXb9LIXaj5WhL
+        {% elif playlist == ''Rock du kender'' %} spotify:playlist:37i9dQZF1DXcSNirXzsHRX
+        {% elif playlist == ''Comfort Zone'' %} spotify:playlist:37i9dQZF1DWYWddJiPzbvb
+        {% elif playlist == ''Stripped Down'' %} spotify:playlist:37i9dQZF1DWXMJdkLQRrmg
+        {% elif playlist == ''Relaxing Piano'' %} spotify:playlist:0OOZzfr4olaGarfeaydGZf
+        {% endif %}'

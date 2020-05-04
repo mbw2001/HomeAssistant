@@ -1,35 +1,35 @@
 - id: '1566466893191'
   alias: Vacuum
   trigger:
-  - at: '11:00:00'
+  - at: '10:00:00'
     platform: time
-  - entity_id: person.michael_winkel
+  - entity_id: person.michael
     event: leave
     platform: zone
     zone: zone.home
-  - entity_id: person.camilla_christensen
+  - entity_id: person.camilla
     event: leave
     platform: zone
     zone: zone.home
   condition:
   - condition: template
-    value_template: '{{ not is_state(''person.michael_winkel'', ''home'') }}'
+    value_template: '{{ not is_state(''person.michael'', ''home'') }}'
   - condition: template
-    value_template: '{{ not is_state(''person.camilla_christensen'', ''home'') }}'
+    value_template: '{{ not is_state(''person.camilla'', ''home'') }}'
   - after: 09:00:00
-    before: '13:00:00'
+    before: '15:00:00'
     condition: time
   action:
-  - data:
-      entity_id: vacuum.tumle
-    service: vacuum.start_pause
+  - data: {}
+    entity_id: vacuum.tumle
+    service: vacuum.start
 - id: '1567088370668'
   alias: Michael left Work
   trigger:
   - entity_id: device_tracker.michael_phone
     event: leave
     platform: zone
-    zone: zone.configit
+    zone: zone.timengo
   condition:
   - after: '15:00:00'
     before: '22:00:00'
@@ -50,24 +50,21 @@
     event: leave
     platform: zone
     zone: zone.uiu
-  - entity_id: device_tracker.320i
-    event: leave
-    platform: zone
-    zone: zone.uiu
+  - event_data:
+      action: update_camilla_work_notification
+    event_type: ''
+    platform: event
   condition:
   - after: '11:00:00'
     before: '23:59:00'
     condition: time
   action:
-  - entity_id: sensor.camilla_travel
-    service: homeassistant.update_entity
   - data:
       data:
         tag: camilla_home
       message: Forventet hjemme om {{ states('sensor.camilla_travel') }} min ({{ (now().strftime('%s')
         | int + (states('sensor.camilla_travel') | int * 60)) | timestamp_custom('%H:%M',
         false) }})
-      target:
       title: Camilla har forladt kontoret
     service: notify.mobile_app_michael_phone
 - id: '1576573187577'
@@ -79,10 +76,10 @@
   condition: []
   action:
   - data:
-      name: transparent
+      name: calm
     service: frontend.set_theme
 - id: '1576578293051'
-  alias: CO2
+  alias: CO2 Alert
   description: ''
   trigger:
   - above: '900'
@@ -97,6 +94,10 @@
   condition: []
   action:
   - data:
+      data:
+        clickAction: /lovelace/co2
+        sticky: 'true'
+        tag: co2notification
       message: 'Living Room: {{states(''sensor.netatmo_savannehuset_living_room_co2'')}}
 
         Bedroom: {{states(''sensor.netatmo_savannehuset_bedroom_co2'')}}
@@ -104,3 +105,174 @@
         Office: {{states(''sensor.netatmo_savannehuset_office_co2'')}}'
       title: Open Windows
     service: notify.mobile_app_michael_phone
+  - data:
+      data:
+        clickAction: /lovelace/co2
+        sticky: 'true'
+        tag: co2notification
+      message: 'Living Room: {{states(''sensor.netatmo_savannehuset_living_room_co2'')}}
+
+        Bedroom: {{states(''sensor.netatmo_savannehuset_bedroom_co2'')}}
+
+        Office: {{states(''sensor.netatmo_savannehuset_office_co2'')}}'
+      title: Open Windows
+    service: notify.mobile_app_camilla_phone
+- id: '1585128715301'
+  alias: CO2 Clear Alert
+  description: ''
+  trigger:
+  - below: '900'
+    entity_id: sensor.netatmo_savannehuset_living_room_co2
+    platform: numeric_state
+  - below: '900'
+    entity_id: sensor.netatmo_savannehuset_bedroom_co2
+    platform: numeric_state
+  - below: '900'
+    entity_id: sensor.netatmo_savannehuset_office_co2
+    platform: numeric_state
+  condition:
+  - condition: and
+    conditions:
+    - below: '900'
+      condition: numeric_state
+      entity_id: sensor.netatmo_savannehuset_living_room_co2
+    - below: '900'
+      condition: numeric_state
+      entity_id: sensor.netatmo_savannehuset_bedroom_co2
+    - below: '900'
+      condition: numeric_state
+      entity_id: sensor.netatmo_savannehuset_office_co2
+  action:
+  - data:
+      data:
+        sticky: 'false'
+        tag: co2notification
+      message: clear_notification
+    service: notify.mobile_app_michael_phone
+  - data:
+      data:
+        sticky: 'false'
+        tag: co2notification
+      message: clear_notification
+    service: notify.mobile_app_camilla_phone
+- id: '1585905570064'
+  alias: Vacuum Full
+  description: ''
+  trigger:
+  - entity_id: binary_sensor.tumle_bin_full
+    platform: state
+    to: 'True'
+  condition: []
+  action:
+  - data:
+      data:
+        clickAction: /lovelace/living_room
+        sticky: 'true'
+        tag: vacuumfull
+      message: Tid til at tømme støvsugeren
+      title: Tumle er fuld
+    service: notify.mobile_app_michael_phone
+- id: '1585902279108'
+  alias: Vacuum Emptied
+  description: ''
+  trigger:
+  - entity_id: binary_sensor.tumle_bin_full
+    platform: state
+    to: 'False'
+  condition: []
+  action:
+  - data:
+      data:
+        sticky: 'false'
+        tag: vacuumfull
+      message: clear_notification
+    service: notify.mobile_app_michael_phone
+  - data:
+      data:
+        sticky: 'false'
+        tag: vacuumfull
+      message: clear_notification
+    service: notify.mobile_app_camilla_phone
+- id: '1586359083253'
+  alias: Leaving Home
+  description: Turn off music when leaving
+  trigger:
+  - device_id: 4a0f1e0acd7642019160c3c55890083b
+    domain: hue
+    platform: device
+    subtype: turn_off
+    type: remote_button_short_release
+  condition: []
+  action:
+  - data: {}
+    entity_id: all
+    service: media_player.turn_off
+- id: '1586360523356'
+  alias: Alarm
+  description: ''
+  trigger:
+  - device_id: 669d07afbd3545f69c4c35356610dfef
+    domain: binary_sensor
+    entity_id: binary_sensor.hallway_sensor_motion
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 1
+    platform: device
+    type: motion
+  condition:
+  - condition: template
+    value_template: '{{ not is_state(''person.michael'', ''home'') }}'
+  - condition: template
+    value_template: '{{ not is_state(''person.camilla'', ''home'') }}'
+  action:
+  - data:
+      data:
+        priority: high
+        ttl: 0
+      message: Bevægelsessensor aktiveret men ingen er hjemme
+      title: Alarm
+    service: notify.mobile_app_michael_phone
+- id: '1586639714136'
+  alias: Start Tumle
+  description: ''
+  trigger:
+  - device_id: 4a0f1e0acd7642019160c3c55890083b
+    domain: hue
+    platform: device
+    subtype: turn_off
+    type: remote_button_long_release
+  condition: []
+  action:
+  - data: {}
+    entity_id: vacuum.tumle
+    service: vacuum.start
+- id: '1586967018072'
+  alias: Enable Remote
+  description: ''
+  trigger:
+  - entity_id: media_player.living_room_media
+    from: 'off'
+    platform: state
+  condition:
+  - condition: template
+    value_template: '{{ not is_state(''remote.living_room'', ''Watch TV'') }}'
+  action:
+  - data:
+      activity: Watch TV
+    entity_id: remote.living_room
+    service: remote.turn_on
+- id: '1588586666039'
+  alias: Vacuum Stop
+  description: ''
+  trigger:
+  - device_id: 4a0f1e0acd7642019160c3c55890083b
+    domain: hue
+    platform: device
+    subtype: turn_on
+    type: remote_button_long_release
+  condition: []
+  action:
+  - data: {}
+    entity_id: vacuum.tumle
+    service: vacuum.return_to_base

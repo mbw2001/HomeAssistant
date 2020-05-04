@@ -1,65 +1,73 @@
 - platform: template
   sensors:
-    oneplus6_battery:
-      friendly_name: 'Oneplus 6 Battery'
-      value_template: "{{ state_attr('device_tracker.michael_phone', 'battery_level') }}"
-      unit_of_measurement: '%'
-      device_class: battery
-    oneplus5t_battery:
-      friendly_name: 'Oneplus 5t Battery'
-      value_template: "{{ state_attr('device_tracker.camilla_phone', 'battery_level') }}"
-      unit_of_measurement: '%'
-      device_class: battery
-    tumle_battery:
-      friendly_name: 'Tumle Battery'
-      value_template: "{{ state_attr('vacuum.tumle', 'battery_level') }}"
-      icon_template: "{{ state_attr('vacuum.tumle', 'battery_icon') }}"
-      unit_of_measurement: '%'
-      device_class: battery
-    living_room_co2:
-      friendly_name: 'Living Room CO2'
-      value_template: "{{ states('sensor.netatmo_savannehuset_living_room_co2') }}"
-      icon_template: 'mdi:periodic-table-co2'
-    bedroom_co2:
-      friendly_name: 'Bedroom CO2'
-      value_template: "{{ states('sensor.netatmo_savannehuset_bedroom_co2') }}"
-      icon_template: 'mdi:periodic-table-co2'
-    office_co2:
-      friendly_name: 'Office CO2'
-      value_template: "{{ states('sensor.netatmo_savannehuset_office_co2') }}"
-      icon_template: 'mdi:periodic-table-co2'
-    camilla_transport_destination:
-      value_template: >-
-        {% if (now().hour > 12 and not is_state('device_tracker.camilla_phone', 'home')) or is_state('device_tracker.camilla_phone', 'UiU') %}
-          Home
-        {% else %}
-          UiU
-        {% endif %}
-    michael_transport_destination:
-      value_template: >-
-        {% if (now().hour > 12 and not is_state('device_tracker.michael_phone', 'home')) or is_state('device_tracker.michael_phone', 'Configit') %}
-          Home
-        {% else %}
-          Configit
-        {% endif %}
+    tv_stats:
+      entity_id:
+        - sensor.living_room_tv_on_today
+        - sensor.living_room_tv_on_yesterday
+      friendly_name: TV Stats
+      value_template:  >-
+          {% if is_state('media_player.living_room_media', 'Off') %}
+            Off
+          {% else %}
+            On
+          {% endif %}
+      icon_template: mdi:television
+      attribute_templates:
+        today: '{{ state_attr(''sensor.living_room_tv_on_today'', ''value'') }}'
+        yesterday: '{{ state_attr(''sensor.living_room_tv_on_yesterday'', ''value'') }}'
+- platform: uptime
 - platform: version
   source: local
 - platform: version
   source: docker
-- platform: netatmo
 - platform: google_travel_time
   name: Michael Travel
   api_key: !secret google_apikey
   origin: device_tracker.michael_phone
-  destination: sensor.michael_transport_destination
+  destination: Home
   scan_interval: 3600
   options:
-    mode: transit
+    mode: driving
 - platform: google_travel_time
   name: Camilla Travel
   api_key: !secret google_apikey
   origin: device_tracker.camilla_phone
-  destination: sensor.camilla_transport_destination
+  destination: Home
   scan_interval: 3600
   options:
-    mode: driving
+    mode: transit
+- platform: history_stats
+  name: Living Room TV on Today
+  entity_id: media_player.living_room_tv
+  state: 'on'
+  start: '{{ now().replace(hour=0).replace(minute=0).replace(second=0) }}'
+  end: '{{ now() }}'
+- platform: history_stats
+  name: Living Room TV on Yesterday
+  entity_id: media_player.living_room_tv
+  state: 'on'
+  end: '{{ now().replace(hour=0).replace(minute=0).replace(second=0) }}'
+  duration:
+    hours: 24
+- platform: history_stats
+  name: Tumle Runtime Today
+  entity_id: vacuum.tumle
+  state: 'on'
+  start: '{{ now().replace(hour=0).replace(minute=0).replace(second=0) }}'
+  end: '{{ now() }}'
+- platform: history_stats
+  name: Michael Home
+  entity_id: person.michael
+  state: 'home'
+  end: '{{ now() }}'
+  type: ratio
+  duration:
+    days: 7
+- platform: history_stats
+  name: Camilla Home
+  entity_id: person.camilla
+  state: 'home'
+  end: '{{ now() }}'
+  type: ratio
+  duration:
+    days: 7

@@ -1,5 +1,5 @@
-  - platform: universal
-    name: Living Room Media
+  - name: Living Room Media
+    platform: universal
     children:
       - media_player.living_room_kodi
       - media_player.living_room_cast
@@ -8,18 +8,25 @@
     commands:
       turn_on:
         service: remote.turn_on
-        entity_id: remote.living_room
+        data:
+          entity_id: remote.living_room
+          activity: Watch TV
       volume_up:
         service: media_player.volume_up
         entity_id: media_player.living_room_tv
       volume_down:
         service: media_player.volume_down
         entity_id: media_player.living_room_tv
+      select_source:
+        service: media_player.select_source
+        data_template:
+          entity_id: media_player.living_room_shield
+          source: '{{ source }}'
     attributes:
-      source: media_player.living_room_tv|source
-      source_list: media_player.living_room_tv|source_list
-  - platform: kodi
-    name: 'Living Room Kodi'
+      source: media_player.living_room_shield|source
+      source_list: media_player.living_room_shield|source_list
+  - name: Living Room Kodi
+    platform: kodi
     host: !secret kodi_host
     username: !secret kodi_user
     password: !secret kodi_password
@@ -28,32 +35,150 @@
       data:
         entity_id: media_player.living_room_kodi
         method: Application.Quit
-  - platform: androidtv
-    name: Living Room Shield
+  - name: Living Room Shield
+    platform: androidtv
     host: 10.0.1.84
+    exclude_unnamed_apps: true
+    state_detection_rules:
+      'com.google.android.tvlauncher':
+        - 'standby'
+    apps:
+      com.google.android.tvlauncher: 'Launcher'
+      com.viaplay.android: 'Viaplay'
+      dk.tv2.tv2playtv: 'TV2 Play'
+      com.spotify.tv.android: ''
+      tv.twitch.android.app:  ''
   - platform: webostv
     host: 10.0.1.70
     name: 'Living Room TV'
-    customize:
-      sources:
-        - 'Home Theatre'
-        - 'PS3'
-        - 'YouTube'
-        - 'TV 2 PLAY'
-        - 'Netflix'
-        - 'Plex'
-        - 'UHD Fireplace'
   - platform: universal
     name: Yoga Room Media
     children:
+      - media_player.yoga_tv_kodi
       - media_player.yoga_tv_cast
       - media_player.yoga_tv
+    commands:
+      turn_on:
+        service: media_player.turn_on
+        entity_id: media_player.yoga_tv
+      select_source:
+        service: media_player.select_source
+        data_template:
+          entity_id: media_player.yoga_tv
+          source: '{{ source }}'
+      volume_set:
+        service: media_player.volume_set
+        data_template:
+          entity_id: media_player.yoga_tv
+          volume_level: '{{ volume_level }}'
     attributes:
+      state: media_player.yoga_tv|state
+      volume_level: media_player.yoga_tv|volume_level
       source: media_player.yoga_tv|source
       source_list: media_player.yoga_tv|source_list
-  - platform: philips_android_tv
-    name: Yoga TV
+  - name: Yoga TV Kodi
+    platform: kodi
+    host: !secret phillips_tv_host
+    username: !secret kodi_user
+    password: !secret kodi_password
+    turn_off_action:
+      service: kodi.call_method
+      data:
+        entity_id: media_player.yoga_tv_kodi
+        method: Application.Quit
+  - name: Yoga TV
+    platform: philips_android_tv
     host: !secret phillips_tv_host
     username: !secret phillips_tv_username
     password: !secret phillips_tv_password
     mac: !secret phillips_tv_mac
+  - name: Living Room Music
+    platform: universal
+    children:
+      - media_player.living_room_speaker
+    commands:
+      turn_on:
+        service: spotcast.start
+        data:
+          entity_id: media_player.living_room_speaker
+          force_playback: true
+      select_source:
+        service: script.start_playlist
+        data_template:
+          entity_id: media_player.living_room_speaker
+          playlist: '{{ source }}'
+    attributes:
+      source: input_select.playlists
+      source_list: input_select.playlists|options
+  - name: Bedroom Music
+    platform: universal
+    children:
+      - media_player.bedroom_speaker
+    commands:
+      turn_on:
+        service: spotcast.start
+        data:
+          entity_id: media_player.bedroom_speaker
+          force_playback: true
+      select_source:
+        service: script.start_playlist
+        data_template:
+          entity_id: media_player.bedroom_speaker
+          playlist: '{{ source }}'
+    attributes:
+      source: input_select.playlists
+      source_list: input_select.playlists|options
+  - name: Office Music
+    platform: universal
+    children:
+      - media_player.office_speaker
+    commands:
+      turn_on:
+        service: spotcast.start
+        data:
+          entity_id: media_player.office_speaker
+          force_playback: true
+      select_source:
+        service: script.start_playlist
+        data_template:
+          entity_id: media_player.office_speaker
+          playlist: '{{ source }}'
+    attributes:
+      source: input_select.playlists
+      source_list: input_select.playlists|options
+  - name: Yoga Room Music
+    platform: universal
+    children:
+      - media_player.yoga_speaker
+    commands:
+      turn_on:
+        service: spotcast.start
+        data:
+          entity_id: media_player.yoga_speaker
+          force_playback: true
+      select_source:
+        service: script.start_playlist
+        data_template:
+          entity_id: media_player.yoga_speaker
+          playlist: '{{ source }}'
+    attributes:
+      source: input_select.playlists
+      source_list: input_select.playlists|options
+  - name: Bathroom Music
+    platform: universal
+    children:
+      - media_player.bathroom_speaker
+    commands:
+      turn_on:
+        service: spotcast.start
+        data:
+          entity_id: media_player.bathroom_speaker
+          force_playback: true
+      select_source:
+        service: script.start_playlist
+        data_template:
+          entity_id: media_player.bathroom_speaker
+          playlist: '{{ source }}'
+    attributes:
+      source: input_select.playlists
+      source_list: input_select.playlists|options

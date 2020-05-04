@@ -1,11 +1,5 @@
 homeassistant:
-  name: Home
   customize: !include customize.yaml
-  latitude: !secret home_lattitude
-  longitude: !secret home_longtitude
-  elevation: !secret home_elevation
-  unit_system: metric
-  time_zone: !secret home_timezone
   auth_providers:
    - type: homeassistant
 
@@ -33,7 +27,6 @@ logger:
 
 recorder:
   db_url: !secret db_url
-  purge_interval: 7
   purge_keep_days: 14
   exclude:
     entities:
@@ -57,41 +50,47 @@ mobile_app:
 
 wake_on_lan:
 
+browser_mod:
+  prefix: "client_"
+  devices:
+    99980b13-dabc9563:
+      name: client_michael_work_laptop
+      disable:
+      - light
+      - media_player
+    a53691e0_6b9d4dc8:
+      name: client_oneplus6
+      disable:
+      - light
+      - media_player
+  disable:
+    - light
+    - media_player
+
 notify:
-  - platform: html5
-    name: html5-notify
-    vapid_pub_key: !secret vapid_pub_key
-    vapid_prv_key: !secret vapid_prv_key
-    vapid_email: !secret vapid_email
-  - platform: webostv
-    host: 10.0.1.70
-    name: living_room_tv
 
 netatmo:
-  api_key: !secret netatmo_api_key
-  secret_key: !secret netatmo_secret_key
-  username: !secret netatmo_username
-  password: !secret netatmo_password
-  discovery: false
+  client_id: !secret netatmo_client_id
+  client_secret: !secret netatmo_client_secret
+
+spotify:
+  client_id: !secret spotify_client_id
+  client_secret: !secret spotify_client_secret
 
 ifttt:
   key: !secret ifttt_key
 
 speedtestdotnet:
 
+docker_monitor:
+  monitored_conditions:
+
 nzbget:
-  host: !secret nzbget_host
+  host: nzbget
   port: !secret nzbget_port
   ssl: false
   username: !secret nzbget_username
   password: !secret nzbget_password
-
-vacuum:
-  - platform: roomba
-    host: !secret roomba_host
-    username: !secret roomba_username
-    password: !secret roomba_password
-    name: !secret roomba_name
 
 bmw_connected_drive:
   name:
@@ -99,9 +98,31 @@ bmw_connected_drive:
     password: !secret bmw_password
     region: "rest_of_world"
 
+webostv:
+  host: 10.0.1.70
+  name: 'Living Room TV'
+  customize:
+    sources:
+      - 'Home Theatre'
+      - 'PS3'
+      - 'YouTube'
+      - 'TV 2 PLAY'
+      - 'Netflix'
+      - 'Plex'
+      - 'UHD Fireplace'
+
+spotcast:
+  username: !secret spotify_username
+  password: !secret spotify_password
+
 automation: !include automations.yaml
-zone: !include zones.yaml
 remote: !include remotes.yaml
 sensor: !include sensors.yaml
 media_player: !include media_players.yaml
-cast: !include cast.yaml
+input_boolean: !include input_boolean.yaml
+input_select: !include input_select.yaml
+input_text: !include input_text.yaml
+input_number: !include input_number.yaml
+input_datetime: !include input_datetime.yaml
+binary_sensor: !include binary_sensor.yaml
+script: !include scripts.yaml

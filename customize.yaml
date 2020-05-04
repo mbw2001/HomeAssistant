@@ -1,6 +1,6 @@
-person.michael_winkel:
+person.michael:
   entity_picture: https://s.gravatar.com/avatar/23268fc644c6cf3137b7f7a4ca4e42b9?s=200
-person.camilla_christensen:
+person.camilla:
   entity_picture: https://s.gravatar.com/avatar/d06b228543e1245813cd403e19852921?s=200
 device_tracker.320i:
   entity_picture: /local/bmw.png
