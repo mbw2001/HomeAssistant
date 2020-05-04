@@ -2,7 +2,7 @@ Wood:
   # Header:
   app-header-background-color: "#000000"
   app-header-text-color: "#BDC1C6"
-  ch-background: 'rgba(150, 150, 150, 0.0)'
+  ch-background: 'rgba(150, 150, 150, 0.1)'
   # Main Interface Colors
   primary-color: "#5F9BEA"
   light-primary-color: var(--primary-color)
@@ -11,6 +11,7 @@ Wood:
   secondary-background-color: var(--primary-background-color)
   divider-color: var(--primary-background-color)
   # Cards
+  ha-card-padding: '5px'
   ha-card-border-radius: '8px'
   ha-card-background: 'rgba(150, 150, 150, 0.1)'
   # Text
@@ -43,7 +44,6 @@ Wood:
   label-badge-blue: "#44A4CD"
   label-badge-yellow: "#D5AE43"
   label-badge-gray: "#5F6267"
-
   # Cards
   paper-card-background-color: "#000000"
   paper-listbox-background-color: "#0D0D0D"

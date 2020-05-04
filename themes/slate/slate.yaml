@@ -89,5 +89,3 @@ slate:
   material-background-color: "var(--paper-listbox-background-color)"
   material-secondary-background-color: '#222222'
   material-body-text-color: '#FFFFFF'
-
-  ch-background: 'rgba(150, 150, 150, 0.0)'
