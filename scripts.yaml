@@ -11,19 +11,17 @@ turn_on_tv:
 turn_on_news:
   alias: Turn on News
   sequence:
-  - service: remote.turn_on
-    data:
-      entity_id: remote.living_room
-      activity: Watch TV
-  - service: media_player.select_source
-    data:
+  - service: script.turn_on_tv
+  - data:
       entity_id: media_player.living_room_shield
       source: Kodi
-  - service: media_player.play_media
-    data_template:
+    service: media_player.select_source
+  - delay: '2'
+  - data_template:
       entity_id: media_player.living_room_kodi
-      media_content_type: CHANNEL
       media_content_id: 24
+      media_content_type: CHANNEL
+    service: media_player.play_media
 start_playlist:
   alias: Start Spotify Playlist
   sequence:
