@@ -1,30 +1,46 @@
+- platform: uptime
+- platform: version
+  source: local
+- platform: version
+  source: docker
+- platform: time_date
+  display_options:
+    - 'time'
+    - 'date'
+    - 'date_time'
+    - 'date_time_utc'
+    - 'date_time_iso'
+    - 'time_date'
+    - 'time_utc'
+    - 'beat'
 - platform: template
   sensors:
     tv_stats:
-      entity_id:
-        - sensor.living_room_tv_on_today
-        - sensor.living_room_tv_on_yesterday
       friendly_name: TV Stats
       value_template:  >-
-          {% if is_state('media_player.living_room_media', 'Off') %}
+          {% if is_state('media_player.alrum_media', 'Off') %}
             Off
           {% else %}
             On
           {% endif %}
       icon_template: mdi:television
       attribute_templates:
-        today: '{{ state_attr(''sensor.living_room_tv_on_today'', ''value'') }}'
-        yesterday: '{{ state_attr(''sensor.living_room_tv_on_yesterday'', ''value'') }}'
-- platform: uptime
-- platform: version
-  source: local
-- platform: version
-  source: docker
+        today: '{{ state_attr(''sensor.alrum_tv_today'', ''value'') }}'
+        yesterday: '{{ state_attr(''sensor.alrum_tv_yesterday'', ''value'') }}'
+    low_battery:
+      friendly_name: "Low Battery"
+      value_template: >
+        {%- set threshold = 20 -%}
+        {%- for domain in ['light', 'switch', 'sensor', 'lock'] -%}
+          {%- for item in states[domain] if ((item.attributes.battery_level is defined and item.attributes['battery_level'] | int < threshold) or ("battery" in item.name | lower and ((item.state | int < threshold and item.state|int != 0) or item.state | lower == "low" or item.state | lower == "unknown"))) -%}
+            {{ item.attributes.friendly_name }}{%- if not loop.last %}, {% endif -%}
+          {%- endfor -%}
+        {%- endfor -%}
 - platform: google_travel_time
   name: Michael Travel
   api_key: !secret google_apikey
-  origin: device_tracker.michael_phone
-  destination: Home
+  origin: device_tracker.samsungs20
+  destination: zone.home
   scan_interval: 3600
   options:
     mode: driving
@@ -32,19 +48,19 @@
   name: Camilla Travel
   api_key: !secret google_apikey
   origin: device_tracker.camilla_phone
-  destination: Home
+  destination: zone.home
   scan_interval: 3600
   options:
     mode: transit
 - platform: history_stats
-  name: Living Room TV on Today
-  entity_id: media_player.living_room_tv
+  name: alrum_tv_today
+  entity_id: media_player.alrum_tv
   state: 'on'
   start: '{{ now().replace(hour=0).replace(minute=0).replace(second=0) }}'
   end: '{{ now() }}'
 - platform: history_stats
-  name: Living Room TV on Yesterday
-  entity_id: media_player.living_room_tv
+  name: alrum_tv_yesterday
+  entity_id: media_player.alrum_tv
   state: 'on'
   end: '{{ now().replace(hour=0).replace(minute=0).replace(second=0) }}'
   duration:
@@ -52,7 +68,7 @@
 - platform: history_stats
   name: Tumle Runtime Today
   entity_id: vacuum.tumle
-  state: 'on'
+  state: 'cleaning'
   start: '{{ now().replace(hour=0).replace(minute=0).replace(second=0) }}'
   end: '{{ now() }}'
 - platform: history_stats

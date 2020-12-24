@@ -1,6 +1,56 @@
-person.michael:
-  entity_picture: https://s.gravatar.com/avatar/23268fc644c6cf3137b7f7a4ca4e42b9?s=200
-person.camilla:
-  entity_picture: https://s.gravatar.com/avatar/d06b228543e1245813cd403e19852921?s=200
 device_tracker.320i:
   entity_picture: /local/bmw.png
+binary_sensor.utility_room_door:
+  device_class: door
+binary_sensor.hoveddoer:
+  device_class: door
+switch.kontor_stik:
+  device_class: outlet
+switch.entre_lys:
+  device_class: outlet
+binary_sensor.kokkenvindue_hojre:
+  device_class: window
+binary_sensor.kokkenvindue_venstre:
+  device_class: window
+binary_sensor.alrum_udestuedor:
+  device_class: door
+binary_sensor.badevaerelsesvindue:
+  device_class: window
+binary_sensor.kontorvindue:
+  device_class: window
+binary_sensor.sovevaerelsesvindue:
+  device_class: window
+binary_sensor.udestuedor:
+  device_class: door
+binary_sensor.alrum_udestue_dor:
+  device_class: door
+binary_sensor.bryggersdor:
+  device_class: door
+binary_sensor.hoveddor:
+  device_class: door
+switch.entre_stik:
+  device_class: outlet
+binary_sensor.udestue:
+  device_class: door
+binary_sensor.kontor_vindue:
+  device_class: window
+binary_sensor.sovevaerelsevindue:
+  device_class: window
+binary_sensor.koekkenvindue_hoejre:
+  device_class: window
+binary_sensor.koekkenvindue_venstre:
+  device_class: window
+binary_sensor.bryggersdoer:
+  device_class: door
+binary_sensor.alrumdoer:
+  device_class: door
+binary_sensor.badevaerelsevindue:
+  device_class: window
+binary_sensor.udestuedoer:
+  device_class: door
+binary_sensor.gaestevaerelse_vindue:
+  device_class: window
+binary_sensor.stuedoer:
+  device_class: door
+binary_sensor.gaestevaerelsevindue:
+  device_class: window

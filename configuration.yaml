@@ -8,13 +8,14 @@ frontend:
 
 config:
 
+cloud:
+
 http:
-  base_url: !secret base_url
   cors_allowed_origins:
     - https://google.com
     - https://home-assistant.io
     - https://cast.home-assistant.io
-  trusted_proxies: 172.18.0.0/16
+  trusted_proxies: 10.0.10.0/24
   use_x_forwarded_for: true
   ip_ban_enabled: true
   login_attempts_threshold: 3
@@ -50,24 +51,17 @@ mobile_app:
 
 wake_on_lan:
 
-browser_mod:
-  prefix: "client_"
-  devices:
-    99980b13-dabc9563:
-      name: client_michael_work_laptop
-      disable:
-      - light
-      - media_player
-    a53691e0_6b9d4dc8:
-      name: client_oneplus6
-      disable:
-      - light
-      - media_player
-  disable:
-    - light
-    - media_player
-
 notify:
+  - platform: html5
+    name: HTML5
+    vapid_pub_key: !secret vapid_pub_key
+    vapid_prv_key: !secret vapid_prv_key
+    vapid_email: !secret vapid_email
+  - platform: group
+    name: both_phones
+    services:
+      - service: mobile_app_michaels_telefon
+      - service: mobile_app_camilla_phone
 
 netatmo:
   client_id: !secret netatmo_client_id
@@ -76,14 +70,15 @@ netatmo:
 spotify:
   client_id: !secret spotify_client_id
   client_secret: !secret spotify_client_secret
+  
+spotcast:
+  sp_dc: !secret spotify_dc
+  sp_key: !secret spotify_key
 
 ifttt:
   key: !secret ifttt_key
 
 speedtestdotnet:
-
-docker_monitor:
-  monitored_conditions:
 
 nzbget:
   host: nzbget
@@ -99,8 +94,8 @@ bmw_connected_drive:
     region: "rest_of_world"
 
 webostv:
-  host: 10.0.1.70
-  name: 'Living Room TV'
+  host: 10.0.1.72
+  name: 'Alrum TV'
   customize:
     sources:
       - 'Home Theatre'
@@ -111,12 +106,7 @@ webostv:
       - 'Plex'
       - 'UHD Fireplace'
 
-spotcast:
-  username: !secret spotify_username
-  password: !secret spotify_password
-
 automation: !include automations.yaml
-remote: !include remotes.yaml
 sensor: !include sensors.yaml
 media_player: !include media_players.yaml
 input_boolean: !include input_boolean.yaml

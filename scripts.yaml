@@ -1,44 +1,49 @@
-turn_on_tv:
-  alias: Turn on TV
-  sequence:
-  - condition: template
-    value_template: '{{ not is_state_attr(''remote.living_room'', ''current_activity'',
-      ''Watch TV'') }}'
-  - data:
-      activity: Watch TV
-      entity_id: remote.living_room
-    service: remote.turn_on
 turn_on_news:
   alias: Turn on News
   sequence:
-  - service: script.turn_on_tv
+  - type: turn_on
+    device_id: f1f514092da9a4cd22fa9f84b0c9fbf4
+    entity_id: remote.alrum_remote
+    domain: remote
   - data:
-      entity_id: media_player.living_room_shield
       source: Kodi
     service: media_player.select_source
-  - delay: '2'
-  - data_template:
-      entity_id: media_player.living_room_kodi
+    entity_id: media_player.alrum_shield
+  - wait_for_trigger:
+    - platform: state
+      entity_id: media_player.alrum_shield
+      attribute: source
+      to: kodi
+    continue_on_timeout: true
+    timeout: '2'
+  - service: media_player.play_media
+    data:
       media_content_id: 24
       media_content_type: CHANNEL
-    service: media_player.play_media
-start_playlist:
-  alias: Start Spotify Playlist
+    entity_id: media_player.alrum_kodi
+  mode: single
+notification_michael_hvis_hjemme:
+  alias: Notificer Michael hvis Hjemme
   sequence:
-  - service: input_select.select_option
-    data_template:
-      entity_id: input_select.playlists
-      option: '{{ playlist }}'
-  - service: spotcast.start
-    data_template:
-      entity_id: '{{ entity_id }}'
-      force_playback: true
-      random_song: true
-      repeat: true
-      shuffle: true
-      uri: '{% if playlist == ''90s Acoustics'' %} spotify:playlist:37i9dQZF1DXb9LIXaj5WhL
-        {% elif playlist == ''Rock du kender'' %} spotify:playlist:37i9dQZF1DXcSNirXzsHRX
-        {% elif playlist == ''Comfort Zone'' %} spotify:playlist:37i9dQZF1DWYWddJiPzbvb
-        {% elif playlist == ''Stripped Down'' %} spotify:playlist:37i9dQZF1DWXMJdkLQRrmg
-        {% elif playlist == ''Relaxing Piano'' %} spotify:playlist:0OOZzfr4olaGarfeaydGZf
-        {% endif %}'
+  - condition: zone
+    entity_id: person.michael
+    zone: zone.home
+  - service: notify.mobile_app_michaels_telefon
+    data:
+      title: '{{ title }}'
+      message: '{{ message }}'
+      data:
+        sticky: 'true'
+        tag: '{{ tag }}'
+  mode: parallel
+  max: 10
+  fields:
+    title:
+      description: The title of the notification
+      example: State change
+    message:
+      description: The message content
+      example: The light is on!
+    tag:
+      description: A tag for the notification
+      example: sample_notification
