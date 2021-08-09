@@ -189,7 +189,7 @@ views:
                   type: service
                   id: spotcast.start
                   data:
-                    entity_id: media_player.badevaerelse_hojtaler
+                    entity_id: media_player.badevarelse_hojtaler
                     force_playback: true
         filter:
           include:

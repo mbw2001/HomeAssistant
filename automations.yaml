@@ -934,7 +934,6 @@
         value_template: '{{ wait.trigger.event.data.action == ''ignore_alarm_disabled''
           }}'
       sequence: []
-    default:
   mode: single
 - id: '1621152495954'
   alias: Remote - TV
