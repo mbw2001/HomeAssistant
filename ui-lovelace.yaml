@@ -1,0 +1,1094 @@
+button_card_templates: !include dashboards/buttons.yaml
+views:
+  - icon: 'mdi:home'
+    path: home
+    title: Home
+    cards:
+      - type: weather-forecast
+        entity: weather.home
+        show_forecast: false
+      - type: horizontal-stack
+        cards:
+          - type: entities
+            entities:
+              - type: 'custom:multiple-entity-row'
+                entity: alarm_control_panel.baunedalen
+                name: Baunedalen
+                show_state: false
+                secondary_info:
+                  entity: alarm_control_panel.baunedalen
+                  name: 'Alarm:'
+                entities:
+                  - entity: sensor.bryggersdor_battery
+                    name: Batteri
+                  - entity: binary_sensor.bryggersdor_open
+                    name: Tilstand
+                  - entity: lock.bryggersdor
+                    name: Status
+                toggle: false
+      - type: vertical-stack
+        cards:
+          - type: grid
+            columns: 3
+            square: false
+            cards:
+              - type: 'custom:button-card'
+                name: Entré
+                entity: light.entre
+                template: area_btn
+                variables:
+                  icon: 'mdi:door'
+                  sensor: binary_sensor.hoveddoer
+                  label_entity: sensor.entre_temperature
+              - type: 'custom:button-card'
+                name: Alrum
+                entity: light.alrum
+                template: area_btn
+                variables:
+                  icon: 'mdi:television'
+                  sensor: binary_sensor.alrumdoer
+                  label_entity: sensor.alrum_temperature
+              - type: 'custom:button-card'
+                name: Køkken
+                entity: light.kokken
+                template: area_btn
+                variables:
+                  icon: 'mdi:stove'
+                  sensor: binary_sensor.koekkenvindue_hoejre
+                  label_entity: sensor.alrum_temperature
+              - type: 'custom:button-card'
+                name: Stue
+                entity: light.stue
+                template: area_btn
+                variables:
+                  icon: 'mdi:sofa'
+                  sensor: binary_sensor.stuedoer
+                  label_entity: sensor.stue_temperature
+              - type: 'custom:button-card'
+                name: Bryggers
+                entity: light.bryggers
+                template: area_btn
+                variables:
+                  icon: 'mdi:washing-machine'
+                  sensor: binary_sensor.bryggersdoer
+                  label_entity: sensor.bryggers_temperature
+              - type: 'custom:button-card'
+                name: Soveværelse
+                entity: light.sovevaerelse
+                template: area_btn
+                variables:
+                  icon: 'mdi:bed'
+                  sensor: binary_sensor.sovevaerelsevindue
+                  label_entity: sensor.sovevaerelse_temperature
+              - type: 'custom:button-card'
+                name: Kontor
+                entity: light.kontor
+                template: area_btn
+                variables:
+                  icon: 'mdi:keyboard'
+                  sensor: binary_sensor.kontorvindue
+                  label_entity: sensor.kontor_temperature
+              - type: 'custom:button-card'
+                name: Badeværelse
+                entity: light.badevaerelse
+                template: area_btn
+                variables:
+                  icon: 'mdi:shower-head'
+                  sensor: binary_sensor.badevaerelsevindue
+                  label_entity: sensor.badevaerelse_temperature
+              - type: 'custom:button-card'
+                name: Gæstetoilet
+                entity: light.toilet
+                template: area_btn
+                variables:
+                  icon: 'mdi:toilet'
+                  label_entity: sensor.toilet_temperature
+              - type: 'custom:button-card'
+                name: Gæsteværelse
+                entity: light.gaestevaerelse
+                template: area_btn
+                variables:
+                  icon: 'mdi:bunk-bed'
+                  sensor: binary_sensor.gaestevaerelsevindue
+                  label_entity: sensor.gaestevaerelse_temperature
+              - type: 'custom:button-card'
+                name: Udestue
+                entity: light.udestue
+                template: area_btn
+                variables:
+                  icon: 'mdi:weather-sunny'
+                  sensor: binary_sensor.udestuedoer
+                  label_entity: sensor.udestue_temperature
+              - type: 'custom:button-card'
+                name: Carport
+                entity: light.carport
+                template: area_btn
+                variables:
+                  icon: 'mdi:garage-open-variant'
+                  sensor: binary_sensor.carport_sensor_occupancy
+                  label_entity: sensor.carport_sensor_temperature
+          - type: grid
+            cards:
+              - type: 'custom:button-card'
+                name: Skur
+                entity: sensor.skur_temperature
+                template: area_btn_small
+                variables:
+                  icon: 'mdi:bike'
+              - type: 'custom:button-card'
+                name: Værksted
+                entity: sensor.vaerksted_temperature
+                template: area_btn_small
+                variables:
+                  icon: 'mdi:screw-flat-top'
+            columns: 2
+            square: false
+      - type: 'custom:auto-entities'
+        card:
+          type: vertical-stack
+        card_param: cards
+        entities:
+          - type: 'custom:mini-media-player'
+            entity: media_player.spotify_michael_winkel
+            name: Spotify
+            hide:
+              icon: true
+              power: true
+              info: true
+              progress: true
+              controls: true
+              source: true
+            shortcuts:
+              columns: 6
+              buttons:
+                - icon: 'mdi:stove'
+                  type: service
+                  id: spotcast.start
+                  data:
+                    entity_id: media_player.kokken_hojtaler
+                    force_playback: true
+                - icon: 'mdi:bed'
+                  type: service
+                  id: spotcast.start
+                  data:
+                    entity_id: media_player.sovevaerelse_hojtaler
+                    force_playback: true
+                - icon: 'mdi:weather-sunny'
+                  type: service
+                  id: spotcast.start
+                  data:
+                    entity_id: media_player.udestue_hojtaler
+                    force_playback: true
+                - icon: 'mdi:keyboard-outline'
+                  type: service
+                  id: spotcast.start
+                  data:
+                    entity_id: media_player.kontor_hojtaler
+                    force_playback: true
+                - icon: 'mdi:shower-head'
+                  type: service
+                  id: spotcast.start
+                  data:
+                    entity_id: media_player.badevaerelse_hojtaler
+                    force_playback: true
+        filter:
+          include:
+            - domain: media_player
+              not:
+                entity_id: media_player.spotify_*
+              options:
+                type: 'custom:mini-media-player'
+                artwork: cover
+                replace_mute: stop
+                source: icon
+                hide:
+                  icon: true
+                  progress: true
+          exclude:
+            - state: 'off'
+            - state: unavailable
+            - entity_id: media_player.alrum_kodi
+            - entity_id: media_player.alrum_shield
+            - entity_id: media_player.shield
+            - entity_id: media_player.alrum_tv
+            - entity_id: media_player.shield_plex
+              state: idle
+        sort:
+          method: entity_id
+          reverse: false
+        show_empty: false
+      - type: grid
+        columns: 5
+        square: false
+        cards:
+          - type: 'custom:button-card'
+            entity: media_player.alrum_tv
+            icon: 'mdi:television'
+            template: icon_btn
+          - type: 'custom:button-card'
+            entity: media_player.alrum_shield
+            icon: 'si:nvidia'
+            template: icon_btn
+          - type: 'custom:button-card'
+            entity: media_player.shield
+            icon: 'mdi:cast'
+            template: icon_btn
+          - type: 'custom:button-card'
+            entity: media_player.alrum_kodi
+            icon: 'mdi:kodi'
+            template: icon_btn
+          - type: 'custom:button-card'
+            entity: media_player.spotify_michael_winkel
+            icon: 'mdi:spotify'
+            template: icon_btn
+      - type: grid
+        columns: 5
+        square: false
+        cards:
+          - type: 'custom:button-card'
+            entity: vacuum.roborock_s7
+            template: icon_btn
+          - type: 'custom:button-card'
+            entity: vacuum.tumle
+            template: icon_btn
+          - type: custom:button-card
+            entity: vacuum.sileno
+            template: icon_btn
+          - type: 'custom:button-card'
+            entity: sensor.vaskemaskine_effekt
+            icon: mdi:washing-machine
+            template: icon_btn
+          - type: 'custom:button-card'
+            icon: mdi:tumble-dryer
+            entity: sensor.torretumbler_effekt
+            template: icon_btn
+      - type: 'custom:mini-graph-card'
+        name: Kuldioxid
+        icon: 'mdi:molecule-co2'
+        color_thresholds:
+          - color: '#44ba83'
+            value: 400
+          - color: '#E0A957'
+            value: 1000
+          - color: '#B54949'
+            value: 1200
+        entities:
+          - entity: sensor.netatmo_alrum_co2
+            name: Alrum
+          - entity: sensor.netatmo_stue_co2
+            name: Stue
+          - entity: sensor.netatmo_sovevaerelse_co2
+            name: Soveværelse
+          - entity: sensor.netatmo_kontor_co2
+            name: Kontor
+        hour24: true
+        line_width: 2
+        show:
+          state: false
+          legend: true
+      - type: 'custom:mini-graph-card'
+        name: Luftfugtighed
+        icon: 'mdi:water-percent'
+        color_thresholds:
+          - color: '#44ba83'
+            value: 30
+          - color: '#E0A957'
+            value: 50
+          - color: '#B54949'
+            value: 70
+        entities:
+          - name: Bryggers
+            entity: sensor.bryggers_humidity
+          - name: Entre
+            entity: sensor.entre_humidity
+          - name: Alrum
+            entity: sensor.netatmo_alrum_humidity
+          - name: Stue
+            entity: sensor.netatmo_stue_humidity
+          - name: Soveværelse
+            entity: sensor.netatmo_sovevaerelse_humidity
+          - name: Kontor
+            entity: sensor.netatmo_kontor_humidity
+          - name: Gæsteværelse
+            entity: sensor.gaestevaerelse_humidity
+          - name: Badeværelse
+            entity: sensor.badevaerelse_humidity
+          - name: Toilet
+            entity: sensor.toilet_humidity
+          - name: Skur
+            entity: sensor.skur_humidity
+          - name: Værksted
+            entity: sensor.vaerksted_humidity
+        hour24: true
+        line_width: 2
+        show:
+          state: false
+  - icon: 'mdi:floor-plan'
+    path: rooms
+    title: Rooms
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: entities
+            title: Alrum
+            entities:
+              - type: 'custom:auto-entities'
+                card:
+                  type: 'custom:fold-entity-row'
+                  head:
+                    entity: light.alrum
+                    type: 'custom:slider-entity-row'
+                    name: Alrum Lys
+                    toggle: true
+                filter:
+                  include:
+                    - domain: light
+                      area: Alrum
+                      options:
+                        type: 'custom:slider-entity-row'
+                        toggle: true
+                  exclude:
+                    - name: '* Lys'
+              - type: 'custom:auto-entities'
+                card:
+                  type: 'custom:fold-entity-row'
+                  head:
+                    entity: light.kokken
+                    type: 'custom:slider-entity-row'
+                    name: Køkken Lys
+                    toggle: true
+                filter:
+                  include:
+                    - domain: light
+                      area: Køkken
+                      options:
+                        type: 'custom:slider-entity-row'
+                        toggle: true
+                  exclude:
+                    - name: '* Lys'
+              - name: Termostat
+                entity: climate.alrum
+          - type: grid
+            columns: 4
+            square: false
+            cards:
+              - type: 'custom:button-card'
+                entity: scene.aben_gardiner_kokken
+                template: icon_btn_scene
+              - type: 'custom:button-card'
+                entity: scene.diskrete_gardiner_kokken
+                template: icon_btn_scene
+              - type: 'custom:button-card'
+                entity: scene.luk_gardiner_kokken
+                template: icon_btn_scene
+              - type: 'custom:button-card'
+                entity: scene.aften_tv
+                template: icon_btn_scene
+          - type: 'custom:mini-graph-card'
+            name: Temperatur
+            line_width: 3
+            color_thresholds:
+              - color: '#539BE1'
+                value: 15
+              - color: '#44BA83'
+                value: 21
+              - color: '#E0A957'
+                value: 24
+              - color: '#B54949'
+                value: 28
+            entities:
+              - sensor.netatmo_alrum_temperature
+          - type: horizontal-stack
+            cards:
+              - type: 'custom:mini-graph-card'
+                name: Kuldioxid
+                line_width: 3
+                color_thresholds:
+                  - color: '#44BA83'
+                    value: 400
+                  - color: '#E0A957'
+                    value: 800
+                  - color: '#B54949'
+                    value: 1100
+                entities:
+                  - sensor.netatmo_alrum_co2
+              - type: 'custom:mini-graph-card'
+                name: Luftfugtighed
+                line_width: 3
+                color_thresholds:
+                  - color: '#539BE1'
+                    value: 30
+                  - color: '#44BA83'
+                    value: 50
+                  - color: '#539BE1'
+                    value: 70
+                entities:
+                  - sensor.netatmo_alrum_humidity
+      - type: vertical-stack
+        cards:
+          - type: entities
+            title: Soveværelse
+            entities:
+              - type: 'custom:auto-entities'
+                card:
+                  type: 'custom:fold-entity-row'
+                  head:
+                    entity: light.sovevaerelse
+                    type: 'custom:slider-entity-row'
+                    name: Lys
+                    toggle: true
+                filter:
+                  include:
+                    - domain: light
+                      area: Soveværelse
+                      options:
+                        type: 'custom:slider-entity-row'
+                        toggle: true
+                  exclude:
+                    - name: '* Lys'
+              - name: Vækkeur
+                entity: sensor.camilla_phone_next_alarm
+              - name: Termostat
+                entity: climate.sovevaerelse
+          - type: grid
+            columns: 4
+            square: false
+            cards:
+              - type: 'custom:button-card'
+                entity: scene.aben_gardiner_sovevaerelse
+                template: icon_btn_scene
+              - type: 'custom:button-card'
+                entity: scene.diskrete_gardiner_sovevaerelse
+                template: icon_btn_scene
+              - type: 'custom:button-card'
+                entity: scene.luk_gardiner_sovevaerelse
+                template: icon_btn_scene
+          - type: 'custom:mini-graph-card'
+            name: Temperatur
+            line_width: 3
+            color_thresholds:
+              - color: '#539BE1'
+                value: 15
+              - color: '#44BA83'
+                value: 21
+              - color: '#E0A957'
+                value: 24
+              - color: '#B54949'
+                value: 28
+            entities:
+              - sensor.netatmo_sovevaerelse_temperature
+          - type: horizontal-stack
+            cards:
+              - type: 'custom:mini-graph-card'
+                name: Kuldioxid
+                line_width: 3
+                color_thresholds:
+                  - color: '#44BA83'
+                    value: 400
+                  - color: '#E0A957'
+                    value: 800
+                  - color: '#B54949'
+                    value: 1100
+                entities:
+                  - sensor.netatmo_sovevaerelse_co2
+              - type: 'custom:mini-graph-card'
+                name: Luftfugtighed
+                line_width: 3
+                color_thresholds:
+                  - color: '#539BE1'
+                    value: 30
+                  - color: '#44BA83'
+                    value: 50
+                  - color: '#539BE1'
+                    value: 70
+                entities:
+                  - sensor.netatmo_sovevaerelse_humidity
+      - type: vertical-stack
+        cards:
+          - type: entities
+            title: Kontor
+            entities:
+              - type: 'custom:auto-entities'
+                card:
+                  type: 'custom:fold-entity-row'
+                  head:
+                    entity: light.kontor
+                    type: 'custom:slider-entity-row'
+                    name: Lys
+                    toggle: true
+                filter:
+                  include:
+                    - domain: light
+                      area: Kontor
+                      options:
+                        type: 'custom:slider-entity-row'
+                        toggle: true
+                  exclude:
+                    - name: '* Lys'
+              - entity: climate.kontor
+                name: Termostat
+              - entity: switch.office
+                name: PC
+                secondary_info: last-changed
+                icon: 'mdi:laptop'
+          - type: grid
+            columns: 4
+            square: false
+            cards:
+              - type: 'custom:button-card'
+                entity: scene.aben_gardiner_sovevaerelse
+                template: icon_btn_scene
+              - type: 'custom:button-card'
+                entity: scene.diskrete_gardiner_sovevaerelse
+                template: icon_btn_scene
+              - type: 'custom:button-card'
+                entity: scene.luk_gardiner_sovevaerelse
+                template: icon_btn_scene
+          - type: 'custom:mini-graph-card'
+            name: Temperatur
+            line_width: 3
+            color_thresholds:
+              - color: '#539BE1'
+                value: 15
+              - color: '#44BA83'
+                value: 21
+              - color: '#E0A957'
+                value: 24
+              - color: '#B54949'
+                value: 28
+            entities:
+              - sensor.netatmo_kontor_temperature
+          - type: horizontal-stack
+            cards:
+              - type: 'custom:mini-graph-card'
+                name: Kuldioxid
+                line_width: 3
+                color_thresholds:
+                  - color: '#44BA83'
+                    value: 400
+                  - color: '#E0A957'
+                    value: 800
+                  - color: '#B54949'
+                    value: 1100
+                entities:
+                  - sensor.netatmo_kontor_co2
+              - type: 'custom:mini-graph-card'
+                name: Luftfugtighed
+                line_width: 3
+                color_thresholds:
+                  - color: '#539BE1'
+                    value: 30
+                  - color: '#44BA83'
+                    value: 50
+                  - color: '#539BE1'
+                    value: 70
+                entities:
+                  - sensor.netatmo_kontor_humidity
+  - title: Alarm
+    path: alarm
+    icon: mdi:shield
+    cards:
+      - type: custom:alarmo-card
+        entity: alarm_control_panel.baunedalen
+        keep_keypad_visible: false
+      - type: custom:auto-entities
+        card:
+          type: grid
+          square: false
+          columns: 4
+        card_param: cards
+        filter:
+          include:
+            - domain: lock
+              options:
+                type: 'custom:button-card'
+                template: simple_btn
+            - domain: binary_sensor
+              attributes:
+                device_class: motion
+              options:
+                type: 'custom:button-card'
+                icon: 'mdi:motion-sensor'
+                template: simple_btn
+            - domain: binary_sensor
+              attributes:
+                device_class: occupancy
+              options:
+                type: 'custom:button-card'
+                icon: 'mdi:motion-sensor'
+                template: simple_btn
+            - domain: binary_sensor
+              attributes:
+                device_class: door
+              options:
+                type: 'custom:button-card'
+                template: simple_btn
+            - domain: binary_sensor
+              attributes:
+                device_class: window
+              options:
+                type: 'custom:button-card'
+                template: simple_btn
+          exclude:
+            - domain: binary_sensor
+              entity_id: '*_open_window'
+      - type: picture-entity
+        entity: camera.hoveddor_snapshot
+        camera_image: camera.hoveddor_snapshot
+        show_name: false
+        show_state: false
+        camera_view: live
+      - type: 'custom:webrtc-camera'
+        url: !secret udestue_stream_rtsp
+        poster: !secret udestue_still_image_url
+        ui: true
+  - icon: 'mdi:map-marker'
+    path: map
+    title: Map
+    badges: []
+    cards:
+      - type: horizontal-stack
+        cards:
+          - type: 'custom:button-card'
+            entity: person.michael
+            template: person
+            variables:
+              wifi: sensor.samsungs20_wifi_forbindelse
+              battery: sensor.samsungs20_batteriniveau
+          - type: 'custom:button-card'
+            entity: person.camilla
+            template: person
+            variables:
+              wifi: sensor.camilla_phone_wifi_connection
+              battery: sensor.camilla_phone_battery_level
+      - type: 'custom:button-card'
+        entity: device_tracker.320i
+        variables:
+          remaining_fuel: sensor.320i_remaining_fuel
+          remaining_range_fuel: sensor.320i_remaining_range_fuel
+          remaining_fuel_percent: sensor.320i_remaining_fuel_percent
+          lock: lock.320i_lock
+        triggers_update: all
+        aspect_ratio: 2/1
+        show_name: false
+        show_icon: false
+        styles:
+          grid:
+            - grid-template-areas: '"tracker lock" "n n" "fuel fuel" "bottom bottom"'
+            - grid-template-columns: 1fr 1fr
+            - grid-template-rows: min-content auto min-content min-content
+          card:
+            - padding: 10px
+            - background-size: cover
+            - background-image: url(/local/bmw-header.png)
+          custom_fields:
+            tracker:
+              - justify-self: start
+            lock:
+              - justify-self: end
+            fuel:
+              - text-align: left
+              - margin-bottom: 10px
+        custom_fields:
+          tracker:
+            card:
+              type: 'custom:button-card'
+              entity: '[[[ return entity.entity_id ]]]'
+              template: icon_btn_tracker
+          lock:
+            card:
+              type: 'custom:button-card'
+              entity: '[[[ return variables.lock ]]]'
+              template: icon_btn_small
+              styles:
+                icon:
+                  - color: var(--paper-item-icon-color)
+          fuel:
+            card:
+              type: 'custom:bar-card'
+              entity: '[[[ return variables.remaining_fuel_percent ]]]'
+              entity_row: true
+              height: 15px
+              positions:
+                name: 'off'
+                icon: 'off'
+                indicator: 'off'
+                value: 'off'
+              severity:
+                - color: var(--label-badge-red)
+                  from: 0
+                  to: 15
+                - color: var(--label-badge-yellow)
+                  from: 15
+                  to: 30
+                - color: var(--paper-item-icon-color)
+                  from: 30
+                  to: 100
+          bottom:
+            card:
+              type: horizontal-stack
+              cards:
+                - type: 'custom:button-card'
+                  entity: binary_sensor.320i_check_control_messages
+                  template: icon_btn_flat
+                - type: 'custom:button-card'
+                  entity: binary_sensor.320i_condition_based_services
+                  template: icon_btn_flat
+                - type: 'custom:button-card'
+                  entity: binary_sensor.320i_lights_parking
+                  template: icon_btn_flat
+                - type: 'custom:button-card'
+                  entity: binary_sensor.320i_windows
+                  template: icon_btn_flat
+                - type: 'custom:button-card'
+                  entity: binary_sensor.320i_lids
+                  template: icon_btn_flat
+                - type: 'custom:button-card'
+                  entity: lock.320i_lock
+                  template: icon_btn_flat
+      - type: map
+        entities:
+          - entity: zone.home
+          - entity: zone.timengo
+          - entity: zone.uiu
+          - entity: zone.fields
+          - entity: person.michael
+          - entity: person.camilla
+          - entity: device_tracker.320i
+        hours_to_show: 24
+        default_zoom: 12
+  - icon: 'mdi:server'
+    path: system
+    title: System
+    badges: []
+    cards:
+      - type: horizontal-stack
+        cards:
+          - type: 'custom:mini-graph-card'
+            name: CPU
+            decimals: 0
+            color_thresholds:
+              - color: '#44BA83'
+                value: 50
+              - color: '#E0A957'
+                value: 70
+              - color: '#B54949'
+                value: 100
+            entities:
+              - sensor.glances_cpu_used
+          - type: 'custom:mini-graph-card'
+            name: Temp
+            decimals: 0
+            color_thresholds:
+              - color: '#539BE1'
+                value: 30
+              - color: '#44BA83'
+                value: 50
+              - color: '#E0A957'
+                value: 70
+              - color: '#B54949'
+                value: 90
+            entities:
+              - sensor.glances_core_0_temperature
+          - type: 'custom:mini-graph-card'
+            name: Memory
+            decimals: 0
+            color_thresholds:
+              - color: '#44BA83'
+                value: 50
+              - color: '#E0A957'
+                value: 70
+              - color: '#B54949'
+                value: 100
+            entities:
+              - sensor.glances_ram_used_percent
+      - type: 'custom:bar-card'
+        entities:
+          - entity: sensor.glances_etc_hostname_used_percent
+            name: System Disk
+          - entity: sensor.glances_storage_used_percent
+            name: Storage Disk
+        entity_row: true
+        columns: '2'
+        positions:
+          icon: inside
+        severity:
+          - color: '#44BA83'
+            from: 0
+            to: 70
+          - color: '#E0A957'
+            from: 70
+            to: 90
+          - color: '#B54949'
+            from: 90
+            to: 100
+      - type: grid
+        square: false
+        columns: 7
+        cards:
+          - type: 'custom:button-card'
+            icon: 'mdi:home'
+            template: icon_btn_cast
+            variables:
+              view_path: home
+          - type: 'custom:button-card'
+            icon: 'mdi:television'
+            template: icon_btn_cast
+            variables:
+              view_path: alrum
+          - type: 'custom:button-card'
+            icon: 'mdi:bed'
+            template: icon_btn_cast
+            variables:
+              view_path: sovevaerelse
+          - type: 'custom:button-card'
+            icon: 'mdi:keyboard'
+            template: icon_btn_cast
+            variables:
+              view_path: kontor
+          - type: 'custom:button-card'
+            icon: 'mdi:server'
+            template: icon_btn_cast
+            variables:
+              view_path: system
+          - type: 'custom:button-card'
+            icon: 'mdi:camera'
+            template: icon_btn
+            tap_action:
+              action: call-service
+              service: camera.play_stream
+              service_data:
+                media_player: media_player.kontor_display
+                entity_id:
+                  - camera.udestue_sub
+          - type: 'custom:button-card'
+            icon: 'mdi:power'
+            template: icon_btn
+            tap_action:
+              action: call-service
+              service: media_player.turn_off
+              service_data:
+                entity_id: media_player.kontor_display
+      - type: horizontal-stack
+        cards:
+          - type: 'custom:mini-graph-card'
+            name: Download
+            decimals: 0
+            color_thresholds:
+              - color: '#B54949'
+                value: 600
+              - color: '#E0A957'
+                value: 700
+              - color: '#44BA83'
+                value: 800
+            entities:
+              - sensor.speedtest_download
+          - type: 'custom:mini-graph-card'
+            name: Upload
+            decimals: 0
+            color_thresholds:
+              - color: '#B54949'
+                value: 600
+              - color: '#E0A957'
+                value: 800
+              - color: '#44BA83'
+                value: 1000
+            entities:
+              - sensor.speedtest_upload
+          - type: 'custom:mini-graph-card'
+            name: Ping
+            decimals: 0
+            color_thresholds:
+              - color: '#44BA83'
+                value: 15
+              - color: '#E0A957'
+                value: 20
+              - color: '#B54949'
+                value: 50
+            entities:
+              - sensor.speedtest_ping
+      - type: horizontal-stack
+        cards:
+          - type: 'custom:mini-graph-card'
+            entities:
+              - entity: sensor.eloverblik_energy_total
+            aggregate_func: max
+            hours_to_show: 168
+            color_thresholds:
+              - color: '#44BA83'
+                value: 8
+              - color: '#E0A957'
+                value: 9
+              - color: '#B54949'
+                value: 10
+            group_by: date
+            hour24: true
+            name: Strømforbrug uge
+            icon: 'mdi:power-plug-outline'
+            show:
+              state: false
+          - aggregate_func: sum
+            color_thresholds:
+              - color: var(--label-badge-green)
+                value: 0
+              - color: var(--label-badge-yellow)
+                value: 0.5
+              - color: var(--label-badge-red)
+                value: 1
+            entities:
+              - entity: sensor.eloverblik_energy_0_1
+                name: 00.00 - 01.00
+              - entity: sensor.eloverblik_energy_1_2
+                name: 01-02
+              - entity: sensor.eloverblik_energy_2_3
+                name: 02-03
+              - entity: sensor.eloverblik_energy_3_4
+                name: 03-04
+              - entity: sensor.eloverblik_energy_4_5
+                name: 04-05
+              - entity: sensor.eloverblik_energy_5_6
+                name: 05-06
+              - entity: sensor.eloverblik_energy_6_7
+                name: 06-07
+              - entity: sensor.eloverblik_energy_7_8
+                name: 07-08
+              - entity: sensor.eloverblik_energy_8_9
+                name: 08-09
+              - entity: sensor.eloverblik_energy_9_10
+                name: 09-10
+              - entity: sensor.eloverblik_energy_10_11
+                name: 10-11
+              - entity: sensor.eloverblik_energy_11_12
+                name: 11-12
+              - entity: sensor.eloverblik_energy_12_13
+                name: 12-13
+              - entity: sensor.eloverblik_energy_13_14
+                name: 13-14
+              - entity: sensor.eloverblik_energy_14_15
+                name: 14-15
+              - entity: sensor.eloverblik_energy_15_16
+                name: 15-16
+              - entity: sensor.eloverblik_energy_16_17
+                name: 16-17
+              - entity: sensor.eloverblik_energy_17_18
+                name: 17-18
+              - entity: sensor.eloverblik_energy_18_19
+                name: 18-19
+              - entity: sensor.eloverblik_energy_19_20
+                name: 19-20
+              - entity: sensor.eloverblik_energy_20_21
+                name: 20-21
+              - entity: sensor.eloverblik_energy_21_22
+                name: 21-22
+              - entity: sensor.eloverblik_energy_22_23
+                name: 22-23
+              - entity: sensor.eloverblik_energy_23_24
+                name: 23-24
+            group_by: date
+            hour24: true
+            name: Strømforbrug døgn
+            icon: 'mdi:power-plug-outline'
+            show:
+              state: false
+              fill: true
+              graph: bar
+              labels: false
+              legend: false
+            type: 'custom:mini-graph-card'
+      - entities:
+          - entities:
+              - entity: sensor.hacs
+                name: Opdateringer
+                unit: false
+                tap_action:
+                  action: navigate
+                  navigation_path: /hacs/entry
+              - entity: sensor.current_version
+                name: Nuværende
+              - entity: sensor.latest_version
+                name: Seneste
+                tap_action:
+                  action: url
+                  url_path: 'https://www.home-assistant.io/latest-release-notes'
+            tap_action:
+              action: call-service
+              confirmation: Restart Home Assistant?
+              service: homeassistant.restart
+            entity: sensor.uptime
+            icon: 'mdi:home'
+            name: Home Assistant
+            secondary_info:
+              entity: sensor.uptime
+              name: Oppetid
+              format: relative
+            show_state: false
+            type: 'custom:multiple-entity-row'
+          - entities:
+              - entity: sensor.adguard_dns_queries_blocked_ratio
+                name: Blokkeret
+              - entity: sensor.adguard_average_processing_speed
+                name: Svartid
+            entity: switch.adguard_filtering
+            toggle: true
+            type: 'custom:multiple-entity-row'
+          - entities:
+              - attribute: yesterday
+                name: I går
+              - attribute: today
+                name: I dag
+            entity: sensor.tv_stats
+            show_state: false
+            state_header: State
+            type: 'custom:multiple-entity-row'
+          - entities:
+              - entity: sensor.camilla_home
+                name: Camilla
+            entity: sensor.michael_home
+            icon: 'mdi:account-multiple'
+            name: Hjemme Ratio
+            state_header: Michael
+            type: 'custom:multiple-entity-row'
+        type: entities
+      - type: 'custom:battery-state-card'
+        title: Batteri Status
+        collapse:
+          - min: 20
+        sort_by_level: asc
+        tap_action: more-info
+        entities:
+          - entity: sensor.samsungs20_batteriniveau
+            charging_state:
+              entity_id: sensor.samsungs20_batteritilstand
+              state: charging
+          - entity: sensor.camilla_phone_battery_level
+            charging_state:
+              entity_id: sensor.camilla_phone_battery_state
+              state: charging
+          - entity: sensor.michael_tablet_battery_level
+            charging_state:
+              entity_id: sensor.michael_tablet_battery_state
+              state: charging
+        filter:
+          include:
+            - name: attributes.device_class
+              value: battery
+          exclude:
+            - name: attributes.friendly_name
+              value: '/(.)*[Bb]attery [Ss]tate/'
+        bulk_rename:
+          - from: Battery Level
+          - from: Batteri
+      - type: 'custom:auto-entities'
+        card:
+          type: entities
+          title: Utilgængelig Enheder
+        filter:
+          include:
+            - state: unavailable
+          exclude:
+            - entity_id: media_player.plex*
+            - entity_id: media_player.*plex*
+            - entity_id: sensor.*_naeste_alarm
+            - entity_id: sensor.*_next_alarm
+        sort:
+          method: entity_id

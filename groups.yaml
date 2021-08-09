@@ -1,0 +1,46 @@
+outer_shell:
+  name: Skalsikring
+  entities:
+    - binary_sensor.badevaerelsevindue
+    - binary_sensor.gaestevaerelsevindue
+    - binary_sensor.koekkenvindue_hoejre
+    - binary_sensor.koekkenvindue_venstre
+    - binary_sensor.kontorvindue
+    - binary_sensor.sovevaerelsevindue
+    - binary_sensor.bryggersdoer
+    - binary_sensor.hoveddoer
+    - binary_sensor.udestuedoer
+all_alarm_triggers:
+  name: Alle Alarm Sensorer
+  entities:
+    - group.outer_shell
+    - group.bryggers_occupancy
+    - group.entre_occupancy
+    - group.udestue_doere
+bryggers_occupancy:
+  name: Bryggers Occupancy
+  entities:
+    - binary_sensor.bryggers_sensor_bag_occupancy
+    - binary_sensor.bryggers_sensor_occupancy
+    - binary_sensor.bryggersdoer
+entre_occupancy:
+  name: Entré Occupancy
+  entities:
+    - binary_sensor.entre_hoveddor_sensor_occupancy
+    - binary_sensor.entre_sovevarelse_sensor_occupancy
+udestue_doere:
+  name: Udestue Døre
+  entities:
+    - binary_sensor.alrumdoer
+    - binary_sensor.stuedoer
+    - binary_sensor.udestuedoer
+udelys_sensorer:
+  name: Udelys Sensorer
+  entities:
+    - binary_sensor.carport_sensor_occupancy
+    - binary_sensor.bryggersdoer
+koekken_gardiner:
+  name: Køkken Gardiner
+  entities:
+    - cover.kokken_hojre
+    - cover.kokken_venstre

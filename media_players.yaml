@@ -1,109 +1,91 @@
-  - name: Alrum Media
-    platform: universal
-    children:
-      - media_player.alrum_kodi
-      - media_player.alrum_shield_cast
-      - media_player.alrum_shield
-      - media_player.alrum_tv
-    commands:
-      turn_on:
-        service: remote.turn_on
-        data:
-          entity_id: remote.alrum
-          activity: Watch TV
-      volume_up:
-        service: media_player.volume_up
+- platform: universal
+  name: Alrum Media
+  children:
+    - media_player.alrum_kodi
+    - media_player.shield
+    - media_player.alrum_shield
+    - media_player.alrum_tv
+  commands:
+    turn_on:
+      service: remote.turn_on
+      data_template:
+        entity_id: remote.alrum
+        activity: Kodi
+    turn_off:
+      service: remote.turn_off
+      data:
+        entity_id: remote.alrum
+    volume_up:
+      service: media_player.volume_up
+      target:
         entity_id: media_player.alrum_tv
-      volume_down:
-        service: media_player.volume_down
+    volume_down:
+      service: media_player.volume_down
+      target:
         entity_id: media_player.alrum_tv
-      volume_set:
-        service: media_player.volume_set
-        data_template:
-          entity_id: media_player.alrum_tv
-          volume_level: '{{ volume_level }}'
-      select_source:
-        service: media_player.select_source
-        data_template:
-          entity_id: media_player.alrum_shield
-          source: '{{ source }}'
-    attributes:
-      source: media_player.alrum_shield|source
-      source_list: media_player.alrum_shield|source_list
-      is_volume_muted: media_player.alrum_tv|is_volume_muted
-      volume_level: media_player.alrum_tv|volume_level
-  - name: Alrum Shield
-    platform: androidtv
-    host: 10.0.1.82
-    exclude_unnamed_apps: true
-    state_detection_rules:
+    volume_set:
+      service: media_player.volume_set
+      target:
+        entity_id: media_player.alrum_tv
+      data:
+        volume_level: "{{ volume_level }}"
+    volume_mute:
+      service: media_player.volume_mute
+      data_template:
+        entity_id: media_player.alrum_tv
+        is_volume_muted: '{{ not state_attr(''media_player.alrum_tv'', ''is_volume_muted'') }}'
+    select_source:
+      service: media_player.select_source
+      data_template:
+        entity_id: media_player.alrum_shield
+        source: '{{ source }}'
+  attributes:
+    is_volume_muted: media_player.alrum_tv|is_volume_muted
+    volume_level: media_player.alrum_tv|volume_level
+    source: media_player.alrum_shield|source
+    source_list: media_player.alrum_shield|source_list
+- name: Alrum Shield
+  platform: androidtv
+  host: 10.0.1.90
+  exclude_unnamed_apps: true
+  state_detection_rules:
       'com.google.android.tvlauncher':
-        - 'standby'
+      - 'standby'
       'com.netflix.ninja':
-        - 'media_session_state'
+      - 'media_session_state'
       'dk.dr.tvplayer':
-        - 'playing':
-            'wake_lock_size': 6
-        - 'playing':
-            'wake_lock_size': 5
-        - 'playing':
-            'wake_lock_size': 4
-        - 'playing':
-            'wake_lock_size': 3
-        - 'paused':
-            'wake_lock_size': 2
-        - 'paused':
-            'wake_lock_size': 1
-        - 'standby'
+      - 'playing':
+          'wake_lock_size': 6
+      - 'playing':
+          'wake_lock_size': 5
+      - 'playing':
+          'wake_lock_size': 4
+      - 'playing':
+          'wake_lock_size': 3
+      - 'paused':
+          'wake_lock_size': 2
+      - 'paused':
+          'wake_lock_size': 1
+      - 'standby'
       'dk.tv2.tv2playtv':
-        - 'playing':
-            'wake_lock_size': 6
-        - 'playing':
-            'wake_lock_size': 5
-        - 'playing':
-            'wake_lock_size': 4
-        - 'playing':
-            'wake_lock_size': 3
-        - 'paused':
-            'wake_lock_size': 2
-        - 'paused':
-            'wake_lock_size': 1
-        - 'standby'
-    apps:
+      - 'playing':
+          'wake_lock_size': 6
+      - 'playing':
+          'wake_lock_size': 5
+      - 'playing':
+          'wake_lock_size': 4
+      - 'playing':
+          'wake_lock_size': 3
+      - 'paused':
+          'wake_lock_size': 2
+      - 'paused':
+          'wake_lock_size': 1
+      - 'standby'
+  apps:
       com.google.android.tvlauncher: 'Launcher'
       com.viaplay.android: 'Viaplay'
       dk.tv2.tv2playtv: 'TV2 Play'
       dk.dr.tvplayer: 'DRTV'
       com.spotify.tv.android: ''
-      tv.twitch.android.app:  ''
-  # - platform: universal
-  #   name: Yoga Room Media
-  #   children:
-  #     - media_player.yoga_tv_kodi
-  #     - media_player.yoga_tv_cast
-  #     - media_player.yoga_tv
-  #   commands:
-  #     turn_on:
-  #       service: media_player.turn_on
-  #       entity_id: media_player.yoga_tv
-  #     select_source:
-  #       service: media_player.select_source
-  #       data_template:
-  #         entity_id: media_player.yoga_tv
-  #         source: '{{ source }}'
-  #     volume_set:
-  #       service: media_player.volume_set
-  #       data_template:
-  #         entity_id: media_player.yoga_tv
-  #         volume_level: '{{ volume_level }}'
-  #   attributes:
-  #     state: media_player.yoga_tv|state
-  #     volume_level: media_player.yoga_tv|volume_level
-  #     source: media_player.yoga_tv|source
-  #     source_list: media_player.yoga_tv|source_list
-  # - name: Yoga TV
-  #   platform: philips_android_tv
-  #   host: !secret phillips_tv_host
-  #   username: !secret phillips_tv_username
-  #   password: !secret phillips_tv_password
-  #   mac: !secret phillips_tv_mac
+      tv.twitch.android.app: ''
+      com.android.vending: ''

@@ -1,14 +1,5 @@
   - name: Docker
     containers:
-      - homeassistant
-      - mosquitto
-      - nodered
-      - unifi
-    rename:
-      homeassistant: Home Assistant
-      mosquitto: Mosquitto
-      nodered: "Node-RED"
-      unifi: UniFi
     monitored_conditions:
       - version
       - containers_running
@@ -16,3 +7,5 @@
       - state
       - status
       - memory
+      - 1cpu_percentage
+      - allinone

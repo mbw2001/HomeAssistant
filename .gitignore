@@ -2,6 +2,7 @@ deps/*
 tts/*
 custom_components/*
 www/community/*
+zigpy_ota/*
 *.conf
 *.log
 *.db
@@ -10,4 +11,5 @@ www/community/*
 .*
 secrets.yaml
 known_devices.yaml
+rtsp2webrtc_*_amd64
 !/.gitignore

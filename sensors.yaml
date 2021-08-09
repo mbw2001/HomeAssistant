@@ -15,6 +15,14 @@
     - 'beat'
 - platform: template
   sensors:
+    320i_remaining_fuel_percent:
+      friendly_name: Brændstof
+      value_template: '{{ states(''sensor.320i_remaining_fuel'') | int / 0.6 }}'
+      unit_of_measurement: '%'
+    doorbell_power:
+      friendly_name: Hoveddør Ringeklokke Batteri
+      value_template: '{{ state_attr(''sensor.hoveddor_info'', ''batteryLevel'')  }}'
+      device_class: battery
     tv_stats:
       friendly_name: TV Stats
       value_template:  >-
@@ -27,31 +35,6 @@
       attribute_templates:
         today: '{{ state_attr(''sensor.alrum_tv_today'', ''value'') }}'
         yesterday: '{{ state_attr(''sensor.alrum_tv_yesterday'', ''value'') }}'
-    low_battery:
-      friendly_name: "Low Battery"
-      value_template: >
-        {%- set threshold = 20 -%}
-        {%- for domain in ['light', 'switch', 'sensor', 'lock'] -%}
-          {%- for item in states[domain] if ((item.attributes.battery_level is defined and item.attributes['battery_level'] | int < threshold) or ("battery" in item.name | lower and ((item.state | int < threshold and item.state|int != 0) or item.state | lower == "low" or item.state | lower == "unknown"))) -%}
-            {{ item.attributes.friendly_name }}{%- if not loop.last %}, {% endif -%}
-          {%- endfor -%}
-        {%- endfor -%}
-- platform: google_travel_time
-  name: Michael Travel
-  api_key: !secret google_apikey
-  origin: device_tracker.samsungs20
-  destination: zone.home
-  scan_interval: 3600
-  options:
-    mode: driving
-- platform: google_travel_time
-  name: Camilla Travel
-  api_key: !secret google_apikey
-  origin: device_tracker.camilla_phone
-  destination: zone.home
-  scan_interval: 3600
-  options:
-    mode: transit
 - platform: history_stats
   name: alrum_tv_today
   entity_id: media_player.alrum_tv
@@ -87,3 +70,22 @@
   type: ratio
   duration:
     days: 7
+# - platform: influxdb
+#   api_version: 2
+#   ssl: false
+#   host: influxdb
+#   port: 8086
+#   token: !secret influxdb_token
+#   organization: mbw.dk
+#   bucket: homeassistant
+#   queries_flux:
+#     - name: "Packet Loss"
+#       unit_of_measurement: "%"
+#       group_function: max
+#       bucket: telegraf
+#       query: >
+#         filter(fn: (r) => r["_measurement"] == "ping")
+#         |> filter(fn: (r) => r["_field"] == "percent_packet_loss")
+#         |> aggregateWindow(every: 30m, fn: max, createEmpty: false)
+#         |> yield(name: "Packet Loss")
+#       range_start: "-1d"

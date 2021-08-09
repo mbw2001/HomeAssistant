@@ -1,12 +1,39 @@
 homeassistant:
   customize: !include customize.yaml
   auth_providers:
-   - type: homeassistant
+    - type: homeassistant
+    - type: trusted_networks
+      trusted_networks:
+        - 10.0.1.0/24
+        - 10.0.10.0/24
+  allowlist_external_dirs:
+    - /config
 
 frontend:
   themes: !include_dir_merge_named themes
 
+lovelace:
+  mode: yaml
+  resources: !include resources.yaml
+  dashboards:
+    lovelace-map:
+      mode: yaml
+      title: Map
+      icon: mdi:map-marker
+      show_in_sidebar: true
+      require_admin: true
+      filename: dashboards/map.yaml
+    lovelace-tablet:
+      mode: yaml
+      title: Tablet
+      icon: mdi:tablet-dashboard
+      show_in_sidebar: false
+      require_admin: false
+      filename: dashboards/tablet.yaml
+
 config:
+
+my:
 
 cloud:
 
@@ -15,24 +42,50 @@ http:
     - https://google.com
     - https://home-assistant.io
     - https://cast.home-assistant.io
-  trusted_proxies: 10.0.10.0/24
+  trusted_proxies:
+    - 10.0.10.0/24
   use_x_forwarded_for: true
-  ip_ban_enabled: true
+  ip_ban_enabled: false
   login_attempts_threshold: 3
 
 updater:
 discovery:
+
 # Log Severities: notset, debug, info, warn, warning, error, fatal, critical
 logger:
   default: warning
+  logs:
+    homeassistant.components.camera: critical
+    #snitun.client.client_peer: debug
+    #hass_nabucasa.remote: debug
+    #homeassistant.core: debug
+    #homeassistant.components.zha: debug
+    #bellows.zigbee.application: debug
+    #bellows.ezsp: debug
+    #zigpy: debug
+    #zigpy_cc: debug
+    #zigpy_deconz.zigbee.application: debug
+    #zigpy_deconz.api: debug
+    #zigpy_xbee.zigbee.application: debug
+    #zigpy_xbee.api: debug
+    #zigpy_zigate: debug
+    #zigpy_znp: debug
+    #zhaquirks: debug
 
 recorder:
   db_url: !secret db_url
   purge_keep_days: 14
   exclude:
     entities:
-      - sensor.date
+      - sensor.yr_symbol
       - sensor.time
+      - sensor.time_date
+      - sensor.time_utc
+      - sensor.date
+      - sensor.date_time
+      - sensor.date_time_iso
+      - sensor.date_time_utc
+      - sensor.internet_time
 
 history:
 
@@ -40,8 +93,108 @@ logbook:
   exclude:
     entities:
       - sensor.yr_symbol
+      - sensor.time
+      - sensor.time_date
+      - sensor.time_utc
+      - sensor.date
+      - sensor.date_time
+      - sensor.date_time_iso
+      - sensor.date_time_utc
+      - sensor.internet_time
+
+influxdb:
+  api_version: 2
+  ssl: false
+  host: influxdb
+  port: 8086
+  token: !secret influxdb_token
+  organization: mbw.dk
+  bucket: homeassistant
+  tags:
+    source: homeassistant
+  tags_attributes:
+    - friendly_name
+  default_measurement: units
+  exclude:
+    entities:
+      - sensor.yr_symbol
+      - sensor.time
+      - sensor.time_date
+      - sensor.time_utc
+      - sensor.date
+      - sensor.date_time
+      - sensor.date_time_iso
+      - sensor.date_time_utc
+      - sensor.internet_time
+  include:
+    entities:
+      - sensor.netatmo_ude_temperature
+      - sensor.udestue_temperatur
+
+rest_command:
+  pipup:
+    url: http://10.0.1.90:7979/notify
+    content_type: "application/json"
+    verify_ssl: false
+    method: "post"
+    timeout: 20
+    payload: >
+      {
+        "duration": "{{ duration }}",
+        "position": "{{ position }}",
+        "title": "{{ title }}",
+        "titleColor": "{{ titleColor }}",
+        "titleSize": "{{ titleSize }}",
+        "message": "{{ message }}",
+        "messageColor": "{{ messageColor }}",
+        "messageSize": "{{ messageSize }}",
+        "backgroundColor": "{{ backgroundColor }}",
+        "media": { 
+          "{{ mediaType }}": {
+            "uri": "{{ uri }}", 
+            "width": "{{ width }}"
+          }
+        }
+      }
+
+folder_watcher:
+  - folder: /config/blueprints
 
 system_health:
+
+media_source:
+
+stream:
+
+camera:
+  - platform: generic
+    name: Udestue Sub
+    still_image_url: !secret udestue_still_image_url
+    stream_source: !secret udestue_stream_source
+  - platform: xiaomi_cloud_map_extractor
+    name: roborock_s7_map
+    host: 10.0.1.92
+    token: !secret xiaomi_vacuum_token
+    username: !secret xiaomi_cloud_username
+    password: !secret xiaomi_cloud_password
+    country: de
+    scan_interval:
+      seconds: 30
+    auto_update: false
+    draw: ["all"]
+    map_transformation:
+      scale: 1.5
+      rotate: 0
+      trim:
+        top: 20
+        bottom: 20
+        left: 10
+        right: 10
+    attributes:
+      - calibration_points
+      - rooms
+      - zones
+      - vacuum_room
 
 sun:
 
@@ -50,6 +203,34 @@ person:
 mobile_app:
 
 wake_on_lan:
+
+zha:
+  custom_quirks_path: /config/zha_custom_quirks
+  zigpy_config:
+    source_routing: true
+    ezsp_config:
+      CONFIG_MAX_END_DEVICE_CHILDREN: 16
+      CONFIG_SOURCE_ROUTE_TABLE_SIZE: 64
+    ota:
+      otau_directory: /config/zigpy_ota
+      ikea_provider: true
+      ledvance_provider: true
+
+emulated_roku:
+  servers:
+    - name: Home Assistant
+      listen_port: 8060
+      host_ip: 10.0.1.5
+
+emulated_hue:
+  listen_port: 80
+  host_ip: 10.0.1.5
+  expose_by_default: false
+  entities:
+    light.alrum:
+      hidden: false
+    scene.aften_tv:
+      hidden: false
 
 notify:
   - platform: html5
@@ -63,14 +244,10 @@ notify:
       - service: mobile_app_michaels_telefon
       - service: mobile_app_camilla_phone
 
-netatmo:
-  client_id: !secret netatmo_client_id
-  client_secret: !secret netatmo_client_secret
-
 spotify:
   client_id: !secret spotify_client_id
   client_secret: !secret spotify_client_secret
-  
+
 spotcast:
   sp_dc: !secret spotify_dc
   sp_key: !secret spotify_key
@@ -78,41 +255,59 @@ spotcast:
 ifttt:
   key: !secret ifttt_key
 
-speedtestdotnet:
-
-nzbget:
-  host: nzbget
-  port: !secret nzbget_port
-  ssl: false
-  username: !secret nzbget_username
-  password: !secret nzbget_password
-
-bmw_connected_drive:
-  name:
-    username: !secret bmw_username
-    password: !secret bmw_password
-    region: "rest_of_world"
-
 webostv:
   host: 10.0.1.72
-  name: 'Alrum TV'
+  name: "Alrum TV"
   customize:
     sources:
-      - 'Home Theatre'
-      - 'PS3'
-      - 'YouTube'
-      - 'TV 2 PLAY'
-      - 'Netflix'
-      - 'Plex'
-      - 'UHD Fireplace'
+      - "Home Theatre"
+      - "PS3"
+      - "YouTube"
+      - "TV 2 PLAY"
+      - "Netflix"
+      - "Plex"
+      - "UHD Fireplace"
+
+monitor_docker: !include monitor_docker.yaml
+
+generic_hygrostat:
+  - name: Badeværelse
+    humidifier: light.badevaerelse_udsugning
+    target_sensor: sensor.badevaerelse_humidity
+    device_class: dehumidifier
+    min_humidity: 30
+    max_humidity: 80
+    target_humidity: 70
+    dry_tolerance: 0
+    wet_tolerance: 0
+    initial_state: true
+    min_cycle_duration:
+      minutes: 5
+    sensor_stale_duration: 00:15:00
+  - name: Toilet
+    humidifier: light.toilet_udsugning
+    target_sensor: sensor.toilet_humidity
+    device_class: dehumidifier
+    min_humidity: 30
+    max_humidity: 80
+    target_humidity: 70
+    dry_tolerance: 0
+    wet_tolerance: 0
+    initial_state: true
+    min_cycle_duration:
+      minutes: 5
+    sensor_stale_duration: 00:15:00
 
 automation: !include automations.yaml
-sensor: !include sensors.yaml
-media_player: !include media_players.yaml
+binary_sensor: !include binary_sensor.yaml
+group: !include groups.yaml
 input_boolean: !include input_boolean.yaml
 input_select: !include input_select.yaml
 input_text: !include input_text.yaml
 input_number: !include input_number.yaml
 input_datetime: !include input_datetime.yaml
-binary_sensor: !include binary_sensor.yaml
+media_player: !include media_players.yaml
+scene: !include scenes.yaml
 script: !include scripts.yaml
+sensor: !include sensors.yaml
+switch: !include switches.yaml

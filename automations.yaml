@@ -1,49 +1,6 @@
-- id: '1608029879336'
-  alias: Kontor Kontakt
-  description: Tænd lyset på kontor
-  trigger:
-  - device_id: 6ac4a37bab02c17d8d59126978dcb0c7
-    domain: zha
-    platform: device
-    type: remote_button_short_press
-    subtype: remote_button_short_press
-  condition: []
-  action:
-  - service: light.toggle
-    data: {}
-    entity_id: light.kontor
-  mode: single
-- id: '1603285560454'
-  alias: Vandskade Alarm
-  description: ''
-  trigger:
-  - type: moist
-    platform: device
-    device_id: 747b94d7e04d789e791ab2b31b40aa49
-    entity_id: binary_sensor.opvaskemaskine
-    domain: binary_sensor
-  condition: []
-  action:
-  - service: persistent_notification.create
-    data:
-      title: Vandalarm Køkken
-      message: Der er fundet vand under opvaskemaskine
-      notification_id: water_alarm
-  - service: notify.mobile_app_michael_phone
-    data:
-      title: Vandalarm Køkken
-      message: Der er fundet vand under opvaskemaskine
-      data:
-        sticky: true
-        persistent: true
-        tag: water_alarm
-        color: '#FF0000'
-        channel: alert
-        importance: high
-  mode: single
 - id: '1603734250810'
-  alias: Støvsuger
-  description: Start støvsuger dagligt
+  alias: Timer - Støvsuger
+  description: Start støvsuger dagligt hvis ingen er hjemme
   trigger:
   - platform: time
     at: '10:00:00'
@@ -66,48 +23,65 @@
       zone: zone.home
     - condition: numeric_state
       entity_id: sensor.tumle_runtime_today
-      above: '0'
+      above: '0.2'
   action:
-  - device_id: 4c0a226ada01406eae600561e2ba4071
+  - device_id: 5c340aa315070d70383a4143d80ba78b
     domain: vacuum
     entity_id: vacuum.tumle
     type: clean
   mode: single
 - id: '1603734502223'
-  alias: Camilla har forladt UiU
+  alias: Zone - Camilla har forladt UiU
   trigger:
-  - entity_id: person.camilla
+  - platform: zone
     event: leave
-    platform: zone
+    entity_id: person.camilla
     zone: zone.uiu
-  - event_data:
+  - platform: zone
+    event: enter
+    entity_id: person.camilla
+    zone: zone.home
+  - platform: event
+    event_type: mobile_app_notification_action
+    event_data:
       action: update_camilla_work_notification
-    event_type: ''
-    platform: event
-  condition:
-  - after: '11:00:00'
-    before: '23:59:00'
-    condition: time
-    weekday:
-    - mon
-    - tue
-    - wed
-    - thu
-    - fri
-    - sat
-    - sun
+  - platform: event
+    event_type: update_camilla_work_notification
+  condition: []
   action:
-  - data:
+  - service: homeassistant.update_entity
+    target:
+      entity_id: sensor.camilla_travel
+  - choose:
+    - conditions:
+      - condition: zone
+        entity_id: person.camilla
+        zone: zone.home
+      sequence:
+      - service: notify.mobile_app_michaels_telefon
+        data:
+          message: clear_notification
+          data:
+            tag: camilla_home
+    default:
+    - service: notify.mobile_app_michaels_telefon
       data:
-        tag: camilla_home
-      message: Forventet hjemme om {{ states('sensor.camilla_travel') }} min ({{ (now().strftime('%s')
-        | int + (states('sensor.camilla_travel') | int * 60)) | timestamp_custom('%H:%M',
-        false) }})
-      title: Camilla har forladt kontoret
-    service: notify.mobile_app_michaels_telefon
-  mode: single
+        data:
+          clickAction: entityId:person.camilla
+          actions:
+          - action: update_camilla_work_notification
+            title: Opdater
+          tag: camilla_home
+          sticky: true
+          chronometer: '{{ states(''sensor.camilla_travel'') | int > 1 }}'
+          when: '{{ as_timestamp(now()) | int + states(''sensor.camilla_travel'')
+            | int * 60 }}'
+        message: Forventet hjemme {{ (as_timestamp(now()) | int + (states('sensor.camilla_travel')
+          | int * 60)) | timestamp_custom('%H:%M', true) }}
+        title: Camilla har forladt kontoret
+  mode: restart
 - id: '1603735485232'
-  alias: Bryggersdør
+  alias: Sensor - Bryggersdør Advarsel
   description: ''
   trigger:
   - type: opened
@@ -115,7 +89,10 @@
     device_id: bb55e91e30b0f5febbdf5ae5c2fd8244
     entity_id: binary_sensor.bryggersdoer
     domain: binary_sensor
-  condition: []
+  condition:
+  - condition: state
+    entity_id: switch.office
+    state: 'on'
   action:
   - service: scene.create
     data:
@@ -123,95 +100,898 @@
       snapshot_entities: light.kontor
   - service: light.turn_on
     data:
-      entity_id: light.kontor
-      rgb_color:
-      - 255
-      - 50
-      - 50
       flash: long
+      color_name: red
+      brightness_pct: 100
+    target:
+      entity_id: light.kontor
   - delay: 00:00:03
   - service: scene.turn_on
     data:
       entity_id: scene.doorbell_notification_revert
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 15
+      milliseconds: 0
   mode: single
-- id: '1608305169136'
-  alias: CO2 Notifikation
-  description: Styrer CO2 notifikation
-  trigger:
-  - platform: numeric_state
-    entity_id: sensor.netatmo_baunedalen_co2,sensor.netatmo_baunedalen_alrum_co2,sensor.netatmo_baunedalen_sovevaerelse_co2,sensor.netatmo_baunedalen_kontor_co2
-    above: '1100'
-  - platform: numeric_state
-    entity_id: sensor.netatmo_baunedalen_co2,sensor.netatmo_baunedalen_alrum_co2,sensor.netatmo_baunedalen_sovevaerelse_co2,sensor.netatmo_baunedalen_kontor_co2
-    below: '1100'
-  - platform: time_pattern
-    minutes: /15
-  action:
-  - choose:
-    - conditions:
-      - condition: numeric_state
-        entity_id:
-        - sensor.netatmo_baunedalen_co2
-        - sensor.netatmo_baunedalen_alrum_co2
-        - sensor.netatmo_baunedalen_sovevaerelse_co2
-        - sensor.netatmo_baunedalen_kontor_co2
-        above: '1100'
-      sequence:
-      - service: script.notification_michael_hvis_hjemme
-        data:
-          title: Frisk Luft Alarm
-          message: '"Alrum: {{ states(''sensor.netatmo_baunedalen_alrum_co2'') }}
-
-            Stue: {{ states(''sensor.netatmo_baunedalen_co2'') }}
-
-            Soveværelse: {{ states(''sensor.netatmo_baunedalen_sovevaerelse_co2'')
-            }}
-
-            Kontor: {{ states(''sensor.netatmo_baunedalen_kontor_co2'') }}"
-
-            '
-          tag: co2notification
-    default:
-    - service: script.notification_michael_hvis_hjemme
-      data:
-        message: clear_notification
-        tag: co2notification
-  mode: queued
-  max: 10
+  max_exceeded: silent
 - id: '1608315737292'
-  alias: Vækkeur
+  alias: Timer - Vækkeur
   description: ''
   use_blueprint:
     path: sbyx/wake-up-light-alarm-with-sunrise-effect.yaml
     input:
-      max_brightness: 100
-      light_entity: light.alrum_gra
-      manual_time: 00:00:00
-      timestamp_sensor: sensor.samsungs20_naeste_alarm
-      sunrise_duration: 20
+      max_brightness: '100'
+      light_entity: light.sovevaerelse
+      manual_time: 0:00:00
+      timestamp_sensor: sensor.camilla_phone_next_alarm
+      sunrise_duration: 15
+      min_mired: 0
+      end_brightness: 255
+      post_sunrise_actions:
+      - service: spotcast.start
+        data:
+          entity_id: media_player.bedroom_speaker
+          force_playback: true
+          uri: spotify:playlist:37i9dQZF1DWYWddJiPzbvb
+          repeat: 'off'
+          random_song: true
+          shuffle: true
+      start_brightness: 10
+      check_entity: person.camilla
+      pre_sunrise_actions:
 - id: '1608321006068'
-  alias: Vaskemaskine
+  alias: Status - Vaskemaskine
   description: ''
   use_blueprint:
-    path: Sbyx/notify-or-do-something-when-an-appliance-like-a-dishwasher-or-washing-machine-finishes.yaml
+    path: sbyx/notify-or-do-something-when-an-appliance-like-a-dishwasher-or-washing-machine-finishes.yaml
     input:
       power_sensor: sensor.vaskemaskine_effekt
       starting_threshold: '5'
       starting_hysteresis: '5'
-      finishing_threshold: '5'
-      finishing_hysteresis: '5'
+      finishing_threshold: 5
+      finishing_hysteresis: 5
       actions:
-      - service: script.notification_michael_hvis_hjemme
+      - service: notify.both_phones
         data:
           title: Vaskemaskine
           message: Færdig
-          tag: vaskemaskine
-- id: '1608652073704'
-  alias: Alrum Kontakt
+          data:
+            tag: vaskemaskine
+- id: '1609255115570'
+  alias: Kontakt - Kontor Skrivebord
   description: ''
   use_blueprint:
-    path: poolcactus/zha-ikea-tradfri-on-off-switch-incl-dimmer.yaml
+    path: SeanM/zha-aqara-wireless-mini-switch.yaml
     input:
-      remote: 4475ce491c875f9b94f70db48da09e67
-      light:
-        area_id: 5fef45b5bd4d42b8bda250c7e7e3d328
+      aqara_mini_switch: 6ac4a37bab02c17d8d59126978dcb0c7
+      button_single_press:
+      - service: light.toggle
+        data: {}
+        target:
+          entity_id: light.kontor
+      button_double_press:
+      - service: light.turn_on
+        data:
+          brightness: 255
+        target:
+          entity_id: light.kontor
+      - service: switch.flux_kontor_update
+- id: '1609280603326'
+  alias: Timer - Aften Mode
+  description: ''
+  trigger:
+  - platform: sun
+    event: sunset
+  - platform: sun
+    event: sunrise
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: sun
+        after: sunset
+      sequence:
+      - scene: scene.solnedgang
+      - scene: scene.diskrete_gardiner
+    default:
+    - scene: scene.solopgang
+  mode: single
+- id: '1609357176878'
+  alias: Sensor - Bryggers Lys
+  description: ''
+  use_blueprint:
+    path: mbw2001/sensor_light.yaml
+    input:
+      sensor: group.bryggers_occupancy
+      light: light.bryggers
+      brightness: 80
+      transition_on: 0
+      transition_off: 3
+      night_time_sensor: input_boolean.nat_mode
+      brightness_day: 70
+      brightness_night: 10
+      helper: input_boolean.bryggers_lys
+- id: '1609543466246'
+  alias: Timer - Nat mode
+  description: ''
+  trigger:
+  - platform: sun
+    event: sunrise
+  - platform: time
+    at: 02:00:00
+  - platform: time
+    at: 01:00:00
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: sun
+        after: sunrise
+      sequence:
+      - service: input_boolean.turn_off
+        data: {}
+        entity_id: input_boolean.nat_mode
+    - conditions:
+      - condition: state
+        entity_id: light.alt
+        state: 'off'
+      sequence:
+      - service: homeassistant.turn_on
+        target:
+          entity_id: automation.timer_nat_mode
+    default: []
+  mode: single
+- id: '1609594104690'
+  alias: Sensor - Udestue Belysning
+  description: Tænd lyset i udestue når en dør åbnes.
+  use_blueprint:
+    path: mbw2001/sensor_light.yaml
+    input:
+      sensor: group.udestue_doere
+      light: light.udestue
+      no_motion_wait: 0
+      transition_on: 1
+      transition_off: 3
+      after_sunset: true
+      brightness: 70
+- id: '1610303359820'
+  alias: Sensor - Åbne døre og vinduer
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: group.outer_shell
+    to: 'on'
+    for: 0:10:00
+  - platform: state
+    entity_id: group.outer_shell
+    to: 'off'
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.to_state.state == ''on'' }}'
+      - condition: template
+        value_template: '{{ states(''sensor.carport_sensor_temperature'') | int <
+          10 }}'
+      sequence:
+      - service: notify.both_phones
+        data:
+          title: Åbne vinduer/døre
+          message: Et vindue eller en dør har været åben i 10 min selvom det er under
+            10º udendørs.
+          data:
+            clickAction: /lovelace/home/
+            persistent: false
+            tag: openwindow
+            chronometer: true
+            when: '{{ as_timestamp(trigger.to_state.last_changed) | int }}'
+    default:
+    - service: notify.both_phones
+      data:
+        message: clear_notification
+        data:
+          tag: openwindow
+  mode: restart
+- id: '1610454538649'
+  alias: Sensor - Lavt Batteri
+  description: ''
+  use_blueprint:
+    path: sbyx/low-battery-level-detection-notification-for-all-battery-sensors.yaml
+    input:
+      day: 7
+      actions:
+      - service: notify.mobile_app_michaels_telefon
+        data:
+          title: Lavt Batteri
+          message: 'Low battery warning for: {{ sensors }}
+
+            '
+          data:
+            tag: batteri
+      threshold: 30
+      exclude:
+        entity_id:
+        - sensor.camilla_phone_battery_level
+        - sensor.samsungs20_batteriniveau
+        - sensor.dashboard_tablet_batteriniveau
+      time: '10:00:00'
+- id: '1615641485479'
+  alias: Kontakt - Køkken Gardiner
+  description: ''
+  use_blueprint:
+    path: Xelloss99/zha-ikea-tradfri-on-off-switch.yaml
+    input:
+      remote: 90405c266939532d32a3c115550e590c
+      button_on_short:
+      - scene: scene.aben_gardiner_kokken
+      - service: alarmo.disarm
+        data:
+          entity_id: alarm_control_panel.baunedalen
+      - device_id: ebf28b4520bd35bdd5bb5781e6d8620b
+        domain: lock
+        entity_id: lock.bryggersdor
+        type: unlock
+      button_off_short:
+      - scene: scene.diskrete_gardiner_kokken
+      button_off_long:
+      - scene: scene.luk_gardiner_kokken
+      button_on_long:
+      - scene: scene.aften_tv
+- id: '1615841878655'
+  alias: Kontakt - Cube
+  description: ''
+  use_blueprint:
+    path: Mikkelmoeller/aqara-magic-cube-zha-51-actions.yaml
+    input:
+      remote: 510d24c130511b6e76770e48e979b378
+      rotate_right:
+      - service: media_player.volume_up
+        target:
+          entity_id: media_player.alrum_tv
+      rotate_left:
+      - service: media_player.volume_down
+        target:
+          entity_id: media_player.alrum_tv
+      flip_180: false
+      cube_flip_180: []
+      slide_any_side: false
+      cube_slide_any: []
+      knock_any_side: true
+      cube_knock_any:
+      - service: light.toggle
+        data: {}
+        target:
+          entity_id: light.alrum
+      cube_shake:
+      - service: media_player.media_stop
+        target:
+          entity_id: media_player.alrum_media
+- id: '1616080334073'
+  alias: Sensor - Video Udestue
+  description: ''
+  trigger:
+  - type: motion
+    platform: device
+    device_id: 14969a8cd3ad84e35b0ff89d780ea66d
+    entity_id: binary_sensor.udestue_person_motion
+    domain: binary_sensor
+  condition:
+  - condition: not
+    conditions:
+    - condition: or
+      conditions:
+      - condition: zone
+        entity_id: person.michael
+        zone: zone.home
+      - condition: zone
+        entity_id: person.camilla
+        zone: zone.home
+  action:
+  - service: notify.mobile_app_michaels_telefon
+    data:
+      title: Bevægelse i Udestue
+      message: En person er observeret i udestuen
+      data:
+        tag: motion
+        channel: motion
+        importance: high
+        ttl: 0
+        priority: high
+        sticky: true
+        image: /api/camera_proxy/camera.udestue
+        clickAction: /lovelace/alarm
+        chronometer: true
+        when: '{{ as_timestamp(now()) | int }}'
+        actions:
+        - action: URI
+          title: Ring
+          uri: app://com.google.android.dialer
+  mode: single
+- id: '1616409818032'
+  alias: Kontakt - Ringeklokke
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.hoveddor_ding
+    to: 'on'
+  condition: []
+  action:
+  - service: notify.mobile_app_michaels_telefon
+    data:
+      title: Dørklokke
+      message: Der er nogen ved hoveddøren
+      data:
+        tag: doorbell
+  - service: media_player.play_media
+    data:
+      media_content_id: https://ha.mbw.dk/local/doorbell.mp3
+      media_content_type: audio/mp3
+    target:
+      entity_id:
+      - media_player.dorklokke
+  mode: single
+- id: '1617456610445'
+  alias: Sensor - Entre Lys
+  description: ''
+  use_blueprint:
+    path: mbw2001/sensor_light.yaml
+    input:
+      sensor: group.entre_occupancy
+      light: light.entre
+      brightness: 30
+      transition_on: 0
+      transition_off: 3
+      no_motion_wait: 15
+      brightness_day: 60
+      night_time_sensor: input_boolean.nat_mode
+      brightness_night: 10
+- id: '1617739074933'
+  alias: Kontakt - Soveværelse Sengeborde
+  description: ''
+  trigger:
+  - device_id: 9c9a6d5ef8aa42b66a46d450cd0bde86
+    domain: zha
+    platform: device
+    type: remote_button_double_press
+    subtype: turn_off
+  - device_id: 9c9a6d5ef8aa42b66a46d450cd0bde86
+    domain: zha
+    platform: device
+    type: remote_button_long_press
+    subtype: turn_off
+  - device_id: ee60b4d428c8e620605865992866744d
+    domain: zha
+    platform: device
+    type: remote_button_long_press
+    subtype: turn_off
+  - device_id: ee60b4d428c8e620605865992866744d
+    domain: zha
+    platform: device
+    type: remote_button_double_press
+    subtype: turn_off
+  condition: []
+  action:
+  - service: light.turn_off
+    target:
+      entity_id: light.alt
+  - service: homeassistant.turn_on
+    target:
+      entity_id: input_boolean.nat_mode
+  - device_id: ebf28b4520bd35bdd5bb5781e6d8620b
+    domain: lock
+    entity_id: lock.bryggersdor
+    type: lock
+  - service: alarmo.arm
+    data:
+      entity_id: alarm_control_panel.baunedalen
+      mode: night
+  mode: restart
+- id: '1617739589869'
+  alias: Kontakt - Bryggersdør
+  description: ''
+  trigger:
+  - device_id: 0415b6d0e7dc099a29955dbf868988fd
+    domain: zha
+    platform: device
+    type: remote_button_short_press
+    subtype: turn_off
+  condition: []
+  action:
+  - service: light.turn_off
+    target:
+      entity_id: light.inde_lys
+  - service: media_player.turn_off
+    target:
+      entity_id:
+      - media_player.all_speakers
+      - media_player.badevarelse_hojtaler
+      - media_player.kokken_hojtaler
+      - media_player.kontor_display
+      - media_player.kontor_hojtaler
+      - media_player.stue_hojtaler
+      - media_player.toilet_hojtaler
+      - media_player.udestue_hojtaler
+      - media_player.alrum_shield
+  - service: alarmo.arm
+    data:
+      entity_id: alarm_control_panel.baunedalen
+  mode: single
+- id: '1617741242136'
+  alias: Kontakt - Alrum Sofabord
+  description: ''
+  use_blueprint:
+    path: mannerisms/zha-philips-hue-dimmer-switch-individual-buttons-with-long-presses.yaml
+    input:
+      remote: 6744b2f8f0f2d73b26f258b9119fd97f
+      button_1_double_press:
+      - scene: scene.aften_tv
+      button_4_double_press:
+      - service: light.turn_off
+        target:
+          entity_id: light.inde_lys
+- id: '1617878983541'
+  alias: Sensor - Udebelysning
+  description: ''
+  use_blueprint:
+    path: mbw2001/sensor_light.yaml
+    input:
+      sensor: group.udelys_sensorer
+      light: light.carport
+      brightness: 70
+      after_sunset: true
+      no_motion_wait: 30
+- id: '1617891406909'
+  alias: Sensor - Opvaskemaskine Vandlækage
+  description: Send advarsel hvis der er lækage fra opvaskemaskine
+  mode: restart
+  max_exceeded: silent
+  trigger:
+  - type: moist
+    platform: device
+    device_id: 6542b18529c56e361ad28f45b6ddbda6
+    entity_id: binary_sensor.opvaskemaskine_vandsensor
+    domain: binary_sensor
+  - platform: event
+    event_type: mobile_app_notification_action
+    event_data:
+      action: clear_water_alarm
+  - platform: event
+    event_type: call_service
+    event_data:
+      domain: persistent_notification
+      service: dismiss
+      service_data:
+        notification_id: water_alarm
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.platform == ''event'' }}'
+      - condition: or
+        conditions:
+        - condition: template
+          value_template: '{{ trigger.event.event_type == ''mobile_app_notification_action''
+            }}'
+        - condition: template
+          value_template: '{{ trigger.event.event_type == ''call_service'' }}'
+      sequence:
+      - service: persistent_notification.dismiss
+        data:
+          notification_id: water_alarm
+      - service: notify.mobile_app_michaels_telefon
+        data:
+          message: clear_notification
+          data:
+            tag: water_alarm
+    default:
+    - service: persistent_notification.create
+      data:
+        title: Vandalarm Køkken
+        message: Der er fundet vand under opvaskemaskine
+        notification_id: water_alarm
+    - service: notify.mobile_app_michaels_telefon
+      data:
+        message: Der er fundet vand under opvaskemaskine
+        title: Vandalarm Køkken
+        data:
+          sticky: true
+          persistent: true
+          tag: water_alarm
+          channel: alert
+          ttl: 0
+          importance: high
+          priority: high
+          actions:
+          - action: clear_water_alarm
+            title: Afvis Alarm
+- id: '1618042501384'
+  alias: Sensor - Home Assistant Update Notification
+  description: ''
+  use_blueprint:
+    path: fortepc/update-notif-for-android.yaml
+    input:
+      clickAction: https://my.home-assistant.io/redirect/supervisor/
+      delay: 0
+      notify_device: bfb4fccf6ca412c7d4e21a0a60d705f3
+      group: Available Updates
+- id: '1618333335000'
+  alias: Kontakt - Soveværelse Musik
+  description: ''
+  use_blueprint:
+    path: mannerisms/zha-philips-hue-dimmer-switch-individual-buttons-with-long-presses.yaml
+    input:
+      button_1_single_press:
+      - service: spotcast.start
+        data:
+          entity_id: media_player.sovevaerelse_hojtaler
+          force_playback: true
+      remote: 767c2ed949ffb08fedc5171900c6b028
+      button_2_single_press:
+      - service: media_player.volume_up
+        target:
+          entity_id: media_player.sovevaerelse_hojtaler
+      button_3_single_press:
+      - service: media_player.volume_down
+        target:
+          entity_id: media_player.sovevaerelse_hojtaler
+      button_4_single_press:
+      - service: media_player.turn_off
+        target:
+          entity_id: media_player.sovevaerelse_hojtaler
+      button_3_long_press:
+      - service: media_player.volume_set
+        entity_id: media_player.sovevaerelse_hojtaler
+        data_template:
+          volume_level: '{{ states.media_player.sovevaerelse_hojtaler.attributes.volume_level
+            + 0.1 }}'
+- id: '1618934065855'
+  alias: Remote - Musik
+  description: ''
+  trigger:
+  - platform: event
+    event_type: roku_command
+    event_data:
+      source_name: Home Assistant
+      type: keypress
+  condition:
+  - condition: device
+    type: is_on
+    device_id: f1f514092da9a4cd22fa9f84b0c9fbf4
+    entity_id: switch.alrum_remote_musik
+    domain: switch
+  action:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.event.data.key == ''Home'' }}'
+      sequence:
+      - service: spotcast.start
+        data:
+          entity_id: media_player.kokken_hojtaler
+          force_playback: true
+          random_song: true
+          shuffle: true
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.event.data.key == ''PowerOff'' }}'
+      sequence:
+      - service: media_player.turn_off
+        data:
+          entity_id: media_player.kokken_hojtaler
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.event.data.key == ''Play'' }}'
+      sequence:
+      - service: media_player.media_play_pause
+        data:
+          entity_id: media_player.kokken_hojtaler
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.event.data.key == ''Up'' }}'
+      sequence:
+      - service: media_player.volume_up
+        data:
+          entity_id: media_player.kokken_hojtaler
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.event.data.key == ''Down'' }}'
+      sequence:
+      - service: media_player.volume_down
+        data:
+          entity_id: media_player.kokken_hojtaler
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.event.data.key == ''Fwd'' }}'
+      sequence:
+      - service: media_player.media_next_track
+        data:
+          entity_id: media_player.kokken_hojtaler
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.event.data.key == ''Rev'' }}'
+      sequence:
+      - service: media_player.media_previous_track
+        data:
+          entity_id: media_player.kokken_hojtaler
+    default:
+    - service: notify.mobile_app_michaels_telefon
+      data:
+        message: '{{ trigger.event.data.key }}'
+  mode: single
+- id: '1618938318824'
+  alias: Remote - Netflix
+  description: ''
+  trigger:
+  - platform: device
+    type: turned_on
+    device_id: f1f514092da9a4cd22fa9f84b0c9fbf4
+    entity_id: switch.alrum_remote_netflix_2
+    domain: switch
+  condition: []
+  action:
+  - service: media_player.select_source
+    target:
+      entity_id: media_player.alrum_shield
+    data:
+      source: Netflix
+  mode: single
+- id: '1619536446141'
+  alias: Sensor - Postkasse
+  description: ''
+  trigger:
+  - type: vibration
+    platform: device
+    device_id: 375b2a3a8337ed6c5eb853e0079d05c8
+    entity_id: binary_sensor.postkasse_vibration
+    domain: binary_sensor
+  condition:
+  - condition: state
+    entity_id: input_boolean.nat_mode
+    state: 'off'
+  action:
+  - service: notify.mobile_app_michaels_telefon
+    data:
+      title: Post
+      message: Der er registreret bevægelse i postkassen
+      data:
+        tag: post
+  mode: single
+- id: '1619689400603'
+  alias: Sensor - Fix Speedtest
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: sensor.speedtest_ping
+    to: unavailable
+    for: 00:05:00
+  condition: []
+  action:
+  - service: speedtestdotnet.speedtest
+  mode: single
+- id: '1620110395264'
+  alias: Kontakt - Badeværelse Musik/Udluftning
+  description: ''
+  use_blueprint:
+    path: SeanM/zha-aqara-wireless-mini-switch.yaml
+    input:
+      aqara_mini_switch: 29a297ddae71585b2fb5675bc910682d
+      button_single_press:
+      - service: spotcast.start
+        data:
+          entity_id: media_player.badevarelse_hojtaler
+          start_volume: 50
+          shuffle: true
+          force_playback: true
+      button_double_press:
+      - condition: device
+        type: is_off
+        device_id: dfc88ad3a3c639f2c48f73eb957e037b
+        entity_id: light.badevaerelse_udsugning
+        domain: light
+      - condition: state
+        entity_id: light.badevaerelse_udsugning
+        state: 'off'
+      - type: turn_on
+        device_id: dfc88ad3a3c639f2c48f73eb957e037b
+        entity_id: light.badevaerelse_udsugning
+        domain: light
+- id: '1620230374528'
+  alias: Kontakt - Badeværelse
+  description: ''
+  trigger:
+  - device_id: 59e7da8b50e5043df7f7dc5e06cacbca
+    domain: zha
+    platform: device
+    type: remote_button_short_press
+    subtype: turn_off
+  condition:
+  - condition: not
+    conditions:
+    - condition: device
+      device_id: 3cfc45826b014982928128060423b171
+      domain: media_player
+      entity_id: media_player.badevarelse_hojtaler
+      type: is_on
+  action:
+  - service: media_player.turn_off
+    target:
+      entity_id:
+      - media_player.badevarelse_hojtaler
+  mode: single
+- id: '1620625674917'
+  alias: Status - Tørretumbler
+  description: ''
+  use_blueprint:
+    path: sbyx/notify-or-do-something-when-an-appliance-like-a-dishwasher-or-washing-machine-finishes.yaml
+    input:
+      power_sensor: sensor.torretumbler_effekt
+      starting_threshold: '5'
+      starting_hysteresis: 5
+      finishing_threshold: 5
+      finishing_hysteresis: 5
+      actions:
+      - service: notify.both_phones
+        data:
+          title: Tørretumbler
+          message: Færdig
+          data:
+            tag: toerretumbler
+- id: '1620625868681'
+  alias: Kontakt - Sengetid
+  description: ''
+  trigger:
+  - platform: device
+    type: turned_off
+    device_id: f1f514092da9a4cd22fa9f84b0c9fbf4
+    entity_id: remote.alrum_remote
+    domain: remote
+  condition:
+  - condition: time
+    after: '21:30'
+  action:
+  - service: light.turn_on
+    target:
+      entity_id:
+      - light.alrum
+      - light.kokken
+      - light.entre
+      - light.badevaerelse
+      - light.sovevaerelse
+    data: {}
+  - service: spotcast.start
+    data:
+      entity_id: media_player.sovevaerelse_hojtaler
+  mode: single
+- id: '1620633898099'
+  alias: Alarm - Deaktiveret advarsel
+  description: ''
+  trigger:
+  - platform: zone
+    entity_id: person.michael
+    zone: zone.home
+    event: leave
+  - platform: zone
+    entity_id: person.camilla
+    zone: zone.home
+    event: leave
+  condition:
+  - condition: not
+    conditions:
+    - condition: zone
+      entity_id: person.michael
+      zone: zone.home
+    - condition: zone
+      entity_id: person.camilla
+      zone: zone.home
+  - condition: or
+    conditions:
+    - condition: device
+      device_id: ebf28b4520bd35bdd5bb5781e6d8620b
+      domain: lock
+      entity_id: lock.bryggersdor
+      type: is_unlocked
+    - type: is_open
+      condition: device
+      device_id: ebf28b4520bd35bdd5bb5781e6d8620b
+      entity_id: binary_sensor.bryggersdor_open
+      domain: binary_sensor
+    - condition: device
+      device_id: 6be732ff6a9a378bf9c893f3b5d1dfaa
+      domain: alarm_control_panel
+      entity_id: alarm_control_panel.baunedalen
+      type: is_disarmed
+  action:
+  - device_id: bfb4fccf6ca412c7d4e21a0a60d705f3
+    domain: mobile_app
+    type: notify
+    title: Alarm!
+    message: Ingen hjemme, men alarmen er slukket
+    data:
+      tag: alarm
+      actions:
+      - title: Aktivér
+        action: activate_alarm
+      - title: Ignorer
+        action: ignore_alarm_disabled
+  - wait_for_trigger:
+      platform: event
+      event_type: mobile_app_notification_action
+    continue_on_timeout: false
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ wait.trigger.event.data.action == ''activate_alarm'' }}'
+      sequence:
+      - service: alarmo.arm
+        data:
+          entity_id: alarm_control_panel.baunedalen
+    - conditions:
+      - condition: template
+        value_template: '{{ wait.trigger.event.data.action == ''ignore_alarm_disabled''
+          }}'
+      sequence: []
+    default:
+  mode: single
+- id: '1621152495954'
+  alias: Remote - TV
+  description: ''
+  trigger:
+  - platform: device
+    type: turned_on
+    device_id: f1f514092da9a4cd22fa9f84b0c9fbf4
+    entity_id: switch.alrum_remote_watch_tv
+    domain: switch
+  condition: []
+  action:
+  - service: media_player.select_source
+    target:
+      entity_id: media_player.alrum_shield
+    data:
+      source: Kodi
+  - service: media_player.play_media
+    target:
+      entity_id: media_player.alrum_kodi
+    data:
+      media_content_type: CHANNEL
+      media_content_id: '46'
+  mode: single
+- id: '1622977895209'
+  alias: Timer - Narko
+  description: ''
+  use_blueprint:
+    path: Mati24/advanced-medication-reminder.yaml
+    input:
+      logbook_message_skip: Reminder skipped
+      reminder_time: 08:00:00
+      notify_device: bfb4fccf6ca412c7d4e21a0a60d705f3
+      notification_title: Husk narko
+      notification_message: Det er tid til at tage narko!
+      notification_action_taken: Taget
+      notification_action_later: Udskyd
+      ask_later_wait_time: 15
+      input_boolean: input_boolean.drugs
+      logbook_message_later: Postpone reminder
+      logbook_message_taken: Medication taken
+      logbook_message_remind: Reminder sent
+- id: '1622980139417'
+  alias: Alarm - Deaktivér
+  description: ''
+  trigger:
+  - platform: device
+    device_id: ebf28b4520bd35bdd5bb5781e6d8620b
+    domain: lock
+    entity_id: lock.bryggersdor
+    type: unlocked
+  condition:
+  - condition: state
+    entity_id: alarm_control_panel.baunedalen
+    state: armed_away
+  action:
+  - service: alarmo.disarm
+    data:
+      entity_id: alarm_control_panel.baunedalen
+  mode: single

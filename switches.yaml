@@ -1,0 +1,17 @@
+- platform: wake_on_lan
+  name: Office
+  host: '10.0.1.117'
+  broadcast_address: '10.0.1.255'
+  mac: 'f0:2f:74:1a:bd:ca'
+- platform: flux
+  name: Flux Soveværelse
+  lights:
+    - light.sovevaerelse
+  disable_brightness_adjust: true
+  transition: 10
+- platform: flux
+  name: Flux Kontor
+  lights:
+    - light.kontor
+  disable_brightness_adjust: true
+  transition: 1

@@ -1,0 +1,240 @@
+btn:
+  size: 80%
+  show_state: true
+  show_label: true
+  triggers_update: all
+  double_tap_action:
+    action: more-info
+  hold_action:
+    action: more-info
+  styles:
+    card:
+      - padding: 10px
+    label:
+      - font-family: lato
+      - font-size: 15pt
+    name:
+      - justify-self: start
+      - margin-top: 8pt
+    state:
+      - justify-self: start
+      - font-size: 10pt
+    custom_fields:
+      s2:
+        - justify-self: start
+        - font-size: 10pt
+area_btn:
+  template: btn
+  styles:
+    grid:
+      - grid-template-areas: '"i l" "n n" "s s" "s2 s2"'
+      - grid-template-columns: 45% 55%
+      - grid-template-rows: 1fr auto auto auto
+    icon:
+      - color: |
+          [[[
+            if (variables.sensor && states[variables.sensor].state == "on")
+              return 'var(--paper-item-icon-active-color)'
+            else
+              return 'var(--paper-item-icon-color)'
+          ]]]
+    state:
+      - color: var(--accent-color)
+  state:
+    - value: 'on'
+      styles:
+        card:
+          - background-color: var(--paper-item-icon-color)
+          - color: var(--card-background-color)
+        icon:
+          - color: |
+              [[[
+                if (variables.sensor && states[variables.sensor].state == "on")
+                  return 'var(--paper-item-icon-active-color)'
+                return 'var(--aper-item-icon-color)'
+              ]]]
+        label:
+          - color: var(--card-background-color)
+  icon: |
+    [[[
+      if (variables.sensor)
+        var device_class = states[variables.sensor].attributes.device_class
+        var opening = (device_class == "door" || device_class == "window")
+        if (opening && states[variables.sensor].state == "on")
+          return "mdi:" + states[variables.sensor].attributes.device_class + "-open"
+      return variables.icon
+    ]]]
+  label: |
+    [[[
+      if (variables.label_entity)
+        return Math.round(states[variables.label_entity].state) + ' ' + states[variables.label_entity].attributes.unit_of_measurement
+    ]]]
+  state_display: |
+    [[[
+      if (variables.sensor && states[variables.sensor].state == "on")
+        var device_class = states[variables.sensor].attributes.device_class
+        if (device_class == "door")
+          return "Døren er åben"
+        else if (device_class == "window")
+          return "Vinduet er åbent"
+        else if (device_class == "motion" || device_class == "occupancy")
+          return "Bevægelse set"
+      else
+        return "&nbsp;"
+    ]]]
+area_btn_small:
+  template: area_btn
+  show_state: false
+  variables:
+    label_entity: '[[[ return entity.entity_id ]]]'
+  styles:
+    grid:
+      - grid-template-areas: '"i n l"'
+      - grid-template-columns: 20% auto 27%
+      - grid-template-rows: auto
+    name:
+      - margin: 0
+      - justify-self: center
+simple_btn:
+  styles:
+    card:
+      - padding: 10px
+    icon:
+      - color: var(--paper-item-icon-color)
+    name:
+      - font-size: 10pt
+      - margin-top: 10px
+  state:
+    - value: 'on'
+      styles:
+        icon:
+          - color: var(--paper-item-icon-active-color)
+icon_btn:
+  show_name: false
+  styles:
+    card:
+      - padding: 10px 2px
+    icon:
+      - color: var(--paper-item-icon-color)
+  state:
+    - value: 'on'
+      styles:
+        icon:
+          - color: var(--paper-item-icon-active-color)
+icon_btn_scene:
+  template: icon_btn
+  tap_action:
+    action: call-service
+    service: scene.turn_on
+    service_data:
+      entity_id: '[[[ return entity.entity_id ]]]'
+  hold_action:
+    action: more-info
+icon_btn_flat:
+  template: icon_btn
+  styles:
+    card:
+      - padding: 0
+    icon:
+      - color: var(--disabled-text-color)
+  style:
+    .: |
+      ha-card {
+        background-color: transparent !important;
+        box-shadow: none !important;
+      }
+icon_btn_small:
+  template: icon_btn_flat
+  styles:
+    icon:
+      - height: 30px
+      - width: 30px
+icon_btn_tracker:
+  template: icon_btn_small
+  icon: |
+    [[[
+      if (entity.state == 'timengo')
+        return 'mdi:briefcase'
+      else if (entity.state == 'UiU')
+        return 'mdi:human-wheelchair'
+      else if (entity.state == 'not_home')
+        return 'mdi:run'
+      else
+        return 'mdi:home'
+    ]]]
+  state:
+    - value: home
+      styles:
+        icon:
+          - color: var(--paper-item-icon-color)
+icon_btn_cast:
+  template: icon_btn
+  variables:
+    cast_device: media_player.kontor_display
+    dashboard_path: lovelace
+  tap_action:
+    action: call-service
+    service: cast.show_lovelace_view
+    service_data:
+      entity_id: '[[[ return variables.cast_device ]]]'
+      dashboard_path: '[[[ return variables.dashboard_path ]]]'
+      view_path: '[[[ return variables.view_path ]]]'
+person:
+  triggers_update: all
+  aspect_ratio: 1/1
+  show_name: false
+  show_icon: false
+  styles:
+    grid:
+      - grid-template-areas: '"tracker wifi" "n n" "bat bat"'
+      - grid-template-columns: 1fr 1fr
+      - grid-template-rows: min-content auto min-content
+    card:
+      - padding: 10px
+      - background-size: cover
+      - background-image: '[[[ return ''url('' + entity.attributes.entity_picture + '')'' ]]]'
+    custom_fields:
+      tracker:
+        - justify-self: start
+      wifi:
+        - justify-self: end
+      bat:
+        - text-align: left
+  custom_fields:
+    tracker:
+      card:
+        type: 'custom:button-card'
+        entity: '[[[ return entity.entity_id ]]]'
+        template: icon_btn_tracker
+    wifi:
+      card:
+        type: 'custom:button-card'
+        entity: '[[[ return variables.wifi ]]]'
+        template: icon_btn_small
+        state:
+          - value: <not connected>
+            operator: '!='
+            styles:
+              icon:
+                - color: var(--paper-item-icon-color)
+    bat:
+      card:
+        type: 'custom:bar-card'
+        entity: '[[[ return variables.battery ]]]'
+        entity_row: true
+        height: 15px
+        positions:
+          name: 'off'
+          icon: 'off'
+          indicator: 'off'
+          value: 'off'
+        severity:
+          - color: var(--label-badge-red)
+            from: 0
+            to: 15
+          - color: var(--label-badge-yellow)
+            from: 15
+            to: 30
+          - color: var(--paper-item-icon-color)
+            from: 30
+            to: 100

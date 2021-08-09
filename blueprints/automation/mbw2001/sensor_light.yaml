@@ -1,0 +1,147 @@
+blueprint:
+  name: Sensor Activated Light 
+  description: Turn on light when sensor is activated
+  domain: automation
+  input:
+    sensor:
+      name: Sensor (or group of sensor)
+      description: The sensor that triggers the light
+      selector:
+        entity:
+    light:
+      name: Light
+      description: The light to turn on
+      selector:
+        entity:
+          domain: light
+    helper:
+      name: Helper
+      description: Boolean helper to track state
+      default: none
+      selector:
+        entity:
+          domain: input_boolean
+    night_time_sensor:
+      name: Day/Night sensor
+      description: Sensor that indicates night/day mode
+      default: none
+      selector:
+        entity:
+          domain: input_boolean
+    brightness_day:
+      name: Brightness Day
+      description: Brightness of the light at day
+      default: 100
+      selector:
+        number:
+          min: 0
+          max: 100
+          step: 5
+          unit_of_measurement: '%'
+    brightness_night:
+      name: Brightness Night
+      description: Brightness of the light at night
+      default: 30
+      selector:
+        number:
+          min: 0
+          max: 100
+          step: 5
+          unit_of_measurement: '%'
+    transition_on:
+      name: Transition On
+      description: How long to transition the light on
+      default: 1
+      selector:
+        number:
+          min: 0
+          max: 5
+          unit_of_measurement: seconds
+    transition_off:
+      name: Transition Off
+      description: How long to transition the light off
+      default: 3
+      selector:
+        number:
+          min: 0
+          max: 5
+          unit_of_measurement: seconds
+    no_motion_wait:
+      name: Wait time
+      description: Time to leave the light on after last motion is detected.
+      default: 20
+      selector:
+        number:
+          min: 0
+          max: 300
+          step: 5
+          unit_of_measurement: seconds
+    after_sunset:
+      name: Only after sunset?
+      description: Only trigger lights after sunset?
+      default: false
+      selector:
+        boolean:
+
+mode: restart
+max_exceeded: silent
+
+trigger:
+- platform: state
+  entity_id: !input sensor
+  from: "off"
+  to: "on"
+- platform: state
+  entity_id: !input sensor
+  from: "on"
+  to: "off"
+  for:
+    seconds: !input no_motion_wait
+
+variables:
+  light: !input light
+  lightstate: '{{ states(light) }}'
+  helper: !input helper
+  after_sunset: !input after_sunset
+  night_time_sensor: !input night_time_sensor
+  brightness_day: !input brightness_day
+  brightness_night: !input brightness_night
+  brightness: '{{ brightness_night if night_time_sensor != ''none'' and states(night_time_sensor) == ''on'' else brightness_day }}'
+
+condition:
+- condition: or
+  conditions:
+  - "{{ after_sunset == false  }}"
+  - "{{ state_attr('sun.sun','elevation') <= 0 }}"
+
+action:
+- choose:
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger.to_state.state == "on" }}'
+    - condition: template
+      value_template: '{{ lightstate == "off" }}'
+    sequence:
+    - service: light.turn_on
+      target:
+        entity_id: !input light
+      data:
+        transition: !input transition_on
+        brightness_pct: '{{ brightness }}'
+    - service: input_boolean.turn_on
+      target:
+        entity_id: !input helper
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger.to_state.state == "off" }}'
+    - condition: template
+      value_template: '{{ helper == "none" or states(helper) == "on" }}'
+    sequence:
+    - service: light.turn_off
+      target:
+        entity_id: !input light
+      data:
+        transition: !input transition_off
+    - service: input_boolean.turn_off
+      target:
+        entity_id: !input helper

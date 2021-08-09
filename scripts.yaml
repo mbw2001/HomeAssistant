@@ -47,3 +47,17 @@ notification_michael_hvis_hjemme:
     tag:
       description: A tag for the notification
       example: sample_notification
+dorklokke:
+  alias: Dørklokke
+  sequence:
+  - service: media_player.volume_set
+    data:
+      volume_level: 0.45
+    entity_id: media_player.dorklokke
+  - service: media_player.play_media
+    data:
+      media_content_id: https://ha.mbw.dk/local/doorbell.mp3
+      media_content_type: music
+    entity_id: media_player.dorklokke
+  mode: single
+  icon: mdi:bell

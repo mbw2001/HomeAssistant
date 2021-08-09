@@ -50,7 +50,7 @@ blueprint:
       description: Persistent notifications cannot be dimissed by swiping away
       default: false
       selector:
-        boolean: {}
+        boolean:
     action_1_title:
       name: First action name
       description: Name of the first button
@@ -64,7 +64,7 @@ blueprint:
       description: Action to run when the first action is clicked
       default: []
       selector:
-        action: {}
+        action:
     action_2_title:
       name: Second action name
       description: Name of the second button
@@ -78,7 +78,7 @@ blueprint:
       description: Action to run when the second action is clicked"
       default: []
       selector:
-        action: {}
+        action:
     action_3_title:
       name: Third action name
       description: Name of the third button
@@ -92,7 +92,7 @@ blueprint:
       description: Action to run when the third action is clicked
       default: []
       selector:
-        action: {}
+        action:
   source_url: https://community.home-assistant.io/t/actionable-notifications-for-android/256773
 mode: restart
 max_exceeded: silent
