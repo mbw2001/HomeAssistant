@@ -4,8 +4,12 @@ homeassistant:
     - type: homeassistant
     - type: trusted_networks
       trusted_networks:
-        - 10.0.1.0/24
-        - 10.0.10.0/24
+        - 10.0.0.0/16
+        - 2a05:f6c7:2186::/48
+      trusted_users:
+        10.0.0.0/16: 53299a6d0c9d4343b50085530bb25314
+        2a05:f6c7:2186::/48: 53299a6d0c9d4343b50085530bb25314
+      allow_bypass_login: true
   allowlist_external_dirs:
     - /config
 
@@ -16,13 +20,6 @@ lovelace:
   mode: yaml
   resources: !include resources.yaml
   dashboards:
-    lovelace-map:
-      mode: yaml
-      title: Map
-      icon: mdi:map-marker
-      show_in_sidebar: true
-      require_admin: true
-      filename: dashboards/map.yaml
     lovelace-tablet:
       mode: yaml
       title: Tablet
@@ -30,6 +27,13 @@ lovelace:
       show_in_sidebar: false
       require_admin: false
       filename: dashboards/tablet.yaml
+    lovelace-alarm:
+      mode: yaml
+      title: Alarm
+      icon: mdi:shield-home
+      show_in_sidebar: false
+      require_admin: false
+      filename: dashboards/alarm.yaml
 
 config:
 
@@ -43,34 +47,24 @@ http:
     - https://home-assistant.io
     - https://cast.home-assistant.io
   trusted_proxies:
-    - 10.0.10.0/24
+    - 10.0.60.10/32
   use_x_forwarded_for: true
   ip_ban_enabled: false
   login_attempts_threshold: 3
 
 updater:
-discovery:
+
+zeroconf:
 
 # Log Severities: notset, debug, info, warn, warning, error, fatal, critical
 logger:
   default: warning
   logs:
-    homeassistant.components.camera: critical
-    #snitun.client.client_peer: debug
-    #hass_nabucasa.remote: debug
-    #homeassistant.core: debug
-    #homeassistant.components.zha: debug
-    #bellows.zigbee.application: debug
-    #bellows.ezsp: debug
-    #zigpy: debug
-    #zigpy_cc: debug
-    #zigpy_deconz.zigbee.application: debug
-    #zigpy_deconz.api: debug
-    #zigpy_xbee.zigbee.application: debug
-    #zigpy_xbee.api: debug
-    #zigpy_zigate: debug
-    #zigpy_znp: debug
-    #zhaquirks: debug
+    gardena.smart_system: warning
+
+system_health:
+
+#media_source:
 
 recorder:
   db_url: !secret db_url
@@ -116,24 +110,11 @@ influxdb:
     - friendly_name
   default_measurement: units
   exclude:
-    entities:
-      - sensor.yr_symbol
-      - sensor.time
-      - sensor.time_date
-      - sensor.time_utc
-      - sensor.date
-      - sensor.date_time
-      - sensor.date_time_iso
-      - sensor.date_time_utc
-      - sensor.internet_time
-  include:
-    entities:
-      - sensor.netatmo_ude_temperature
-      - sensor.udestue_temperatur
+    entity_globs: "*"
 
 rest_command:
   pipup:
-    url: http://10.0.1.90:7979/notify
+    url: http://10.0.10.20:7979/notify
     content_type: "application/json"
     verify_ssl: false
     method: "post"
@@ -157,23 +138,16 @@ rest_command:
         }
       }
 
-folder_watcher:
-  - folder: /config/blueprints
-
-system_health:
-
-media_source:
-
 stream:
 
 camera:
   - platform: generic
-    name: Udestue Sub
-    still_image_url: !secret udestue_still_image_url
-    stream_source: !secret udestue_stream_source
+    name: Hoveddør
+    still_image_url: http://homeassistant.local:8123{{ states.camera.hoveddor_snapshot.attributes.entity_picture }}
+    stream_source: rtsp://ring-mqtt:8554/54e01919cdf6_live
   - platform: xiaomi_cloud_map_extractor
     name: roborock_s7_map
-    host: 10.0.1.92
+    host: 10.0.20.91
     token: !secret xiaomi_vacuum_token
     username: !secret xiaomi_cloud_username
     password: !secret xiaomi_cloud_password
@@ -204,32 +178,60 @@ mobile_app:
 
 wake_on_lan:
 
-zha:
-  custom_quirks_path: /config/zha_custom_quirks
-  zigpy_config:
-    source_routing: true
-    ezsp_config:
-      CONFIG_MAX_END_DEVICE_CHILDREN: 16
-      CONFIG_SOURCE_ROUTE_TABLE_SIZE: 64
-    ota:
-      otau_directory: /config/zigpy_ota
-      ikea_provider: true
-      ledvance_provider: true
+energy:
+
+#modbus:
+#  - name: smart-me
+#    type: tcp
+#    host: 10.0.20.144
+#    port: 502
+#    sensors:
+#      - name: Smart-Me Counter
+#        slave: 1
+#        address: 8267
+#        input_type: holding
+#        count: 2
+#        scale: 0.001
+#        precision: 2
+#        scan_interval: 30
+#        device_class: energy
+#        unit_of_measurement: kWh
+#        state_class: total_increasing
+
+home_connect:
+  client_id: !secret home_connect_client_id
+  client_secret: !secret home_connect_client_secret
+
+nordpool:
+
+utility_meter:
+  gasforbrug_manedlig:
+    name: Gasforbrug Månedlig
+    source: input_number.gasforbrug
+    cycle: monthly
+  vandforbrug_manedlig:
+    name: Vandforbrug Månedlig
+    source: input_number.vandforbrug
+    cycle: monthly
 
 emulated_roku:
   servers:
     - name: Home Assistant
       listen_port: 8060
-      host_ip: 10.0.1.5
 
 emulated_hue:
   listen_port: 80
-  host_ip: 10.0.1.5
+  host_ip: 10.0.20.20
+  advertise_ip: 10.0.20.20
   expose_by_default: false
   entities:
     light.alrum:
       hidden: false
-    scene.aften_tv:
+    light.kokken:
+      hidden: false
+    light.udestue:
+      hidden: false
+    light.alrum_spisebord:
       hidden: false
 
 notify:
@@ -242,7 +244,7 @@ notify:
     name: both_phones
     services:
       - service: mobile_app_michaels_telefon
-      - service: mobile_app_camilla_phone
+      - service: mobile_app_camillas_telefon
 
 spotify:
   client_id: !secret spotify_client_id
@@ -256,7 +258,7 @@ ifttt:
   key: !secret ifttt_key
 
 webostv:
-  host: 10.0.1.72
+  host: 10.0.10.25
   name: "Alrum TV"
   customize:
     sources:
@@ -268,35 +270,26 @@ webostv:
       - "Plex"
       - "UHD Fireplace"
 
-monitor_docker: !include monitor_docker.yaml
-
-generic_hygrostat:
-  - name: Badeværelse
-    humidifier: light.badevaerelse_udsugning
-    target_sensor: sensor.badevaerelse_humidity
-    device_class: dehumidifier
-    min_humidity: 30
-    max_humidity: 80
-    target_humidity: 70
-    dry_tolerance: 0
-    wet_tolerance: 0
-    initial_state: true
-    min_cycle_duration:
-      minutes: 5
-    sensor_stale_duration: 00:15:00
-  - name: Toilet
-    humidifier: light.toilet_udsugning
-    target_sensor: sensor.toilet_humidity
-    device_class: dehumidifier
-    min_humidity: 30
-    max_humidity: 80
-    target_humidity: 70
-    dry_tolerance: 0
-    wet_tolerance: 0
-    initial_state: true
-    min_cycle_duration:
-      minutes: 5
-    sensor_stale_duration: 00:15:00
+browser_mod:
+  prefix: "browser_"
+  devices:
+    bd62425d-cb008492:
+      name: Alarm Dashboard
+      force_stay_awake: true
+      disable:
+        - media_player
+    763a9f90-6da3cfc1:
+      name: Kontor Dashboard
+      force_stay_awake: true
+      disable:
+        - media_player
+    d02cd761-5c4c5bf1:
+      name: Køkken Dashboard
+      force_stay_awake: true
+      disable:
+        - media_player
+  disable:
+    - all
 
 automation: !include automations.yaml
 binary_sensor: !include binary_sensor.yaml

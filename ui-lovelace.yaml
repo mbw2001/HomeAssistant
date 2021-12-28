@@ -1,31 +1,15 @@
 button_card_templates: !include dashboards/buttons.yaml
 views:
-  - icon: 'mdi:home'
+  - icon: 'mdi:home-outline'
     path: home
     title: Home
+    type: custom:masonry-layout
+    layout:
+      max_cols: 3
     cards:
-      - type: weather-forecast
-        entity: weather.home
-        show_forecast: false
-      - type: horizontal-stack
-        cards:
-          - type: entities
-            entities:
-              - type: 'custom:multiple-entity-row'
-                entity: alarm_control_panel.baunedalen
-                name: Baunedalen
-                show_state: false
-                secondary_info:
-                  entity: alarm_control_panel.baunedalen
-                  name: 'Alarm:'
-                entities:
-                  - entity: sensor.bryggersdor_battery
-                    name: Batteri
-                  - entity: binary_sensor.bryggersdor_open
-                    name: Tilstand
-                  - entity: lock.bryggersdor
-                    name: Status
-                toggle: false
+      - type: custom:button-card
+        entity: alarm_control_panel.baunedalen
+        template: alarm
       - type: vertical-stack
         cards:
           - type: grid
@@ -33,114 +17,115 @@ views:
             square: false
             cards:
               - type: 'custom:button-card'
-                name: Entré
                 entity: light.entre
+                name: Entré
                 template: area_btn
                 variables:
-                  icon: 'mdi:door'
-                  sensor: binary_sensor.hoveddoer
+                  area: Entré
+                  sensor: binary_sensor.hoveddor_sensor_contact
                   label_entity: sensor.entre_temperature
               - type: 'custom:button-card'
-                name: Alrum
                 entity: light.alrum
+                name: Alrum
                 template: area_btn
                 variables:
-                  icon: 'mdi:television'
-                  sensor: binary_sensor.alrumdoer
+                  area: Alrum
+                  sensor: binary_sensor.alrum_dor_sensor_contact
                   label_entity: sensor.alrum_temperature
               - type: 'custom:button-card'
-                name: Køkken
                 entity: light.kokken
+                name: Køkken
                 template: area_btn
                 variables:
-                  icon: 'mdi:stove'
-                  sensor: binary_sensor.koekkenvindue_hoejre
+                  area: Køkken
+                  sensor: 
+                    - binary_sensor.kokken_vindue_hojre_sensor_contact
+                    - binary_sensor.kokken_vindue_venstre_sensor_contact
                   label_entity: sensor.alrum_temperature
               - type: 'custom:button-card'
-                name: Stue
                 entity: light.stue
+                name: Stue
                 template: area_btn
                 variables:
-                  icon: 'mdi:sofa'
-                  sensor: binary_sensor.stuedoer
+                  area: Stue
+                  sensor: binary_sensor.stuedor_contact
                   label_entity: sensor.stue_temperature
               - type: 'custom:button-card'
-                name: Bryggers
                 entity: light.bryggers
+                name: Bryggers
                 template: area_btn
                 variables:
-                  icon: 'mdi:washing-machine'
-                  sensor: binary_sensor.bryggersdoer
+                  area: Bryggers
+                  sensor: binary_sensor.bryggersdor_sensor_contact
                   label_entity: sensor.bryggers_temperature
               - type: 'custom:button-card'
-                name: Soveværelse
                 entity: light.sovevaerelse
+                name: Soveværelse
                 template: area_btn
                 variables:
-                  icon: 'mdi:bed'
-                  sensor: binary_sensor.sovevaerelsevindue
+                  area: Soveværelse
+                  sensor: binary_sensor.sovevaerelse_vindue_sensor_contact
                   label_entity: sensor.sovevaerelse_temperature
               - type: 'custom:button-card'
-                name: Kontor
                 entity: light.kontor
+                name: Kontor
                 template: area_btn
                 variables:
-                  icon: 'mdi:keyboard'
-                  sensor: binary_sensor.kontorvindue
+                  area: Kontor
+                  sensor: binary_sensor.kontor_vindue_sensor_contact
                   label_entity: sensor.kontor_temperature
               - type: 'custom:button-card'
-                name: Badeværelse
                 entity: light.badevaerelse
+                name: Badeværelse
                 template: area_btn
                 variables:
-                  icon: 'mdi:shower-head'
-                  sensor: binary_sensor.badevaerelsevindue
-                  label_entity: sensor.badevaerelse_temperature
+                  area: Badeværelse
+                  sensor: binary_sensor.badevaerelse_vindue_sensor_contact
+                  label_entity: sensor.badevaerelse_luftsensor_temperature
               - type: 'custom:button-card'
+                entity: switch.toilet_udsugning
                 name: Gæstetoilet
-                entity: light.toilet
+                icon: 'mdi:toilet'
                 template: area_btn
                 variables:
-                  icon: 'mdi:toilet'
-                  label_entity: sensor.toilet_temperature
+                  area: Gæstetoilet
+                  label_entity: sensor.toilet_luftsensor_temperature
               - type: 'custom:button-card'
                 name: Gæsteværelse
                 entity: light.gaestevaerelse
                 template: area_btn
                 variables:
-                  icon: 'mdi:bunk-bed'
-                  sensor: binary_sensor.gaestevaerelsevindue
+                  area: Gæsteværelse
+                  sensor: binary_sensor.gaestevaerelse_vindue_sensor_contact
                   label_entity: sensor.gaestevaerelse_temperature
               - type: 'custom:button-card'
-                name: Udestue
                 entity: light.udestue
+                name: Udestue
                 template: area_btn
                 variables:
-                  icon: 'mdi:weather-sunny'
-                  sensor: binary_sensor.udestuedoer
-                  label_entity: sensor.udestue_temperature
+                  area: Udestue
+                  sensor: binary_sensor.udestue_dor_contact
+                  label_entity: sensor.udestue_dor_temperature
               - type: 'custom:button-card'
-                name: Carport
                 entity: light.carport
+                name: Carport
                 template: area_btn
                 variables:
-                  icon: 'mdi:garage-open-variant'
+                  area: Ude
                   sensor: binary_sensor.carport_sensor_occupancy
                   label_entity: sensor.carport_sensor_temperature
           - type: grid
             cards:
               - type: 'custom:button-card'
+                entity: sensor.skur_sensor_temperature
                 name: Skur
-                entity: sensor.skur_temperature
+                icon: 'mdi:bike'
                 template: area_btn_small
-                variables:
-                  icon: 'mdi:bike'
               - type: 'custom:button-card'
+                entity: sensor.vaerksted_sensor_temperature
                 name: Værksted
-                entity: sensor.vaerksted_temperature
+                icon: 'mdi:screw-flat-top'
                 template: area_btn_small
-                variables:
-                  icon: 'mdi:screw-flat-top'
             columns: 2
             square: false
       - type: 'custom:auto-entities'
@@ -213,9 +198,6 @@ views:
             - entity_id: media_player.alrum_tv
             - entity_id: media_player.shield_plex
               state: idle
-        sort:
-          method: entity_id
-          reverse: false
         show_empty: false
       - type: grid
         columns: 5
@@ -242,7 +224,7 @@ views:
             icon: 'mdi:spotify'
             template: icon_btn
       - type: grid
-        columns: 5
+        columns: 4
         square: false
         cards:
           - type: 'custom:button-card'
@@ -255,12 +237,8 @@ views:
             entity: vacuum.sileno
             template: icon_btn
           - type: 'custom:button-card'
-            entity: sensor.vaskemaskine_effekt
+            entity: sensor.vaskemaskine_sensor_power
             icon: mdi:washing-machine
-            template: icon_btn
-          - type: 'custom:button-card'
-            icon: mdi:tumble-dryer
-            entity: sensor.torretumbler_effekt
             template: icon_btn
       - type: 'custom:mini-graph-card'
         name: Kuldioxid
@@ -312,13 +290,13 @@ views:
           - name: Gæsteværelse
             entity: sensor.gaestevaerelse_humidity
           - name: Badeværelse
-            entity: sensor.badevaerelse_humidity
+            entity: sensor.badevaerelse_luftsensor_humidity
           - name: Toilet
-            entity: sensor.toilet_humidity
+            entity: sensor.toilet_luftsensor_humidity
           - name: Skur
-            entity: sensor.skur_humidity
+            entity: sensor.skur_sensor_humidity
           - name: Værksted
-            entity: sensor.vaerksted_humidity
+            entity: sensor.vaerksted_sensor_humidity
         hour24: true
         line_width: 2
         show:
@@ -326,6 +304,9 @@ views:
   - icon: 'mdi:floor-plan'
     path: rooms
     title: Rooms
+    type: custom:masonry-layout
+    layout:
+      max_cols: 3
     cards:
       - type: vertical-stack
         cards:
@@ -447,7 +428,7 @@ views:
                   exclude:
                     - name: '* Lys'
               - name: Vækkeur
-                entity: sensor.camilla_phone_next_alarm
+                entity: sensor.camillas_telefon_next_alarm
               - name: Termostat
                 entity: climate.sovevaerelse
           - type: grid
@@ -462,6 +443,9 @@ views:
                 template: icon_btn_scene
               - type: 'custom:button-card'
                 entity: scene.luk_gardiner_sovevaerelse
+                template: icon_btn_scene
+              - type: 'custom:button-card'
+                entity: scene.aben_vindue
                 template: icon_btn_scene
           - type: 'custom:mini-graph-card'
             name: Temperatur
@@ -585,12 +569,15 @@ views:
                 entities:
                   - sensor.netatmo_kontor_humidity
   - title: Alarm
+    type: custom:masonry-layout
+    layout:
+      max_cols: 3
     path: alarm
-    icon: mdi:shield
+    icon: mdi:shield-outline
     cards:
-      - type: custom:alarmo-card
+      - type: custom:button-card
+        template: alarm
         entity: alarm_control_panel.baunedalen
-        keep_keypad_visible: false
       - type: custom:auto-entities
         card:
           type: grid
@@ -599,10 +586,6 @@ views:
         card_param: cards
         filter:
           include:
-            - domain: lock
-              options:
-                type: 'custom:button-card'
-                template: simple_btn
             - domain: binary_sensor
               attributes:
                 device_class: motion
@@ -630,21 +613,37 @@ views:
                 type: 'custom:button-card'
                 template: simple_btn
           exclude:
+            - entity_id: binary_sensor.anyone_home
+            - domain: binary_sensor
+              entity_id: '*_dashboard'
             - domain: binary_sensor
               entity_id: '*_open_window'
-      - type: picture-entity
-        entity: camera.hoveddor_snapshot
-        camera_image: camera.hoveddor_snapshot
-        show_name: false
-        show_state: false
-        camera_view: live
-      - type: 'custom:webrtc-camera'
-        url: !secret udestue_stream_rtsp
-        poster: !secret udestue_still_image_url
-        ui: true
-  - icon: 'mdi:map-marker'
+            - state: 'off'
+      - type: custom:swipe-card
+        cards:
+          - type: picture-entity
+            entity: camera.hoveddor
+            show_name: false
+            show_state: false
+            camera_view: auto
+          - type: custom:frigate-card
+            camera_entity: camera.carport
+            frigate:
+              url: https://frigate.mbw.dk
+            menu:
+              mode: hidden-bottom
+          - type: custom:frigate-card
+            camera_entity: camera.udestue
+            frigate:
+              url: https://frigate.mbw.dk
+            menu:
+              mode: hidden-bottom
+  - icon: 'mdi:map-marker-outline'
     path: map
     title: Map
+    type: custom:masonry-layout
+    layout:
+      max_cols: 3
     badges: []
     cards:
       - type: horizontal-stack
@@ -653,99 +652,16 @@ views:
             entity: person.michael
             template: person
             variables:
-              wifi: sensor.samsungs20_wifi_forbindelse
-              battery: sensor.samsungs20_batteriniveau
+              wifi: sensor.michaels_telefon_wifi_connection
+              battery: sensor.michaels_telefon_battery_level
           - type: 'custom:button-card'
             entity: person.camilla
             template: person
             variables:
-              wifi: sensor.camilla_phone_wifi_connection
-              battery: sensor.camilla_phone_battery_level
+              wifi: sensor.camillas_telefon_wifi_connection
+              battery: sensor.camillas_telefon_battery_level
       - type: 'custom:button-card'
-        entity: device_tracker.320i
-        variables:
-          remaining_fuel: sensor.320i_remaining_fuel
-          remaining_range_fuel: sensor.320i_remaining_range_fuel
-          remaining_fuel_percent: sensor.320i_remaining_fuel_percent
-          lock: lock.320i_lock
-        triggers_update: all
-        aspect_ratio: 2/1
-        show_name: false
-        show_icon: false
-        styles:
-          grid:
-            - grid-template-areas: '"tracker lock" "n n" "fuel fuel" "bottom bottom"'
-            - grid-template-columns: 1fr 1fr
-            - grid-template-rows: min-content auto min-content min-content
-          card:
-            - padding: 10px
-            - background-size: cover
-            - background-image: url(/local/bmw-header.png)
-          custom_fields:
-            tracker:
-              - justify-self: start
-            lock:
-              - justify-self: end
-            fuel:
-              - text-align: left
-              - margin-bottom: 10px
-        custom_fields:
-          tracker:
-            card:
-              type: 'custom:button-card'
-              entity: '[[[ return entity.entity_id ]]]'
-              template: icon_btn_tracker
-          lock:
-            card:
-              type: 'custom:button-card'
-              entity: '[[[ return variables.lock ]]]'
-              template: icon_btn_small
-              styles:
-                icon:
-                  - color: var(--paper-item-icon-color)
-          fuel:
-            card:
-              type: 'custom:bar-card'
-              entity: '[[[ return variables.remaining_fuel_percent ]]]'
-              entity_row: true
-              height: 15px
-              positions:
-                name: 'off'
-                icon: 'off'
-                indicator: 'off'
-                value: 'off'
-              severity:
-                - color: var(--label-badge-red)
-                  from: 0
-                  to: 15
-                - color: var(--label-badge-yellow)
-                  from: 15
-                  to: 30
-                - color: var(--paper-item-icon-color)
-                  from: 30
-                  to: 100
-          bottom:
-            card:
-              type: horizontal-stack
-              cards:
-                - type: 'custom:button-card'
-                  entity: binary_sensor.320i_check_control_messages
-                  template: icon_btn_flat
-                - type: 'custom:button-card'
-                  entity: binary_sensor.320i_condition_based_services
-                  template: icon_btn_flat
-                - type: 'custom:button-card'
-                  entity: binary_sensor.320i_lights_parking
-                  template: icon_btn_flat
-                - type: 'custom:button-card'
-                  entity: binary_sensor.320i_windows
-                  template: icon_btn_flat
-                - type: 'custom:button-card'
-                  entity: binary_sensor.320i_lids
-                  template: icon_btn_flat
-                - type: 'custom:button-card'
-                  entity: lock.320i_lock
-                  template: icon_btn_flat
+        template: bmw
       - type: map
         entities:
           - entity: zone.home
@@ -757,9 +673,13 @@ views:
           - entity: device_tracker.320i
         hours_to_show: 24
         default_zoom: 12
-  - icon: 'mdi:server'
+        dark_mode: false
+  - icon: 'mdi:server-network'
     path: system
     title: System
+    type: custom:masonry-layout
+    layout:
+      max_cols: 3
     badges: []
     cards:
       - type: horizontal-stack
@@ -775,7 +695,7 @@ views:
               - color: '#B54949'
                 value: 100
             entities:
-              - sensor.glances_cpu_used
+              - sensor.nuc_cpu_usage
           - type: 'custom:mini-graph-card'
             name: Temp
             decimals: 0
@@ -789,7 +709,7 @@ views:
               - color: '#B54949'
                 value: 90
             entities:
-              - sensor.glances_core_0_temperature
+              - sensor.nuc_temperature
           - type: 'custom:mini-graph-card'
             name: Memory
             decimals: 0
@@ -801,12 +721,12 @@ views:
               - color: '#B54949'
                 value: 100
             entities:
-              - sensor.glances_ram_used_percent
+              - sensor.nuc_memory_usage
       - type: 'custom:bar-card'
         entities:
-          - entity: sensor.glances_etc_hostname_used_percent
+          - entity: sensor.nuc_disk_os
             name: System Disk
-          - entity: sensor.glances_storage_used_percent
+          - entity: sensor.nuc_disk_data
             name: Storage Disk
         entity_row: true
         columns: '2'
@@ -822,53 +742,6 @@ views:
           - color: '#B54949'
             from: 90
             to: 100
-      - type: grid
-        square: false
-        columns: 7
-        cards:
-          - type: 'custom:button-card'
-            icon: 'mdi:home'
-            template: icon_btn_cast
-            variables:
-              view_path: home
-          - type: 'custom:button-card'
-            icon: 'mdi:television'
-            template: icon_btn_cast
-            variables:
-              view_path: alrum
-          - type: 'custom:button-card'
-            icon: 'mdi:bed'
-            template: icon_btn_cast
-            variables:
-              view_path: sovevaerelse
-          - type: 'custom:button-card'
-            icon: 'mdi:keyboard'
-            template: icon_btn_cast
-            variables:
-              view_path: kontor
-          - type: 'custom:button-card'
-            icon: 'mdi:server'
-            template: icon_btn_cast
-            variables:
-              view_path: system
-          - type: 'custom:button-card'
-            icon: 'mdi:camera'
-            template: icon_btn
-            tap_action:
-              action: call-service
-              service: camera.play_stream
-              service_data:
-                media_player: media_player.kontor_display
-                entity_id:
-                  - camera.udestue_sub
-          - type: 'custom:button-card'
-            icon: 'mdi:power'
-            template: icon_btn
-            tap_action:
-              action: call-service
-              service: media_player.turn_off
-              service_data:
-                entity_id: media_player.kontor_display
       - type: horizontal-stack
         cards:
           - type: 'custom:mini-graph-card'
@@ -1056,17 +929,17 @@ views:
         sort_by_level: asc
         tap_action: more-info
         entities:
-          - entity: sensor.samsungs20_batteriniveau
+          - entity: sensor.michaels_telefon_battery_level
             charging_state:
-              entity_id: sensor.samsungs20_batteritilstand
+              entity_id: sensor.michaels_telefon_battery_state
               state: charging
-          - entity: sensor.camilla_phone_battery_level
+          - entity: sensor.camillas_telefon_battery_level
             charging_state:
-              entity_id: sensor.camilla_phone_battery_state
+              entity_id: sensor.camillas_telefon_battery_state
               state: charging
-          - entity: sensor.michael_tablet_battery_level
+          - entity: sensor.michaels_tablet_battery_level
             charging_state:
-              entity_id: sensor.michael_tablet_battery_state
+              entity_id: sensor.michaels_tablet_battery_state
               state: charging
         filter:
           include:
@@ -1090,5 +963,9 @@ views:
             - entity_id: media_player.*plex*
             - entity_id: sensor.*_naeste_alarm
             - entity_id: sensor.*_next_alarm
+            - entity_id: sensor.office*
+            - entity_id: '*_dashboard'
+            - entity_id: sensor.opvaskemaskine_program_progress
+            - entity_id: sensor.opvaskemaskine_remaining_program_time
         sort:
           method: entity_id

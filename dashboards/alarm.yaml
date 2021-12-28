@@ -1,0 +1,81 @@
+kiosk_mode:
+  user_settings:
+    - users:
+        - tablet
+      hide_header: true
+button_card_templates: !include buttons.yaml
+title: Alarm
+views:
+  - cards:
+      - type: weather-forecast
+        entity: weather.home
+        tap_action:
+          action: none
+      - type: custom:button-card
+        entity: alarm_control_panel.baunedalen
+        template: alarm
+      - type: custom:button-card
+        entity: vacuum.roborock_s7
+        template: vacuum
+      - type: custom:auto-entities
+        card:
+          type: grid
+          square: false
+          columns: 2
+        card_param: cards
+        filter:
+          include:
+            - domain: light
+              name: '* Lys'
+              options:
+                type: 'custom:button-card'
+                template: simple_btn
+                color_type: card
+            - domain: binary_sensor
+              attributes:
+                device_class: door
+              options:
+                type: 'custom:button-card'
+                template: simple_btn
+                color_type: card
+            - domain: binary_sensor
+              attributes:
+                device_class: window
+              options:
+                type: 'custom:button-card'
+                template: simple_btn
+                color_type: card
+            - domain: binary_sensor
+              attributes:
+                device_class: motion
+              options:
+                type: 'custom:button-card'
+                icon: 'mdi:motion-sensor'
+                template: simple_btn
+                color_type: card
+            - domain: binary_sensor
+              attributes:
+                device_class: occupancy
+              options:
+                type: 'custom:button-card'
+                icon: 'mdi:motion-sensor'
+                template: simple_btn
+                color_type: card
+            - domain: media_player
+              options:
+                type: 'custom:button-card'
+                template: simple_btn
+                tap_action:
+                  action: toggle
+          exclude:
+            - entity_id: binary_sensor.anyone_home
+            - entity_id: binary_sensor.*_[ck]at_*
+            - entity_id: binary_sensor.hoveddor_ding
+            - entity_id: '*_dashboard'
+            - entity_id: media_player.spotify_michael_winkel
+            - domain: binary_sensor
+              entity_id: '*_open_window'
+            - entity_id: light.alt_lys
+            - entity_id: light.ude
+            - state: 'off'
+            - state: 'idle'

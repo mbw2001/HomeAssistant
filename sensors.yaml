@@ -17,7 +17,7 @@
   sensors:
     320i_remaining_fuel_percent:
       friendly_name: Brændstof
-      value_template: '{{ states(''sensor.320i_remaining_fuel'') | int / 0.6 }}'
+      value_template: '{{ states(''sensor.320i_remaining_fuel'') | int(0) / 0.6 }}'
       unit_of_measurement: '%'
     doorbell_power:
       friendly_name: Hoveddør Ringeklokke Batteri
@@ -25,12 +25,12 @@
       device_class: battery
     tv_stats:
       friendly_name: TV Stats
-      value_template:  >-
-          {% if is_state('media_player.alrum_media', 'Off') %}
-            Off
-          {% else %}
-            On
-          {% endif %}
+      value_template: >-
+        {% if is_state('media_player.alrum_media', 'Off') %}
+          Off
+        {% else %}
+          On
+        {% endif %}
       icon_template: mdi:television
       attribute_templates:
         today: '{{ state_attr(''sensor.alrum_tv_today'', ''value'') }}'
@@ -48,6 +48,12 @@
   end: '{{ now().replace(hour=0).replace(minute=0).replace(second=0) }}'
   duration:
     hours: 24
+- platform: history_stats
+  name: Roborock Runtime Today
+  entity_id: vacuum.roborock_s7
+  state: 'cleaning'
+  start: '{{ now().replace(hour=0).replace(minute=0).replace(second=0) }}'
+  end: '{{ now() }}'
 - platform: history_stats
   name: Tumle Runtime Today
   entity_id: vacuum.tumle
@@ -70,22 +76,106 @@
   type: ratio
   duration:
     days: 7
-# - platform: influxdb
-#   api_version: 2
-#   ssl: false
-#   host: influxdb
-#   port: 8086
-#   token: !secret influxdb_token
-#   organization: mbw.dk
-#   bucket: homeassistant
-#   queries_flux:
-#     - name: "Packet Loss"
-#       unit_of_measurement: "%"
-#       group_function: max
-#       bucket: telegraf
-#       query: >
-#         filter(fn: (r) => r["_measurement"] == "ping")
-#         |> filter(fn: (r) => r["_field"] == "percent_packet_loss")
-#         |> aggregateWindow(every: 30m, fn: max, createEmpty: false)
-#         |> yield(name: "Packet Loss")
-#       range_start: "-1d"
+- platform: influxdb
+  api_version: 2
+  ssl: false
+  host: influxdb
+  port: 8086
+  token: !secret influxdb_token
+  organization: mbw.dk
+  bucket: telegraf
+  queries_flux:
+    - name: "Pakketab"
+      unit_of_measurement: "%"
+      range_start: "-5m"
+      group_function: mean
+      query: >
+        filter(fn: (r) => r["_measurement"] == "ping")
+        |> filter(fn: (r) => r["_field"] == "percent_packet_loss")
+        |> group(columns: ["_measurement", "_field"])
+    - name: "Elforbrug Total"
+      unit_of_measurement: "kWh"
+      range_start: "-1h"
+      group_function: max
+      query: >
+        filter(fn: (r) => r["_measurement"] == "modbus")
+        |> filter(fn: (r) => r["_field"] == "counter_total")
+    - name: "NUC CPU Usage"
+      unit_of_measurement: "%"
+      range_start: "-5m"
+      query: >
+        filter(fn: (r) => r["_measurement"] == "cpu")
+        |> filter(fn: (r) => r["_field"] == "usage_idle")
+        |> filter(fn: (r) => r["cpu"] == "cpu-total")
+        |> filter(fn: (r) => r["host"] == "NUC")
+      value_template: "{{ (100.0-(value | float(0))) | round(2) }}"
+    - name: "NUC Temperature"
+      unit_of_measurement: "°C"
+      range_start: "-5m"
+      query: >
+        filter(fn: (r) => r["_measurement"] == "temp")
+        |> filter(fn: (r) => r["_field"] == "temp")
+        |> filter(fn: (r) => r["host"] == "NUC")
+        |> filter(fn: (r) => r["sensor"] == "coretemp_core_0")
+      value_template: "{{ (value | float(0)) | round(2) }}"
+    - name: "NUC Memory Usage"
+      unit_of_measurement: "%"
+      range_start: "-5m"
+      query: >
+        filter(fn: (r) => r["_measurement"] == "mem")
+        |> filter(fn: (r) => r["_field"] == "used_percent")
+        |> filter(fn: (r) => r["host"] == "NUC")
+      value_template: "{{ (value | float(0)) | round(2) }}"
+    - name: "NUC Disk OS"
+      unit_of_measurement: "%"
+      range_start: "-5m"
+      query: >
+        filter(fn: (r) => r["_measurement"] == "disk")
+        |> filter(fn: (r) => r["_field"] == "used_percent")
+        |> filter(fn: (r) => r["host"] == "NUC")
+        |> filter(fn: (r) => r["device"] == "nvme0n1p2")
+      value_template: "{{ (value | float(0)) | round(2) }}"
+    - name: "NUC Disk Data"
+      unit_of_measurement: "%"
+      range_start: "-5m"
+      query: >
+        filter(fn: (r) => r["_measurement"] == "disk")
+        |> filter(fn: (r) => r["_field"] == "used_percent")
+        |> filter(fn: (r) => r["host"] == "NUC")
+        |> filter(fn: (r) => r["device"] == "sda1")
+      value_template: "{{ (value | float(0)) | round(2) }}"
+    - name: "Speedtest Download"
+      unit_of_measurement: "Mbps"
+      range_start: "-90m"
+      query: >
+        filter(fn: (r) => r["_measurement"] == "speedtest")
+        |> filter(fn: (r) => r["_field"] == "download_bandwidth")
+        |> group(columns: ["_measurement", "_field"])
+      value_template: "{{ ((value | int(0)) * 8 / 1024 / 1024) | round(2) }}"
+    - name: "Speedtest Upload"
+      unit_of_measurement: "Mbps"
+      range_start: "-90m"
+      query: >
+        filter(fn: (r) => r["_measurement"] == "speedtest")
+        |> filter(fn: (r) => r["_field"] == "upload_bandwidth")
+        |> group(columns: ["_measurement", "_field"])
+      value_template: "{{ ((value | int(0)) * 8 / 1024 / 1024) | round(2) }}"
+    - name: "Speedtest Ping"
+      unit_of_measurement: "ms"
+      range_start: "-90m"
+      query: >
+        filter(fn: (r) => r["_measurement"] == "speedtest")
+        |> filter(fn: (r) => r["_field"] == "ping_latency")
+        |> group(columns: ["_measurement", "_field"])
+- platform: nordpool
+  VAT: false
+  currency: DKK
+  region: DK2
+  precision: 3
+  additional_costs: >-
+    {% set elabonnement = 16 %}
+    {% set netabonnement = 26.25 %}
+    {% set afgift_stat_kwh = 1.125 %}
+    {% set transport_kwh = 0.4357 %}
+    {% set fixed_cost = (elabonnement + netabonnement) / 30 / 24 | float(0) %}
+    {{ afgift_stat_kwh + transport_kwh + fixed_cost | float(0) }}

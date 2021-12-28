@@ -3,32 +3,31 @@
   description: Start støvsuger dagligt hvis ingen er hjemme
   trigger:
   - platform: time
-    at: '10:00:00'
-  - platform: zone
-    entity_id: person.michael
-    zone: zone.home
-    event: leave
-  - platform: zone
-    entity_id: person.camilla
-    zone: zone.home
-    event: leave
+    at: '10:00'
   condition:
   - condition: not
     conditions:
     - condition: zone
-      entity_id: person.michael
-      zone: zone.home
-    - condition: zone
       entity_id: person.camilla
       zone: zone.home
-    - condition: numeric_state
-      entity_id: sensor.tumle_runtime_today
-      above: '0.2'
+  - condition: time
+    after: 09:45
+    before: '12:00'
+    weekday:
+    - mon
+    - wed
+    - fri
   action:
-  - device_id: 5c340aa315070d70383a4143d80ba78b
-    domain: vacuum
-    entity_id: vacuum.tumle
-    type: clean
+  - service: xiaomi_miio.vacuum_clean_segment
+    target:
+      entity_id: vacuum.roborock_s7
+    data:
+      segments:
+      - 23
+      - 24
+      - 25
+      - 26
+      - 20
   mode: single
 - id: '1603734502223'
   alias: Zone - Camilla har forladt UiU
@@ -37,10 +36,12 @@
     event: leave
     entity_id: person.camilla
     zone: zone.uiu
+    id: left
   - platform: zone
     event: enter
     entity_id: person.camilla
     zone: zone.home
+    id: home
   - platform: event
     event_type: mobile_app_notification_action
     event_data:
@@ -54,9 +55,8 @@
       entity_id: sensor.camilla_travel
   - choose:
     - conditions:
-      - condition: zone
-        entity_id: person.camilla
-        zone: zone.home
+      - condition: trigger
+        id: home
       sequence:
       - service: notify.mobile_app_michaels_telefon
         data:
@@ -73,11 +73,12 @@
             title: Opdater
           tag: camilla_home
           sticky: true
-          chronometer: '{{ states(''sensor.camilla_travel'') | int > 1 }}'
-          when: '{{ as_timestamp(now()) | int + states(''sensor.camilla_travel'')
-            | int * 60 }}'
-        message: Forventet hjemme {{ (as_timestamp(now()) | int + (states('sensor.camilla_travel')
-          | int * 60)) | timestamp_custom('%H:%M', true) }}
+          alert_once: true
+          chronometer: '{{ states(''sensor.camilla_travel'') | int(0) > 1 }}'
+          when: '{{ now().timestamp() | int + states(''sensor.camilla_travel'') |
+            int(0) * 60 }}'
+        message: Forventet hjemme {{ (now().timestamp() | int + (states('sensor.camilla_travel')
+          | int(0) * 60)) | timestamp_custom('%H:%M', true) }}
         title: Camilla har forladt kontoret
   mode: restart
 - id: '1603735485232'
@@ -86,34 +87,22 @@
   trigger:
   - type: opened
     platform: device
-    device_id: bb55e91e30b0f5febbdf5ae5c2fd8244
-    entity_id: binary_sensor.bryggersdoer
+    device_id: 67b43d28bfe74d7cdf7c5287fe2dec8b
+    entity_id: binary_sensor.bryggersdor_sensor_contact
     domain: binary_sensor
   condition:
   - condition: state
     entity_id: switch.office
     state: 'on'
   action:
-  - service: scene.create
-    data:
-      scene_id: doorbell_notification_revert
-      snapshot_entities: light.kontor
-  - service: light.turn_on
-    data:
-      flash: long
-      color_name: red
-      brightness_pct: 100
-    target:
-      entity_id: light.kontor
-  - delay: 00:00:03
-  - service: scene.turn_on
-    data:
-      entity_id: scene.doorbell_notification_revert
-  - delay:
-      hours: 0
-      minutes: 0
-      seconds: 15
-      milliseconds: 0
+  - device_id: 69300b990439ca921cb8b97a1554f4ab
+    domain: light
+    entity_id: light.kontor_skrivebord_hojre
+    type: flash
+  - device_id: 76edc4fe6486ae59a3fd3ec0697082bb
+    domain: light
+    entity_id: light.kontor_skrivebord_venstre
+    type: flash
   mode: single
   max_exceeded: silent
 - id: '1608315737292'
@@ -125,31 +114,31 @@
       max_brightness: '100'
       light_entity: light.sovevaerelse
       manual_time: 0:00:00
-      timestamp_sensor: sensor.camilla_phone_next_alarm
+      timestamp_sensor: sensor.camillas_telefon_next_alarm
       sunrise_duration: 15
       min_mired: 0
       end_brightness: 255
       post_sunrise_actions:
       - service: spotcast.start
         data:
-          entity_id: media_player.bedroom_speaker
+          entity_id: media_player.sovevaerelse_hojtaler
           force_playback: true
           uri: spotify:playlist:37i9dQZF1DWYWddJiPzbvb
-          repeat: 'off'
           random_song: true
           shuffle: true
+          start_volume: 30
       start_brightness: 10
       check_entity: person.camilla
       pre_sunrise_actions:
 - id: '1608321006068'
-  alias: Status - Vaskemaskine
+  alias: Sensor - Vaskemaskine
   description: ''
   use_blueprint:
     path: sbyx/notify-or-do-something-when-an-appliance-like-a-dishwasher-or-washing-machine-finishes.yaml
     input:
-      power_sensor: sensor.vaskemaskine_effekt
-      starting_threshold: '5'
-      starting_hysteresis: '5'
+      power_sensor: sensor.vaskemaskine_sensor_power
+      starting_threshold: 5
+      starting_hysteresis: 5
       finishing_threshold: 5
       finishing_hysteresis: 5
       actions:
@@ -159,103 +148,66 @@
           message: Færdig
           data:
             tag: vaskemaskine
-- id: '1609255115570'
-  alias: Kontakt - Kontor Skrivebord
-  description: ''
-  use_blueprint:
-    path: SeanM/zha-aqara-wireless-mini-switch.yaml
-    input:
-      aqara_mini_switch: 6ac4a37bab02c17d8d59126978dcb0c7
-      button_single_press:
-      - service: light.toggle
-        data: {}
-        target:
-          entity_id: light.kontor
-      button_double_press:
-      - service: light.turn_on
-        data:
-          brightness: 255
-        target:
-          entity_id: light.kontor
-      - service: switch.flux_kontor_update
 - id: '1609280603326'
   alias: Timer - Aften Mode
   description: ''
   trigger:
   - platform: sun
     event: sunset
+    id: sunset
   - platform: sun
     event: sunrise
+    id: sunrise
   condition: []
   action:
   - choose:
     - conditions:
-      - condition: sun
-        after: sunset
+      - condition: trigger
+        id: sunset
       sequence:
-      - scene: scene.solnedgang
-      - scene: scene.diskrete_gardiner
-    default:
-    - scene: scene.solopgang
+      - scene: scene.diskrete_gardiner_sovevaerelse
+      - scene: scene.diskrete_gardiner_kokken
+      - service: homeassistant.turn_on
+        target:
+          entity_id:
+          - light.husnummer
+          - light.hoveddor
+          - switch.udestik
+    - conditions:
+      - condition: trigger
+        id: sunrise
+      sequence:
+      - service: homeassistant.turn_off
+        target:
+          entity_id:
+          - light.husnummer
+          - light.hoveddor
+          - switch.udestik
+      - service: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.nat_mode
+    default: []
   mode: single
-- id: '1609357176878'
-  alias: Sensor - Bryggers Lys
-  description: ''
-  use_blueprint:
-    path: mbw2001/sensor_light.yaml
-    input:
-      sensor: group.bryggers_occupancy
-      light: light.bryggers
-      brightness: 80
-      transition_on: 0
-      transition_off: 3
-      night_time_sensor: input_boolean.nat_mode
-      brightness_day: 70
-      brightness_night: 10
-      helper: input_boolean.bryggers_lys
 - id: '1609543466246'
   alias: Timer - Nat mode
   description: ''
   trigger:
-  - platform: sun
-    event: sunrise
-  - platform: time
-    at: 02:00:00
-  - platform: time
-    at: 01:00:00
-  condition: []
+  - platform: time_pattern
+    hours: '*'
+  condition:
+  - condition: device
+    type: is_off
+    device_id: 9e22b19bd2e18ef0cc72dc095f4bce30
+    entity_id: switch.alt_lys
+    domain: switch
+  - condition: time
+    after: 00:00:00
+    before: 06:00
   action:
-  - choose:
-    - conditions:
-      - condition: sun
-        after: sunrise
-      sequence:
-      - service: input_boolean.turn_off
-        data: {}
-        entity_id: input_boolean.nat_mode
-    - conditions:
-      - condition: state
-        entity_id: light.alt
-        state: 'off'
-      sequence:
-      - service: homeassistant.turn_on
-        target:
-          entity_id: automation.timer_nat_mode
-    default: []
+  - service: input_boolean.turn_on
+    target:
+      entity_id: input_boolean.nat_mode
   mode: single
-- id: '1609594104690'
-  alias: Sensor - Udestue Belysning
-  description: Tænd lyset i udestue når en dør åbnes.
-  use_blueprint:
-    path: mbw2001/sensor_light.yaml
-    input:
-      sensor: group.udestue_doere
-      light: light.udestue
-      no_motion_wait: 0
-      transition_on: 1
-      transition_off: 3
-      after_sunset: true
-      brightness: 70
 - id: '1610303359820'
   alias: Sensor - Åbne døre og vinduer
   description: ''
@@ -295,100 +247,24 @@
         data:
           tag: openwindow
   mode: restart
-- id: '1610454538649'
-  alias: Sensor - Lavt Batteri
-  description: ''
-  use_blueprint:
-    path: sbyx/low-battery-level-detection-notification-for-all-battery-sensors.yaml
-    input:
-      day: 7
-      actions:
-      - service: notify.mobile_app_michaels_telefon
-        data:
-          title: Lavt Batteri
-          message: 'Low battery warning for: {{ sensors }}
-
-            '
-          data:
-            tag: batteri
-      threshold: 30
-      exclude:
-        entity_id:
-        - sensor.camilla_phone_battery_level
-        - sensor.samsungs20_batteriniveau
-        - sensor.dashboard_tablet_batteriniveau
-      time: '10:00:00'
-- id: '1615641485479'
-  alias: Kontakt - Køkken Gardiner
-  description: ''
-  use_blueprint:
-    path: Xelloss99/zha-ikea-tradfri-on-off-switch.yaml
-    input:
-      remote: 90405c266939532d32a3c115550e590c
-      button_on_short:
-      - scene: scene.aben_gardiner_kokken
-      - service: alarmo.disarm
-        data:
-          entity_id: alarm_control_panel.baunedalen
-      - device_id: ebf28b4520bd35bdd5bb5781e6d8620b
-        domain: lock
-        entity_id: lock.bryggersdor
-        type: unlock
-      button_off_short:
-      - scene: scene.diskrete_gardiner_kokken
-      button_off_long:
-      - scene: scene.luk_gardiner_kokken
-      button_on_long:
-      - scene: scene.aften_tv
-- id: '1615841878655'
-  alias: Kontakt - Cube
-  description: ''
-  use_blueprint:
-    path: Mikkelmoeller/aqara-magic-cube-zha-51-actions.yaml
-    input:
-      remote: 510d24c130511b6e76770e48e979b378
-      rotate_right:
-      - service: media_player.volume_up
-        target:
-          entity_id: media_player.alrum_tv
-      rotate_left:
-      - service: media_player.volume_down
-        target:
-          entity_id: media_player.alrum_tv
-      flip_180: false
-      cube_flip_180: []
-      slide_any_side: false
-      cube_slide_any: []
-      knock_any_side: true
-      cube_knock_any:
-      - service: light.toggle
-        data: {}
-        target:
-          entity_id: light.alrum
-      cube_shake:
-      - service: media_player.media_stop
-        target:
-          entity_id: media_player.alrum_media
 - id: '1616080334073'
   alias: Sensor - Video Udestue
   description: ''
   trigger:
   - type: motion
     platform: device
-    device_id: 14969a8cd3ad84e35b0ff89d780ea66d
+    device_id: c6e4f546bb07ecd95dc4c82b4ffcb783
     entity_id: binary_sensor.udestue_person_motion
     domain: binary_sensor
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 2
+      milliseconds: 0
   condition:
-  - condition: not
-    conditions:
-    - condition: or
-      conditions:
-      - condition: zone
-        entity_id: person.michael
-        zone: zone.home
-      - condition: zone
-        entity_id: person.camilla
-        zone: zone.home
+  - condition: state
+    entity_id: binary_sensor.anyone_home
+    state: 'off'
   action:
   - service: notify.mobile_app_michaels_telefon
     data:
@@ -404,19 +280,21 @@
         image: /api/camera_proxy/camera.udestue
         clickAction: /lovelace/alarm
         chronometer: true
-        when: '{{ as_timestamp(now()) | int }}'
+        when: '{{ now().timestamp() | int }}'
         actions:
         - action: URI
           title: Ring
           uri: app://com.google.android.dialer
   mode: single
 - id: '1616409818032'
-  alias: Kontakt - Ringeklokke
+  alias: Sensor - Ringeklokke
   description: ''
   trigger:
-  - platform: state
+  - type: occupied
+    platform: device
+    device_id: c0d962ea88828f4b5c1ebb9936e8a6a0
     entity_id: binary_sensor.hoveddor_ding
-    to: 'on'
+    domain: binary_sensor
   condition: []
   action:
   - service: notify.mobile_app_michaels_telefon
@@ -432,51 +310,33 @@
     target:
       entity_id:
       - media_player.dorklokke
+  - service: notify.shield
+    data:
+      message: Der er nogen ved døren
+      title: Dørklokke
   mode: single
-- id: '1617456610445'
-  alias: Sensor - Entre Lys
-  description: ''
-  use_blueprint:
-    path: mbw2001/sensor_light.yaml
-    input:
-      sensor: group.entre_occupancy
-      light: light.entre
-      brightness: 30
-      transition_on: 0
-      transition_off: 3
-      no_motion_wait: 15
-      brightness_day: 60
-      night_time_sensor: input_boolean.nat_mode
-      brightness_night: 10
 - id: '1617739074933'
   alias: Kontakt - Soveværelse Sengeborde
   description: ''
   trigger:
-  - device_id: 9c9a6d5ef8aa42b66a46d450cd0bde86
-    domain: zha
-    platform: device
-    type: remote_button_double_press
-    subtype: turn_off
-  - device_id: 9c9a6d5ef8aa42b66a46d450cd0bde86
-    domain: zha
-    platform: device
-    type: remote_button_long_press
-    subtype: turn_off
-  - device_id: ee60b4d428c8e620605865992866744d
-    domain: zha
-    platform: device
-    type: remote_button_long_press
-    subtype: turn_off
-  - device_id: ee60b4d428c8e620605865992866744d
-    domain: zha
-    platform: device
-    type: remote_button_double_press
-    subtype: turn_off
+  - platform: device
+    domain: mqtt
+    device_id: 6d60f3a043421001ea4866e1c99a6b67
+    type: action
+    subtype: off-hold
+    discovery_id: 0x0017880104f793fe action_off-hold
+  - platform: device
+    domain: mqtt
+    device_id: 70388d8007f720eab2a52fa595d25318
+    type: action
+    subtype: off-hold
+    discovery_id: 0x00178801020ed4ba action_off-hold
   condition: []
   action:
   - service: light.turn_off
     target:
-      entity_id: light.alt
+      entity_id:
+      - light.alt_lys
   - service: homeassistant.turn_on
     target:
       entity_id: input_boolean.nat_mode
@@ -484,80 +344,65 @@
     domain: lock
     entity_id: lock.bryggersdor
     type: lock
-  - service: alarmo.arm
-    data:
-      entity_id: alarm_control_panel.baunedalen
-      mode: night
+  - device_id: 6be732ff6a9a378bf9c893f3b5d1dfaa
+    domain: alarm_control_panel
+    entity_id: alarm_control_panel.baunedalen
+    type: arm_night
   mode: restart
 - id: '1617739589869'
   alias: Kontakt - Bryggersdør
   description: ''
   trigger:
-  - device_id: 0415b6d0e7dc099a29955dbf868988fd
-    domain: zha
-    platform: device
-    type: remote_button_short_press
-    subtype: turn_off
+  - platform: device
+    domain: mqtt
+    device_id: cc83660ee6980279ac068feeccbd339e
+    type: action
+    subtype: 'off'
+    discovery_id: 0x5c0272fffe81eaa6 action_off
   condition: []
   action:
-  - service: light.turn_off
-    target:
-      entity_id: light.inde_lys
+  - type: turn_off
+    device_id: d5a961b4b739de49ac37ebbfe797678b
+    entity_id: light.inde_lys
+    domain: light
   - service: media_player.turn_off
     target:
       entity_id:
-      - media_player.all_speakers
-      - media_player.badevarelse_hojtaler
       - media_player.kokken_hojtaler
       - media_player.kontor_display
       - media_player.kontor_hojtaler
       - media_player.stue_hojtaler
-      - media_player.toilet_hojtaler
-      - media_player.udestue_hojtaler
       - media_player.alrum_shield
-  - service: alarmo.arm
-    data:
-      entity_id: alarm_control_panel.baunedalen
+      - media_player.badevaerelse_hojtaler
+      - media_player.alle_hojtalere
+      - media_player.jbl_link_10
+      - media_player.sovevaerelse_hojtaler
+  - wait_for_trigger:
+    - platform: device
+      device_id: ebf28b4520bd35bdd5bb5781e6d8620b
+      domain: lock
+      entity_id: lock.bryggersdor
+      type: locked
+    timeout: '60'
+  - device_id: 6be732ff6a9a378bf9c893f3b5d1dfaa
+    domain: alarm_control_panel
+    entity_id: alarm_control_panel.baunedalen
+    type: arm_away
   mode: single
-- id: '1617741242136'
-  alias: Kontakt - Alrum Sofabord
-  description: ''
-  use_blueprint:
-    path: mannerisms/zha-philips-hue-dimmer-switch-individual-buttons-with-long-presses.yaml
-    input:
-      remote: 6744b2f8f0f2d73b26f258b9119fd97f
-      button_1_double_press:
-      - scene: scene.aften_tv
-      button_4_double_press:
-      - service: light.turn_off
-        target:
-          entity_id: light.inde_lys
-- id: '1617878983541'
-  alias: Sensor - Udebelysning
-  description: ''
-  use_blueprint:
-    path: mbw2001/sensor_light.yaml
-    input:
-      sensor: group.udelys_sensorer
-      light: light.carport
-      brightness: 70
-      after_sunset: true
-      no_motion_wait: 30
 - id: '1617891406909'
   alias: Sensor - Opvaskemaskine Vandlækage
   description: Send advarsel hvis der er lækage fra opvaskemaskine
-  mode: restart
-  max_exceeded: silent
   trigger:
   - type: moist
     platform: device
-    device_id: 6542b18529c56e361ad28f45b6ddbda6
-    entity_id: binary_sensor.opvaskemaskine_vandsensor
+    device_id: 1be9a7ce20600667a0a7754cbe4fcd22
+    entity_id: binary_sensor.opvaskemaskine_vandsensor_water_leak
     domain: binary_sensor
   - platform: event
     event_type: mobile_app_notification_action
     event_data:
       action: clear_water_alarm
+    id: MobileClear
   - platform: event
     event_type: call_service
     event_data:
@@ -565,19 +410,17 @@
       service: dismiss
       service_data:
         notification_id: water_alarm
+    id: PersistentClear
   condition: []
   action:
   - choose:
     - conditions:
-      - condition: template
-        value_template: '{{ trigger.platform == ''event'' }}'
       - condition: or
         conditions:
-        - condition: template
-          value_template: '{{ trigger.event.event_type == ''mobile_app_notification_action''
-            }}'
-        - condition: template
-          value_template: '{{ trigger.event.event_type == ''call_service'' }}'
+        - condition: trigger
+          id: MobileClear
+        - condition: trigger
+          id: PersistentClear
       sequence:
       - service: persistent_notification.dismiss
         data:
@@ -608,46 +451,76 @@
           actions:
           - action: clear_water_alarm
             title: Afvis Alarm
-- id: '1618042501384'
-  alias: Sensor - Home Assistant Update Notification
-  description: ''
-  use_blueprint:
-    path: fortepc/update-notif-for-android.yaml
-    input:
-      clickAction: https://my.home-assistant.io/redirect/supervisor/
-      delay: 0
-      notify_device: bfb4fccf6ca412c7d4e21a0a60d705f3
-      group: Available Updates
+  mode: restart
+  max_exceeded: silent
 - id: '1618333335000'
   alias: Kontakt - Soveværelse Musik
   description: ''
-  use_blueprint:
-    path: mannerisms/zha-philips-hue-dimmer-switch-individual-buttons-with-long-presses.yaml
-    input:
-      button_1_single_press:
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: a10ae492fdff65871cda97b8823d165e
+    type: action
+    subtype: on-press
+    discovery_id: 0x0017880104f748e3 action_on-press
+    id: on-press
+  - platform: device
+    domain: mqtt
+    device_id: a10ae492fdff65871cda97b8823d165e
+    type: action
+    subtype: up-press
+    discovery_id: 0x0017880104f748e3 action_up-press
+    id: up-press
+  - platform: device
+    domain: mqtt
+    device_id: a10ae492fdff65871cda97b8823d165e
+    type: action
+    subtype: down-press
+    discovery_id: 0x0017880104f748e3 action_down-press
+    id: down-press
+  - platform: device
+    domain: mqtt
+    device_id: a10ae492fdff65871cda97b8823d165e
+    type: action
+    subtype: off-press
+    discovery_id: 0x0017880104f748e3 action_off-press
+    id: off-press
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: on-press
+      sequence:
       - service: spotcast.start
         data:
           entity_id: media_player.sovevaerelse_hojtaler
           force_playback: true
-      remote: 767c2ed949ffb08fedc5171900c6b028
-      button_2_single_press:
-      - service: media_player.volume_up
-        target:
-          entity_id: media_player.sovevaerelse_hojtaler
-      button_3_single_press:
-      - service: media_player.volume_down
-        target:
-          entity_id: media_player.sovevaerelse_hojtaler
-      button_4_single_press:
-      - service: media_player.turn_off
-        target:
-          entity_id: media_player.sovevaerelse_hojtaler
-      button_3_long_press:
+    - conditions:
+      - condition: trigger
+        id: up-press
+      sequence:
       - service: media_player.volume_set
         entity_id: media_player.sovevaerelse_hojtaler
         data_template:
-          volume_level: '{{ states.media_player.sovevaerelse_hojtaler.attributes.volume_level
-            + 0.1 }}'
+          volume_level: '{{states.media_player.sovevaerelse_hojtaler.attributes.volume_level+0.05}}'
+    - conditions:
+      - condition: trigger
+        id: down-press
+      sequence:
+      - service: media_player.volume_set
+        entity_id: media_player.sovevaerelse_hojtaler
+        data_template:
+          volume_level: '{{states.media_player.sovevaerelse_hojtaler.attributes.volume_level-0.05}}'
+    - conditions:
+      - condition: trigger
+        id: off-press
+      sequence:
+      - service: media_player.turn_off
+        target:
+          entity_id: media_player.sovevaerelse_hojtaler
+    default: []
+  mode: restart
 - id: '1618934065855'
   alias: Remote - Musik
   description: ''
@@ -721,6 +594,8 @@
     - service: notify.mobile_app_michaels_telefon
       data:
         message: '{{ trigger.event.data.key }}'
+        data:
+          tag: remotetest
   mode: single
 - id: '1618938318824'
   alias: Remote - Netflix
@@ -729,7 +604,7 @@
   - platform: device
     type: turned_on
     device_id: f1f514092da9a4cd22fa9f84b0c9fbf4
-    entity_id: switch.alrum_remote_netflix_2
+    entity_id: switch.alrum_remote_netflix
     domain: switch
   condition: []
   action:
@@ -743,11 +618,12 @@
   alias: Sensor - Postkasse
   description: ''
   trigger:
-  - type: vibration
-    platform: device
-    device_id: 375b2a3a8337ed6c5eb853e0079d05c8
-    entity_id: binary_sensor.postkasse_vibration
-    domain: binary_sensor
+  - platform: device
+    domain: mqtt
+    device_id: be5229f8e849f2e16850a6f285ec2fcb
+    type: action
+    subtype: vibration
+    discovery_id: 0x00158d0006693c4f action_vibration
   condition:
   - condition: state
     entity_id: input_boolean.nat_mode
@@ -760,88 +636,32 @@
       data:
         tag: post
   mode: single
-- id: '1619689400603'
-  alias: Sensor - Fix Speedtest
-  description: ''
-  trigger:
-  - platform: state
-    entity_id: sensor.speedtest_ping
-    to: unavailable
-    for: 00:05:00
-  condition: []
-  action:
-  - service: speedtestdotnet.speedtest
-  mode: single
-- id: '1620110395264'
-  alias: Kontakt - Badeværelse Musik/Udluftning
-  description: ''
-  use_blueprint:
-    path: SeanM/zha-aqara-wireless-mini-switch.yaml
-    input:
-      aqara_mini_switch: 29a297ddae71585b2fb5675bc910682d
-      button_single_press:
-      - service: spotcast.start
-        data:
-          entity_id: media_player.badevarelse_hojtaler
-          start_volume: 50
-          shuffle: true
-          force_playback: true
-      button_double_press:
-      - condition: device
-        type: is_off
-        device_id: dfc88ad3a3c639f2c48f73eb957e037b
-        entity_id: light.badevaerelse_udsugning
-        domain: light
-      - condition: state
-        entity_id: light.badevaerelse_udsugning
-        state: 'off'
-      - type: turn_on
-        device_id: dfc88ad3a3c639f2c48f73eb957e037b
-        entity_id: light.badevaerelse_udsugning
-        domain: light
 - id: '1620230374528'
   alias: Kontakt - Badeværelse
   description: ''
   trigger:
-  - device_id: 59e7da8b50e5043df7f7dc5e06cacbca
-    domain: zha
-    platform: device
-    type: remote_button_short_press
-    subtype: turn_off
+  - platform: device
+    domain: mqtt
+    device_id: f1f30501dca6f87e21e01dc9bdfe6823
+    type: action
+    subtype: 'off'
+    discovery_id: 0x5c0272fffe817aa0 action_off
   condition:
   - condition: not
     conditions:
-    - condition: device
-      device_id: 3cfc45826b014982928128060423b171
-      domain: media_player
-      entity_id: media_player.badevarelse_hojtaler
-      type: is_on
+    - condition: state
+      entity_id: media_player.alle_hojtalere
+      state: playing
+  - condition: state
+    entity_id: media_player.badevaerelse_hojtaler
+    state: playing
   action:
-  - service: media_player.turn_off
+  - service: media_player.media_stop
     target:
-      entity_id:
-      - media_player.badevarelse_hojtaler
+      entity_id: media_player.badevaerelse_hojtaler
   mode: single
-- id: '1620625674917'
-  alias: Status - Tørretumbler
-  description: ''
-  use_blueprint:
-    path: sbyx/notify-or-do-something-when-an-appliance-like-a-dishwasher-or-washing-machine-finishes.yaml
-    input:
-      power_sensor: sensor.torretumbler_effekt
-      starting_threshold: '5'
-      starting_hysteresis: 5
-      finishing_threshold: 5
-      finishing_hysteresis: 5
-      actions:
-      - service: notify.both_phones
-        data:
-          title: Tørretumbler
-          message: Færdig
-          data:
-            tag: toerretumbler
 - id: '1620625868681'
-  alias: Kontakt - Sengetid
+  alias: Sensor - Sengetid
   description: ''
   trigger:
   - platform: device
@@ -851,7 +671,7 @@
     domain: remote
   condition:
   - condition: time
-    after: '21:30'
+    after: '21:30:00'
   action:
   - service: light.turn_on
     target:
@@ -865,28 +685,24 @@
   - service: spotcast.start
     data:
       entity_id: media_player.sovevaerelse_hojtaler
+      shuffle: true
+      force_playback: true
+      random_song: true
+      start_volume: 40
   mode: single
 - id: '1620633898099'
   alias: Alarm - Deaktiveret advarsel
   description: ''
   trigger:
-  - platform: zone
-    entity_id: person.michael
-    zone: zone.home
-    event: leave
-  - platform: zone
-    entity_id: person.camilla
-    zone: zone.home
-    event: leave
+  - platform: state
+    entity_id: binary_sensor.anyone_home
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 15
+      milliseconds: 0
   condition:
-  - condition: not
-    conditions:
-    - condition: zone
-      entity_id: person.michael
-      zone: zone.home
-    - condition: zone
-      entity_id: person.camilla
-      zone: zone.home
   - condition: or
     conditions:
     - condition: device
@@ -926,9 +742,10 @@
       - condition: template
         value_template: '{{ wait.trigger.event.data.action == ''activate_alarm'' }}'
       sequence:
-      - service: alarmo.arm
-        data:
-          entity_id: alarm_control_panel.baunedalen
+      - device_id: 6be732ff6a9a378bf9c893f3b5d1dfaa
+        domain: alarm_control_panel
+        entity_id: alarm_control_panel.baunedalen
+        type: arm_away
     - conditions:
       - condition: template
         value_template: '{{ wait.trigger.event.data.action == ''ignore_alarm_disabled''
@@ -944,7 +761,17 @@
     device_id: f1f514092da9a4cd22fa9f84b0c9fbf4
     entity_id: switch.alrum_remote_watch_tv
     domain: switch
-  condition: []
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 0
+  condition:
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: media_player.alrum_shield
+      state: playing
   action:
   - service: media_player.select_source
     target:
@@ -956,7 +783,7 @@
       entity_id: media_player.alrum_kodi
     data:
       media_content_type: CHANNEL
-      media_content_id: '46'
+      media_content_id: '15'
   mode: single
 - id: '1622977895209'
   alias: Timer - Narko
@@ -985,12 +812,650 @@
     domain: lock
     entity_id: lock.bryggersdor
     type: unlocked
+  - platform: device
+    device_id: ebf28b4520bd35bdd5bb5781e6d8620b
+    domain: lock
+    entity_id: lock.bryggersdor
+    type: unlocking
   condition:
-  - condition: state
-    entity_id: alarm_control_panel.baunedalen
-    state: armed_away
-  action:
-  - service: alarmo.disarm
-    data:
+  - condition: not
+    conditions:
+    - condition: device
+      device_id: 6be732ff6a9a378bf9c893f3b5d1dfaa
+      domain: alarm_control_panel
       entity_id: alarm_control_panel.baunedalen
+      type: is_disarmed
+  action:
+  - device_id: 6be732ff6a9a378bf9c893f3b5d1dfaa
+    domain: alarm_control_panel
+    entity_id: alarm_control_panel.baunedalen
+    type: disarm
+    code: '7864'
   mode: single
+- id: '1628752054758'
+  alias: Sensor - Græsslåmaskine
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: vacuum.sileno
+    attribute: error
+  condition:
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: vacuum.sileno
+      state: None
+  action:
+  - service: notify.mobile_app_michaels_telefon
+    data:
+      message: Græsslåmaskine er fejlet
+      title: Græsslåmaskine
+      data:
+        tag: mower
+  mode: single
+- id: '1628975797289'
+  alias: Kontakt - Alrum
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: d64fd712f6bb0538afe7b28042e069a7
+    type: action
+    subtype: on-press
+    discovery_id: 0x0017880103caa749 action_on-press
+    id: on-press
+  - platform: device
+    domain: mqtt
+    device_id: d64fd712f6bb0538afe7b28042e069a7
+    type: action
+    subtype: off-press
+    discovery_id: 0x0017880103caa749 action_off-press
+    id: off-press
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: on-press
+      sequence: []
+    - conditions:
+      - condition: trigger
+        id: off-press
+      sequence: []
+    default: []
+  mode: single
+- id: '1628976030376'
+  alias: Kontakt - Badeværelse Knap
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 253788bb53f0b9fe783ef75fba8ca75f
+    type: click
+    subtype: single
+    discovery_id: 0x00158d00057256d6 click_single
+    id: SingleClick
+  - platform: device
+    domain: mqtt
+    device_id: 253788bb53f0b9fe783ef75fba8ca75f
+    type: click
+    subtype: double
+    discovery_id: 0x00158d00057256d6 click_double
+    id: DoubleClick
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: SingleClick
+      sequence:
+      - service: spotcast.start
+        data:
+          entity_id: media_player.badevaerelse_hojtaler
+          start_volume: 50
+          shuffle: true
+          force_playback: true
+    - conditions:
+      - condition: trigger
+        id: DoubleClick
+      sequence:
+      - type: toggle
+        device_id: f0ec46e3b8f597c3ec1b10cd46fdca3c
+        entity_id: switch.badevaerelse_udsugning
+        domain: switch
+    default: []
+  mode: single
+- id: '1628976354696'
+  alias: Kontakt - Køkken Gardiner
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 127489261d40c017578e36c00f59038f
+    type: action
+    subtype: 'on'
+    discovery_id: 0x5c0272fffed377a9 action_on
+    id: OnAction
+  - platform: device
+    domain: mqtt
+    device_id: 127489261d40c017578e36c00f59038f
+    type: action
+    subtype: 'off'
+    discovery_id: 0x5c0272fffed377a9 action_off
+    id: OffAction
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: OnAction
+      sequence:
+      - scene: scene.aben_gardiner_kokken
+      - device_id: ebf28b4520bd35bdd5bb5781e6d8620b
+        domain: lock
+        entity_id: lock.bryggersdor
+        type: unlock
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: alarm_control_panel.baunedalen
+          state: disarmed
+      - device_id: 6be732ff6a9a378bf9c893f3b5d1dfaa
+        domain: alarm_control_panel
+        entity_id: alarm_control_panel.baunedalen
+        type: disarm
+        code: '7864'
+    - conditions:
+      - condition: trigger
+        id: OffAction
+      sequence:
+      - scene: scene.diskrete_gardiner_kokken
+    default: []
+  mode: single
+- id: '1629744898726'
+  alias: Cube
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 308396ca9a53815670d42bde4c371abe
+    type: action
+    subtype: rotate_left
+    discovery_id: 0x00158d00051e721b action_rotate_left
+    id: rotate_left
+  - platform: device
+    domain: mqtt
+    device_id: 308396ca9a53815670d42bde4c371abe
+    type: action
+    subtype: rotate_right
+    discovery_id: 0x00158d00051e721b action_rotate_right
+    id: rotate_right
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: rotate_left
+      sequence:
+      - service: media_player.volume_down
+        target:
+          entity_id: media_player.alrum_tv
+    - conditions:
+      - condition: trigger
+        id: rotate_right
+      sequence:
+      - service: media_player.volume_up
+        target:
+          entity_id: media_player.alrum_tv
+    default: []
+  mode: single
+- id: '1629885049549'
+  alias: Kontakt - Køkken/Alrum
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 315f8b4eec26164d3d46b5cf5508ba6e
+    type: action
+    subtype: press_1
+    discovery_id: 0x00000000017111a3 action_press_1
+    id: TopLeft
+  - platform: device
+    domain: mqtt
+    device_id: 315f8b4eec26164d3d46b5cf5508ba6e
+    type: action
+    subtype: press_2
+    discovery_id: 0x00000000017111a3 action_press_2
+    id: BottomLeft
+  - platform: device
+    domain: mqtt
+    device_id: 315f8b4eec26164d3d46b5cf5508ba6e
+    type: action
+    subtype: press_3
+    discovery_id: 0x00000000017111a3 action_press_3
+    id: TopRight
+  - platform: device
+    domain: mqtt
+    device_id: 315f8b4eec26164d3d46b5cf5508ba6e
+    type: action
+    subtype: press_4
+    discovery_id: 0x00000000017111a3 action_press_4
+    id: BottomRight
+  - platform: device
+    domain: mqtt
+    device_id: 315f8b4eec26164d3d46b5cf5508ba6e
+    type: action
+    subtype: press_1_and_3
+    discovery_id: 0x00000000017111a3 action_press_1_and_3
+    id: BothTop
+  - platform: device
+    domain: mqtt
+    device_id: 315f8b4eec26164d3d46b5cf5508ba6e
+    type: action
+    subtype: press_2_and_4
+    discovery_id: 0x00000000017111a3 action_press_2_and_4
+    id: BothBottom
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: TopLeft
+      sequence:
+      - type: turn_off
+        device_id: 94279a765a9ea17f28383076b7d563f2
+        entity_id: light.alrum
+        domain: light
+    - conditions:
+      - condition: trigger
+        id: BottomLeft
+      sequence:
+      - type: turn_on
+        device_id: 94279a765a9ea17f28383076b7d563f2
+        entity_id: light.alrum
+        domain: light
+    - conditions:
+      - condition: trigger
+        id: TopRight
+      sequence:
+      - type: turn_off
+        device_id: 185670e7b7f5ca18280ef7d9480f9a96
+        entity_id: light.kokken
+        domain: light
+    - conditions:
+      - condition: trigger
+        id: BottomRight
+      sequence:
+      - type: turn_on
+        device_id: 185670e7b7f5ca18280ef7d9480f9a96
+        entity_id: light.kokken
+        domain: light
+        brightness_pct: 100
+    - conditions:
+      - condition: trigger
+        id: BothTop
+      sequence:
+      - scene: scene.aben_gardiner_kokken
+    - conditions:
+      - condition: trigger
+        id: BothBottom
+      sequence:
+      - scene: scene.diskrete_gardiner_kokken
+    default: []
+  mode: parallel
+  max: 10
+- id: '1630073866167'
+  alias: Kontakt - Bryggers BMW
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: d8f925b1d23c28b397e4d3d5459c2232
+    type: click
+    subtype: single
+    discovery_id: 0x00158d000572499b click_single
+    id: SingleClick
+  - platform: device
+    domain: mqtt
+    device_id: d8f925b1d23c28b397e4d3d5459c2232
+    type: click
+    subtype: double
+    discovery_id: 0x00158d000572499b click_double
+    id: DoubleClick
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: SingleClick
+      sequence:
+      - device_id: 922dab17fc3d3bd48cb5743ff372fbe8
+        domain: lock
+        entity_id: lock.320i_lock
+        type: lock
+    - conditions:
+      - condition: trigger
+        id: DoubleClick
+      sequence:
+      - device_id: 922dab17fc3d3bd48cb5743ff372fbe8
+        domain: lock
+        entity_id: lock.320i_lock
+        type: unlock
+    default: []
+  mode: single
+- id: '1630918977385'
+  alias: Kontakt - Soveværelse Gardiner
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 8de516c490f45065e539aa39f778c376
+    type: click
+    subtype: 'on'
+    discovery_id: 0xbc33acfffebd4c3f click_on
+    id: 'on'
+  - platform: device
+    domain: mqtt
+    device_id: 8de516c490f45065e539aa39f778c376
+    type: click
+    subtype: 'off'
+    discovery_id: 0xbc33acfffebd4c3f click_off
+    id: 'off'
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: 'on'
+      sequence:
+      - wait_for_trigger:
+        - platform: device
+          domain: mqtt
+          device_id: 8de516c490f45065e539aa39f778c376
+          type: click
+          subtype: 'on'
+          discovery_id: 0xbc33acfffebd4c3f click_on
+        timeout: 00:00:01
+        continue_on_timeout: false
+      - scene: scene.luk_gardiner_sovevaerelse
+    - conditions:
+      - condition: trigger
+        id: 'off'
+      sequence:
+      - wait_for_trigger:
+        - platform: device
+          domain: mqtt
+          device_id: 8de516c490f45065e539aa39f778c376
+          type: click
+          subtype: 'off'
+          discovery_id: 0xbc33acfffebd4c3f click_off
+        timeout: 00:00:01
+        continue_on_timeout: false
+      - scene: scene.aben_gardiner_sovevaerelse
+    default: []
+  mode: restart
+- id: '1630920734708'
+  alias: Sensor - Støvsuger Fejl
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: vacuum.roborock_s7
+    attribute: error
+    to: Collision sensor error
+    id: stuck
+  - platform: state
+    entity_id: vacuum.roborock_s7
+    id: unstuck
+    to: cleaning
+  - platform: event
+    event_type: mobile_app_notification_action
+    event_data:
+      action: restart_vacuum
+    id: trigger_restart
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: stuck
+      sequence:
+      - service: notify.mobile_app_michaels_telefon
+        data:
+          title: Støvsuger
+          message: Støvsuger sidder fast
+          data:
+            tag: vacuum
+            actions:
+            - action: restart_vacuum
+              title: Genstart
+    - conditions:
+      - condition: trigger
+        id: unstuck
+      sequence:
+      - service: notify.mobile_app_michaels_telefon
+        data:
+          message: clear_notification
+          data:
+            tag: vacuum
+    - conditions:
+      - condition: trigger
+        id: trigger_restart
+      sequence:
+      - service: vacuum.start
+        target:
+          entity_id: vacuum.roborock_s7
+    default: []
+  mode: restart
+  max: 10
+- id: '1630941142019'
+  alias: Kontakt - Stue
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: e2774f391330d74ef9c140c31a1b4bf8
+    type: action
+    subtype: press_1
+    discovery_id: 0x00000000017125e7 action_press_1
+    id: TopLeft
+  - platform: device
+    domain: mqtt
+    device_id: e2774f391330d74ef9c140c31a1b4bf8
+    type: action
+    subtype: press_2
+    discovery_id: 0x00000000017125e7 action_press_2
+    id: BottomLeft
+  - platform: device
+    domain: mqtt
+    device_id: e2774f391330d74ef9c140c31a1b4bf8
+    type: action
+    subtype: press_3
+    discovery_id: 0x00000000017125e7 action_press_3
+    id: TopRight
+  - platform: device
+    domain: mqtt
+    device_id: e2774f391330d74ef9c140c31a1b4bf8
+    type: action
+    subtype: press_4
+    discovery_id: 0x00000000017125e7 action_press_4
+    id: BottomRight
+  - platform: device
+    domain: mqtt
+    device_id: e2774f391330d74ef9c140c31a1b4bf8
+    type: action
+    subtype: press_1_and_3
+    discovery_id: 0x00000000017125e7 action_press_1_and_3
+    id: BothTop
+  - platform: device
+    domain: mqtt
+    device_id: e2774f391330d74ef9c140c31a1b4bf8
+    type: action
+    subtype: press_2_and_4
+    discovery_id: 0x00000000017125e7 action_press_2_and_4
+    id: BothBottom
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: TopLeft
+      sequence:
+      - type: turn_off
+        device_id: 355964c683674bef435b4477b5a488cb
+        entity_id: light.stue
+        domain: light
+    - conditions:
+      - condition: trigger
+        id: BottomLeft
+      sequence:
+      - type: turn_on
+        device_id: 355964c683674bef435b4477b5a488cb
+        entity_id: light.stue
+        domain: light
+        brightness_pct: 100
+    - conditions:
+      - condition: trigger
+        id: TopRight
+      sequence:
+      - type: turn_off
+        device_id: ef989f034d746661abd531120f86bb1e
+        entity_id: light.kontor
+        domain: light
+    - conditions:
+      - condition: trigger
+        id: BottomRight
+      sequence:
+      - type: turn_on
+        device_id: ef989f034d746661abd531120f86bb1e
+        entity_id: light.kontor
+        domain: light
+    - conditions:
+      - condition: trigger
+        id: BothTop
+      sequence: []
+    - conditions:
+      - condition: trigger
+        id: BothBottom
+      sequence: []
+    default: []
+  mode: parallel
+  max: 10
+- id: '1631694396624'
+  alias: Sensor - Udestue Kamera
+  description: ''
+  trigger:
+  - type: motion
+    platform: device
+    device_id: c6e4f546bb07ecd95dc4c82b4ffcb783
+    entity_id: binary_sensor.udestue_person_motion
+    domain: binary_sensor
+  condition: []
+  action:
+  - service: browser_mod.no_blackout
+    data:
+      deviceID: 156f2270-d363a663
+  - service: browser_mod.more_info
+    data:
+      entity_id: camera.udestue
+      deviceID: 156f2270-d363a663
+      large: true
+  mode: single
+- id: '1631964309789'
+  alias: Kontakt - Kontor
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 6d4f4de6b9ae7a1a7bf8c43c3b84eb2b
+    type: click
+    subtype: 'on'
+    discovery_id: 0x842e14fffea02d72 click_on
+    id: 'on'
+  - platform: device
+    domain: mqtt
+    device_id: 6d4f4de6b9ae7a1a7bf8c43c3b84eb2b
+    type: click
+    subtype: 'off'
+    discovery_id: 0x842e14fffea02d72 click_off
+    id: 'off'
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: 'off'
+      sequence:
+      - condition: and
+        conditions:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: media_player.alle_hojtalere
+            state: playing
+        - condition: state
+          entity_id: media_player.kontor_hojtaler
+          state: playing
+      - service: media_player.media_stop
+        target:
+          device_id: c1c4c9bd0210ea0214cecce2f943df97
+    default: []
+  mode: parallel
+  max: 10
+- id: '1632999747259'
+  alias: Sensor - Badeværelse Udsugning
+  description: ''
+  trigger:
+  - platform: time_pattern
+    seconds: '5'
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: device
+        type: is_off
+        device_id: f0ec46e3b8f597c3ec1b10cd46fdca3c
+        entity_id: switch.badevaerelse_udsugning
+        domain: switch
+      - type: is_humidity
+        condition: device
+        device_id: d498c91b173674f6d579e4d238be9889
+        entity_id: sensor.badevaerelse_luftsensor_humidity
+        domain: sensor
+        above: 70
+      sequence:
+      - type: turn_on
+        device_id: f0ec46e3b8f597c3ec1b10cd46fdca3c
+        entity_id: switch.badevaerelse_udsugning
+        domain: switch
+    - conditions:
+      - condition: device
+        type: is_on
+        device_id: f0ec46e3b8f597c3ec1b10cd46fdca3c
+        entity_id: switch.badevaerelse_udsugning
+        domain: switch
+        for:
+          hours: 0
+          minutes: 0
+          seconds: 30
+          milliseconds: 0
+      - type: is_humidity
+        condition: device
+        device_id: d498c91b173674f6d579e4d238be9889
+        entity_id: sensor.badevaerelse_luftsensor_humidity
+        domain: sensor
+        below: 70
+      sequence:
+      - type: turn_off
+        device_id: f0ec46e3b8f597c3ec1b10cd46fdca3c
+        entity_id: switch.badevaerelse_udsugning
+        domain: switch
+    default: []
+  mode: single
+- id: '1637143064953'
+  alias: Disable vacuum camera update when docked
+  description: ''
+  use_blueprint:
+    path: PiotrMachowski/disable_vacuum_camera_update_when_docked.yaml
+    input:
+      vacuum: vacuum.roborock_s7
+      camera: camera.roborock_s7_map

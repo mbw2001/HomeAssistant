@@ -9,12 +9,12 @@
     turn_on:
       service: remote.turn_on
       data_template:
-        entity_id: remote.alrum
+        entity_id: remote.alrum_remote
         activity: Kodi
     turn_off:
       service: remote.turn_off
       data:
-        entity_id: remote.alrum
+        entity_id: remote.alrum_remote
     volume_up:
       service: media_player.volume_up
       target:
@@ -46,7 +46,7 @@
     source_list: media_player.alrum_shield|source_list
 - name: Alrum Shield
   platform: androidtv
-  host: 10.0.1.90
+  host: 10.0.10.20
   exclude_unnamed_apps: true
   state_detection_rules:
       'com.google.android.tvlauncher':

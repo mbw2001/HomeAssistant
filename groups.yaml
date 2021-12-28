@@ -1,46 +1,46 @@
 outer_shell:
   name: Skalsikring
   entities:
-    - binary_sensor.badevaerelsevindue
-    - binary_sensor.gaestevaerelsevindue
-    - binary_sensor.koekkenvindue_hoejre
-    - binary_sensor.koekkenvindue_venstre
-    - binary_sensor.kontorvindue
-    - binary_sensor.sovevaerelsevindue
-    - binary_sensor.bryggersdoer
-    - binary_sensor.hoveddoer
-    - binary_sensor.udestuedoer
-all_alarm_triggers:
-  name: Alle Alarm Sensorer
-  entities:
-    - group.outer_shell
-    - group.bryggers_occupancy
-    - group.entre_occupancy
-    - group.udestue_doere
-bryggers_occupancy:
-  name: Bryggers Occupancy
-  entities:
-    - binary_sensor.bryggers_sensor_bag_occupancy
-    - binary_sensor.bryggers_sensor_occupancy
-    - binary_sensor.bryggersdoer
+    - binary_sensor.badevaerelse_vindue_sensor_contact
+    - binary_sensor.gaestevaerelse_vindue_sensor_contact
+    - binary_sensor.kokken_vindue_hojre_sensor_contact
+    - binary_sensor.kokken_vindue_venstre_sensor_contact
+    - binary_sensor.kontor_vindue_sensor_contact
+    - binary_sensor.sovevaerelse_vindue_sensor_contact
+    - binary_sensor.bryggersdor_sensor_contact
+    - binary_sensor.hoveddor_sensor_contact
+    - binary_sensor.udestue_dor_contact
 entre_occupancy:
   name: Entré Occupancy
   entities:
     - binary_sensor.entre_hoveddor_sensor_occupancy
-    - binary_sensor.entre_sovevarelse_sensor_occupancy
+    - binary_sensor.entre_sovevaerelse_sensor_occupancy
+    - binary_sensor.hoveddor_sensor_contact
+bryggers_occupancy:
+  name: Bryggers Occupancy
+  entities:
+    - binary_sensor.bryggers_sensor_bag_occupancy
+    - binary_sensor.bryggers_sensor_dor_occupancy
+    - binary_sensor.bryggersdor_sensor_contact
 udestue_doere:
   name: Udestue Døre
   entities:
-    - binary_sensor.alrumdoer
-    - binary_sensor.stuedoer
-    - binary_sensor.udestuedoer
+    - binary_sensor.alrum_dor_sensor_contact
+    - binary_sensor.stuedor_contact
+    - binary_sensor.udestue_dor_contact
 udelys_sensorer:
   name: Udelys Sensorer
   entities:
     - binary_sensor.carport_sensor_occupancy
-    - binary_sensor.bryggersdoer
-koekken_gardiner:
+    - binary_sensor.bryggersdor_sensor_contact
+kokken_gardiner:
   name: Køkken Gardiner
   entities:
     - cover.kokken_hojre
     - cover.kokken_venstre
+kokken_vinduer:
+  name: Køkken Vinduer
+  entities:
+    - binary_sensor.kokken_vindue_hojre_sensor_contact
+    - binary_sensor.kokken_vindue_venstre_sensor_contact
+

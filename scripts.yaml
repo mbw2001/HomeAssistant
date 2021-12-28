@@ -18,10 +18,12 @@ turn_on_news:
     timeout: '2'
   - service: media_player.play_media
     data:
-      media_content_id: 24
       media_content_type: CHANNEL
-    entity_id: media_player.alrum_kodi
+      media_content_id: '15'
+    target:
+      entity_id: media_player.alrum_kodi
   mode: single
+  icon: mdi:television
 notification_michael_hvis_hjemme:
   alias: Notificer Michael hvis Hjemme
   sequence:

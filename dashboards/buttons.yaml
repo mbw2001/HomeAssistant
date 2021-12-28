@@ -9,7 +9,7 @@ btn:
     action: more-info
   styles:
     card:
-      - padding: 10px
+      - padding: 8px
     label:
       - font-family: lato
       - font-size: 15pt
@@ -30,67 +30,108 @@ area_btn:
       - grid-template-areas: '"i l" "n n" "s s" "s2 s2"'
       - grid-template-columns: 45% 55%
       - grid-template-rows: 1fr auto auto auto
-    icon:
-      - color: |
+    card:
+      - border: |
           [[[
-            if (variables.sensor && states[variables.sensor].state == "on")
-              return 'var(--paper-item-icon-active-color)'
-            else
-              return 'var(--paper-item-icon-color)'
+            if (variables.sensor)
+              var sensor = (typeof variables.sensor == 'object') ? variables.sensor[0] : variables.sensor
+              if (sensor && states[sensor].state == "on")
+                return '3px solid var(--state-icon-active-color)'
+              else
+                return '3px solid transparent'
           ]]]
-    state:
-      - color: var(--accent-color)
-  state:
-    - value: 'on'
-      styles:
-        card:
-          - background-color: var(--paper-item-icon-color)
-          - color: var(--card-background-color)
-        icon:
-          - color: |
-              [[[
-                if (variables.sensor && states[variables.sensor].state == "on")
-                  return 'var(--paper-item-icon-active-color)'
-                return 'var(--aper-item-icon-color)'
-              ]]]
-        label:
-          - color: var(--card-background-color)
-  icon: |
-    [[[
-      if (variables.sensor)
-        var device_class = states[variables.sensor].attributes.device_class
-        var opening = (device_class == "door" || device_class == "window")
-        if (opening && states[variables.sensor].state == "on")
-          return "mdi:" + states[variables.sensor].attributes.device_class + "-open"
-      return variables.icon
-    ]]]
   label: |
     [[[
-      if (variables.label_entity)
-        return Math.round(states[variables.label_entity].state) + ' ' + states[variables.label_entity].attributes.unit_of_measurement
+      if (variables.label_entity && states[variables.label_entity].state)
+        return Math.round(states[variables.label_entity].state) + '<small><sup>' + states[variables.label_entity].attributes.unit_of_measurement + '</sup></small>'
     ]]]
   state_display: |
     [[[
-      if (variables.sensor && states[variables.sensor].state == "on")
-        var device_class = states[variables.sensor].attributes.device_class
-        if (device_class == "door")
-          return "Døren er åben"
-        else if (device_class == "window")
-          return "Vinduet er åbent"
-        else if (device_class == "motion" || device_class == "occupancy")
-          return "Bevægelse set"
-      else
-        return "&nbsp;"
+      if (variables.sensor)
+        var sensor = (typeof variables.sensor == 'object') ? variables.sensor[0] : variables.sensor
+        if (sensor && states[sensor].state == "on")
+          var device_class = states[sensor].attributes.device_class
+          if (device_class == "door")
+            return "Døren er åben"
+          else if (device_class == "window")
+            return "Vinduet er åbent"
+          else if (device_class == "motion" || device_class == "occupancy")
+            return "Bevægelse set"
+        else
+          return "&nbsp;"
+      return "&nbsp;"
     ]]]
+  hold_action:
+    action: fire-dom-event
+    browser_mod:
+      command: popup
+      title: '[[[ return variables.area ]]]'
+      card:
+        type: vertical-stack
+        cards:
+          - type: 'custom:auto-entities'
+            card:
+              type: entities
+            entities:
+              - type: 'custom:slider-button-card'
+                entity: '[[[ return entity.entity_id ]]]'
+                compact: true
+                show_state: false
+                slider:
+                  use_state_color: false
+                  direction: left-right
+                  background: gradient
+                action_button:
+                  mode: custom
+                  show: true
+                  tap_action:
+                    action: toggle
+            filter:
+              include:
+                - domain: light
+                  not:
+                    name: '* Lys'
+                  area: '[[[ return variables.area ]]]'
+                  options:
+                    type: 'custom:slider-button-card'
+                    compact: true
+                    show_state: false
+                    slider:
+                      use_state_color: false
+                      direction: left-right
+                      background: gradient
+                    action_button:
+                      mode: custom
+                      show: true
+                      tap_action:
+                        action: toggle
+                  sort:
+                    method: name
+              exclude:
+                - name: '* Dashboard'
+          - type: 'custom:auto-entities'
+            card:
+              type: grid
+            card_param: cards
+            filter:
+              include:
+                - domain: scene
+                  name: '[[[ return "* " + variables.area ]]]'
+                  options:
+                    type: custom:button-card
+                    template: icon_btn
+                  sort:
+                    method: name
 area_btn_small:
   template: area_btn
   show_state: false
+  color_type: icon
   variables:
     label_entity: '[[[ return entity.entity_id ]]]'
   styles:
     grid:
       - grid-template-areas: '"i n l"'
-      - grid-template-columns: 20% auto 27%
+      - grid-template-columns: 20% auto min-content
       - grid-template-rows: auto
     name:
       - margin: 0
@@ -104,11 +145,6 @@ simple_btn:
     name:
       - font-size: 10pt
       - margin-top: 10px
-  state:
-    - value: 'on'
-      styles:
-        icon:
-          - color: var(--paper-item-icon-active-color)
 icon_btn:
   show_name: false
   styles:
@@ -116,11 +152,6 @@ icon_btn:
       - padding: 10px 2px
     icon:
       - color: var(--paper-item-icon-color)
-  state:
-    - value: 'on'
-      styles:
-        icon:
-          - color: var(--paper-item-icon-active-color)
 icon_btn_scene:
   template: icon_btn
   tap_action:
@@ -132,11 +163,10 @@ icon_btn_scene:
     action: more-info
 icon_btn_flat:
   template: icon_btn
+  size: 100%
   styles:
     card:
       - padding: 0
-    icon:
-      - color: var(--disabled-text-color)
   style:
     .: |
       ha-card {
@@ -149,6 +179,17 @@ icon_btn_small:
     icon:
       - height: 30px
       - width: 30px
+icon_btn_small_alert:
+  template: icon_btn_small
+  state:
+    - value: 'off'
+      styles:
+        icon:
+          - color: var(--disabled-text-color)
+    - value: 'on'
+      styles:
+        icon:
+          - color: var(--label-badge-red)
 icon_btn_tracker:
   template: icon_btn_small
   icon: |
@@ -162,11 +203,6 @@ icon_btn_tracker:
       else
         return 'mdi:home'
     ]]]
-  state:
-    - value: home
-      styles:
-        icon:
-          - color: var(--paper-item-icon-color)
 icon_btn_cast:
   template: icon_btn
   variables:
@@ -211,12 +247,6 @@ person:
         type: 'custom:button-card'
         entity: '[[[ return variables.wifi ]]]'
         template: icon_btn_small
-        state:
-          - value: <not connected>
-            operator: '!='
-            styles:
-              icon:
-                - color: var(--paper-item-icon-color)
     bat:
       card:
         type: 'custom:bar-card'
@@ -238,3 +268,165 @@ person:
           - color: var(--paper-item-icon-color)
             from: 30
             to: 100
+bmw:
+  entity: device_tracker.320i
+  variables:
+    remaining_fuel: sensor.320i_remaining_fuel
+    remaining_range_fuel: sensor.320i_remaining_range_fuel
+    remaining_fuel_percent: sensor.320i_remaining_fuel_percent
+    lock: lock.320i_lock
+  triggers_update: all
+  aspect_ratio: 2/1
+  show_name: false
+  show_icon: false
+  styles:
+    grid:
+      - grid-template-areas: '"tracker lock" "n n" "bottom bottom" "fuel fuel"'
+      - grid-template-columns: 1fr 1fr
+      - grid-template-rows: min-content auto min-content min-content
+    card:
+      - padding: 10px
+      - background-size: cover
+      - background-image: url(/local/bmw-header.png)
+    custom_fields:
+      tracker:
+        - justify-self: start
+      lock:
+        - justify-self: end
+      fuel:
+        - text-align: left
+        - margin-top: 10px
+  custom_fields:
+    tracker:
+      card:
+        type: 'custom:button-card'
+        entity: '[[[ return entity.entity_id ]]]'
+        template: icon_btn_tracker
+    lock:
+      card:
+        type: 'custom:button-card'
+        entity: '[[[ return variables.lock ]]]'
+        template: icon_btn_small
+    fuel:
+      card:
+        type: 'custom:bar-card'
+        entity: '[[[ return variables.remaining_fuel_percent ]]]'
+        entity_row: true
+        height: 15px
+        positions:
+          name: 'off'
+          icon: 'off'
+          indicator: 'off'
+          value: 'off'
+        severity:
+          - color: var(--label-badge-red)
+            from: 0
+            to: 15
+          - color: var(--label-badge-yellow)
+            from: 15
+            to: 30
+          - color: var(--paper-item-icon-color)
+            from: 30
+            to: 100
+    bottom:
+      card:
+        type: horizontal-stack
+        cards:
+          - type: 'custom:button-card'
+            entity: binary_sensor.320i_check_control_messages
+            template: icon_btn_small_alert
+          - type: 'custom:button-card'
+            entity: binary_sensor.320i_condition_based_services
+            template: icon_btn_small_alert
+          - type: 'custom:button-card'
+            entity: binary_sensor.320i_windows
+            template: icon_btn_small_alert
+          - type: 'custom:button-card'
+            entity: binary_sensor.320i_lids
+            template: icon_btn_small_alert
+btn_big:
+  show_state: true
+  size: 50%
+  custom_fields:
+    btn1:
+    btn2:
+  styles:
+    grid:
+      - grid-template-areas: '"i n btn1 btn2" "i s btn1 btn2"'
+      - grid-template-columns: 18% 1fr 12% 12%
+      - grid-template-rows:  1fr 1fr
+    name:
+      - font-size: 12pt
+      - font-weight: bold
+      - justify-self: start
+    state:
+      - font-size: 10pt
+      - justify-self: start
+    custom_fields:
+      btn1:
+        - justify-self: center
+        - margin-right: 25px
+      btn2:
+        - justify-self: center
+        - margin-right: 25px
+alarm:
+  name: Alarm Status
+  template: btn_big
+  state:
+    - value: armed_away
+      color: var(--label-badge-red)
+    - value: armed_home
+      color: var(--label-badge-yellow)
+    - value: disarmed
+      color: var(--label-badge-green)
+  custom_fields:
+    btn1:
+      card:
+        type: 'custom:button-card'
+        entity: 
+        template: icon_btn_flat
+    btn2:
+      card:
+        type: 'custom:button-card'
+        entity: lock.bryggersdor
+        template: icon_btn_flat
+vacuum:
+  template: btn_big
+  state:
+    - value: docked
+      color: var(--ha-card-background)
+    - value: cleaning
+      color: var(--label-badge-green)
+    - value: returning
+      color: var(--label-badge-yellow)
+    - value: error
+      color: var(--label-badge-red)
+  custom_fields:
+    btn1:
+      card:
+        type: 'custom:button-card'
+        entity: '[[[ return entity.entity_id ]]]'
+        icon: mdi:stop-circle-outline
+        template: icon_btn_flat
+        tap_action:
+          action: call-service
+          service: vacuum.return_to_base
+          service_data:
+            entity_id: '[[[ return entity.entity_id ]]]'
+    btn2:
+      card:
+        type: 'custom:button-card'
+        entity: '[[[ return entity.entity_id ]]]'
+        icon: mdi:play-circle-outline
+        template: icon_btn_flat
+        tap_action:
+          action: call-service
+          service: xiaomi_miio.vacuum_clean_segment
+          service_data:
+            entity_id: '[[[ return entity.entity_id ]]]'
+            segments:
+              - 23
+              - 24
+              - 25
+              - 26
+              - 20
